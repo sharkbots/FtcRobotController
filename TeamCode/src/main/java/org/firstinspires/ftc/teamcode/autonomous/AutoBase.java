@@ -17,63 +17,63 @@ public abstract class AutoBase extends LinearOpMode {
     protected StandardTrackingWheelLocalizer myLocalizer;
 
     public class Coordinates{
-        Pose2d rightParkIntermediateBlueLeft = new Pose2d(-11.5, 42, Math.toRadians(270.00));
-        Pose2d rightParkFinalBlueLeft = new Pose2d(-11.5, 50, Math.toRadians(270.00));
-        Pose2d leftParkIntermediateRedRight = new Pose2d(11.5, 42, Math.toRadians(270.00));
-        Pose2d leftParkFinalRedRight = new Pose2d(11.5, 50, Math.toRadians(270.00));
+        Pose2d rightParkIntermediateBlueLeft = new Pose2d(42, 11.5, Math.toRadians(180.00));
+        Pose2d rightParkFinalBlueLeft = new Pose2d(50, 11.5, Math.toRadians(180.00));
+        Pose2d leftParkIntermediateRedRight = new Pose2d(42, -11.5, Math.toRadians(180.00));
+        Pose2d leftParkFinalRedRight = new Pose2d(50, -11.5, Math.toRadians(180.00));
 
 
         // DBZ Right park on Red team
-        Pose2d rightParkIntermediateRedRight = new Pose2d(60, 42, Math.toRadians(270.00));
-        Pose2d rightParkFinalRedRight = new Pose2d(60, 50, Math.toRadians(270.00));
+        Pose2d rightParkIntermediateRedRight = new Pose2d(42, -60, Math.toRadians(180.00));
+        Pose2d rightParkFinalRedRight = new Pose2d(50, -60, Math.toRadians(180.00));
 
 
 
 
         //left backdrop
-        Pose2d leftBackdropLeft = new Pose2d(-44, 50, Math.toRadians(270.00));
-        Pose2d leftBackdropCenter = new Pose2d(-36, 50, Math.toRadians(270.00));
-        Pose2d leftBackdropRight = new Pose2d(-30, 50, Math.toRadians(270.00));
-        Pose2d leftBackdropIntermediateLeft = new Pose2d(-42, 30, Math.toRadians(270));
-        Pose2d leftBackdropIntermediateCenter = new Pose2d(-36, 35, Math.toRadians(270));
-        Pose2d leftBackdropIntermediateRight = new Pose2d(-30, 30, Math.toRadians(270));
+        Pose2d leftBackdropLeft = new Pose2d(50, 44, Math.toRadians(180.00));
+        Pose2d leftBackdropCenter = new Pose2d(50, 36, Math.toRadians(180.00));
+        Pose2d leftBackdropRight = new Pose2d(50, 30, Math.toRadians(180.00));
+        Pose2d leftBackdropIntermediateLeft = new Pose2d(30, 42, Math.toRadians(180.00));
+        Pose2d leftBackdropIntermediateCenter = new Pose2d(35, 36, Math.toRadians(180.00));
+        Pose2d leftBackdropIntermediateRight = new Pose2d(30, 30, Math.toRadians(180.00));
 
         //right backdrop
-        Pose2d rightBackdropLeft = new Pose2d(29, 50, Math.toRadians(270.00));
-        Pose2d rightBackdropCenter = new Pose2d(36, 50, Math.toRadians(270.00));
-        Pose2d rightBackdropRight = new Pose2d(44, 50, Math.toRadians(270.00));
-        Pose2d rightBackdropIntermediateLeft = new Pose2d(30, 30, Math.toRadians(270));
-        Pose2d rightBackdropIntermediateCenter = new Pose2d(36, 35, Math.toRadians(270));
-        Pose2d rightBackdropIntermediateRight = new Pose2d(42, 30, Math.toRadians(270));
+        Pose2d rightBackdropLeft = new Pose2d(50, -29, Math.toRadians(180.00));
+        Pose2d rightBackdropCenter = new Pose2d(50, -36, Math.toRadians(180.00));
+        Pose2d rightBackdropRight = new Pose2d(50, -44, Math.toRadians(180.00));
+        Pose2d rightBackdropIntermediateLeft = new Pose2d(30, -30, Math.toRadians(180.00));
+        Pose2d rightBackdropIntermediateCenter = new Pose2d(35, -36, Math.toRadians(180.00));
+        Pose2d rightBackdropIntermediateRight = new Pose2d(30, -42, Math.toRadians(180.00));
 
 
         //Blue Left
-        Pose2d preStartPoseBlueLeft = new Pose2d(-63, 9.5, Math.toRadians(180)); //robot needs to strafe 2 inches to the actual start pose
-        Pose2d startPoseBlueLeft = new Pose2d(-63, 14, Math.toRadians(180));
-        Pose2d rightTeamPropBlueLeft = new Pose2d(-32, 10.5, Math.toRadians(90.00));
-        Pose2d centerTeamPropBlueLeft = new Pose2d(-34.5, 12, Math.toRadians(180.00));
-        Pose2d leftTeamPropBlueLeft = new Pose2d(-28, 9.5, Math.toRadians(270.00));
+        Pose2d preStartPoseBlueLeft = new Pose2d(9.5, 63, Math.toRadians(90)); //robot needs to strafe 2 inches to the actual start pose
+        Pose2d startPoseBlueLeft = new Pose2d(14, 63, Math.toRadians(90));
+        Pose2d rightTeamPropBlueLeft = new Pose2d(10.5, 32, Math.toRadians(0.00));
+        Pose2d centerTeamPropBlueLeft = new Pose2d(12, 34.5, Math.toRadians(90.00));
+        Pose2d leftTeamPropBlueLeft = new Pose2d(9.5, 28, Math.toRadians(180.00));
 
         //Blue right
-        Pose2d preStartPoseBlueRight = new Pose2d(-63, -9.5, Math.toRadians(180));
-        Pose2d startPoseBlueRight = new Pose2d(-61, -14, Math.toRadians(180));
-        Pose2d leftTeamPropBlueRight = new Pose2d(-28, -11, Math.toRadians(250));
-        Pose2d centerTeamPropBlueRight = new Pose2d(-35, -12, Math.toRadians(180.00));
-        Pose2d rightTeamPropBlueRight = new Pose2d(-39, -11.5, Math.toRadians(90));
+        Pose2d preStartPoseBlueRight = new Pose2d(-9.5, 63, Math.toRadians(90));
+        Pose2d startPoseBlueRight = new Pose2d(-14, 61, Math.toRadians(90));
+        Pose2d leftTeamPropBlueRight = new Pose2d(-11, 28, Math.toRadians(160));
+        Pose2d centerTeamPropBlueRight = new Pose2d(-12, 35, Math.toRadians(90.00));
+        Pose2d rightTeamPropBlueRight = new Pose2d(-11.5, 39, Math.toRadians(0));
 
         //Red left
-        Pose2d preStartPoseRedLeft = new Pose2d(63, -9.5, Math.toRadians(0));
-        Pose2d startPoseRedLeft = new Pose2d(63, -13, Math.toRadians(0));
-        Pose2d rightTeamPropRedLeft = new Pose2d(32, -10, Math.toRadians(270.00));
-        Pose2d centerTeamPropRedLeft = new Pose2d(34.5, -12, Math.toRadians(0));
-        Pose2d leftTeamPropRedLeft = new Pose2d(30, -10.5, Math.toRadians(90));
+        Pose2d preStartPoseRedLeft = new Pose2d(-9.5, -63, Math.toRadians(270));
+        Pose2d startPoseRedLeft = new Pose2d(-13, -63, Math.toRadians(270));
+        Pose2d rightTeamPropRedLeft = new Pose2d(-10, -32, Math.toRadians(180.00));
+        Pose2d centerTeamPropRedLeft = new Pose2d(-12, -34.5, Math.toRadians(270));
+        Pose2d leftTeamPropRedLeft = new Pose2d(-10.5, -30, Math.toRadians(0));
 
         //Red right
-        Pose2d preStartPoseRedRight = new Pose2d(63, 9.5, Math.toRadians(0));
-        Pose2d startPoseRedRight = new Pose2d(60, 15.5, Math.toRadians(0));
-        Pose2d rightTeamPropRedRight = new Pose2d(28, 9.5, Math.toRadians(270));
-        Pose2d centerTeamPropRedRight = new Pose2d(35, 12, Math.toRadians(0));
-        Pose2d leftTeamPropRedRight = new Pose2d(31, 10, Math.toRadians(80));
+        Pose2d preStartPoseRedRight = new Pose2d(9.5, -63, Math.toRadians(270));
+        Pose2d startPoseRedRight = new Pose2d(15.5, -60, Math.toRadians(270));
+        Pose2d rightTeamPropRedRight = new Pose2d(9.5, -28, Math.toRadians(180.00));
+        Pose2d centerTeamPropRedRight = new Pose2d(12, -35, Math.toRadians(270));
+        Pose2d leftTeamPropRedRight = new Pose2d(10, -31, Math.toRadians(350));
 
 
     }
