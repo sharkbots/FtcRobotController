@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tools;
+package org.firstinspires.ftc.teamcode.tools.StateMachine;
 
 public class Timer {
     Timer(String name) {

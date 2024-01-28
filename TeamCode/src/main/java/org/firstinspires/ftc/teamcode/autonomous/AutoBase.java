@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.google.ar.core.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.apache.commons.math3.geometry.euclidean.threed.PolyhedronsSet;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection;
@@ -17,6 +19,9 @@ public abstract class AutoBase extends LinearOpMode {
     protected StandardTrackingWheelLocalizer myLocalizer;
 
     public class Coordinates{
+        final Boolean BlueAlliance;
+        final Boolean CloseSide;
+
         Pose2d rightParkIntermediateBlueLeft = new Pose2d(42, 11.5, Math.toRadians(180.00));
         Pose2d rightParkFinalBlueLeft = new Pose2d(50, 11.5, Math.toRadians(180.00));
         Pose2d leftParkIntermediateRedRight = new Pose2d(42, -11.5, Math.toRadians(180.00));
@@ -34,14 +39,19 @@ public abstract class AutoBase extends LinearOpMode {
         Pose2d leftBackdropLeft = new Pose2d(50, 44, Math.toRadians(180.00));
         Pose2d leftBackdropCenter = new Pose2d(50, 36, Math.toRadians(180.00));
         Pose2d leftBackdropRight = new Pose2d(50, 30, Math.toRadians(180.00));
+
+        // close side
         Pose2d leftBackdropIntermediateLeft = new Pose2d(30, 42, Math.toRadians(180.00));
         Pose2d leftBackdropIntermediateCenter = new Pose2d(35, 36, Math.toRadians(180.00));
         Pose2d leftBackdropIntermediateRight = new Pose2d(30, 30, Math.toRadians(180.00));
+
 
         //right backdrop
         Pose2d rightBackdropLeft = new Pose2d(50, -29, Math.toRadians(180.00));
         Pose2d rightBackdropCenter = new Pose2d(50, -36, Math.toRadians(180.00));
         Pose2d rightBackdropRight = new Pose2d(50, -44, Math.toRadians(180.00));
+
+
         Pose2d rightBackdropIntermediateLeft = new Pose2d(30, -30, Math.toRadians(180.00));
         Pose2d rightBackdropIntermediateCenter = new Pose2d(35, -36, Math.toRadians(180.00));
         Pose2d rightBackdropIntermediateRight = new Pose2d(30, -42, Math.toRadians(180.00));
@@ -76,8 +86,52 @@ public abstract class AutoBase extends LinearOpMode {
         Pose2d leftTeamPropRedRight = new Pose2d(10, -31, Math.toRadians(350));
 
 
+        public Coordinates(Boolean BlueAlliance, Boolean CloseSide) {
+            this.BlueAlliance = BlueAlliance;
+            this.CloseSide = CloseSide;
+
+            // Default is blue alliance close side
+
+            // Blue alliance far side
+            if(BlueAlliance && !CloseSide){
+
+            }
+
+            // Red alliance
+            if (!BlueAlliance){
+
+                // Close side
+                if (CloseSide){
+
+                }
+
+                // Far side
+                if (!CloseSide){
+
+                }
+            }
+        }
+
+
+        // Blue alliance to red alliance
+        public Pose2d flipAcrossX(Pose2d pose){
+            return new Pose2d(pose.getX(), -pose.getY(), (-pose.getHeading())%360);
+        }
+
+        // Close side to far side
+        public Pose2d flipCloseToFarSide(Pose2d pose){
+            return new Pose2d(pose.getX()-48, pose.getY(), pose.getHeading());
+        }
+
+        public Pose2d flipAcrossCenter(Pose2d pose) {
+            return flipCloseToFarSide(flipAcrossX(pose));
+        }
+
+        public Pose2d flipBackDrop(Pose2d pose){
+            return new Pose2d(pose.getX(), pose.getY()-72, (-pose.getHeading())%360);
+        }
     }
-    Coordinates c = new Coordinates();
+    Coordinates c = new Coordinates(true, true);
     static final double SLOWERVELOCITY = 15;
     static final double SLOWERANGULARVELOCITY = 2.5;
 

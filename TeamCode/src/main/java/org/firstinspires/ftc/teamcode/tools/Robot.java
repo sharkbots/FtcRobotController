@@ -12,6 +12,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hanger;
 import org.firstinspires.ftc.teamcode.Lift;
+import org.firstinspires.ftc.teamcode.tools.StateMachine.ActionBuilder;
+import org.firstinspires.ftc.teamcode.tools.StateMachine.Actions;
+import org.firstinspires.ftc.teamcode.tools.StateMachine.StateMachine;
 
 import java.util.function.BooleanSupplier;
 
