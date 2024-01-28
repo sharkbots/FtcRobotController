@@ -15,29 +15,29 @@ import org.firstinspires.ftc.teamcode.tools.Robot;
 public class AutoLeftBlue extends AutoBase {
     @Override
     public void runAutonomous(Robot robot, SampleMecanumDrive drive, TeamPropDetection.propLocation propLoc) {
-        myLocalizer.setPoseEstimate(c.preStartPoseBlueLeft);
-        drive.setPoseEstimate(c.preStartPoseBlueLeft); // !!!!!
+        myLocalizer.setPoseEstimate(c.preStartPose);
+        drive.setPoseEstimate(c.preStartPose); // !!!!!
 
         Pose2d teamPropCoordinate;
         Pose2d backdropCoordinate;
         if (propLoc == TeamPropDetection.propLocation.LEFT) {
-            teamPropCoordinate = c.leftTeamPropBlueLeft;
-            backdropCoordinate = c.leftBackdropLeft;
+            teamPropCoordinate = c.leftTeamProp;
+            backdropCoordinate = c.backdropLeft;
         }
         else if (propLoc == TeamPropDetection.propLocation.CENTER) {
-            teamPropCoordinate = c.centerTeamPropBlueLeft;
-            backdropCoordinate = c.leftBackdropCenter;
+            teamPropCoordinate = c.centerTeamProp;
+            backdropCoordinate = c.backdropCenter;
         }
         else {
-            teamPropCoordinate = c.rightTeamPropBlueLeft;
-            backdropCoordinate = c.leftBackdropRight;
+            teamPropCoordinate = c.rightTeamProp;
+            backdropCoordinate = c.backdropRight;
         }
 
         // hardware map to get motors and sensors
-        TrajectorySequence dropPropPixelRight = drive.trajectorySequenceBuilder(c.preStartPoseBlueLeft)
+        TrajectorySequence dropPropPixelRight = drive.trajectorySequenceBuilder(c.preStartPose)
                 //.lineTo(c.leftTeamProp)
                 //.lineTo(c.centerTeamProp)
-                .lineToLinearHeading(c.startPoseBlueLeft)
+                .lineToLinearHeading(c.startPose)
                 .lineToLinearHeading(teamPropCoordinate)
                 .back(3.5)
                 .forward(3)
@@ -47,15 +47,15 @@ public class AutoLeftBlue extends AutoBase {
                 .build();
 
         TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(dropPropPixelRight.end())
-                .lineToLinearHeading(c.leftBackdropIntermediateCenter)
+                .lineToLinearHeading(c.backdropIntermediateCenter)
                 .lineToLinearHeading(backdropCoordinate, SampleMecanumDrive.getVelocityConstraint(SLOWERVELOCITY, SLOWERANGULARVELOCITY, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdrop.end())
                 .forward(8)
-                .lineToLinearHeading(c.rightParkIntermediateBlueLeft)
-                .lineToLinearHeading(c.rightParkFinalBlueLeft)
+                .lineToLinearHeading(c.parkIntermediate)
+                .lineToLinearHeading(c.parkFinal)
                 .build();
 
         robot.closeClaw = true;

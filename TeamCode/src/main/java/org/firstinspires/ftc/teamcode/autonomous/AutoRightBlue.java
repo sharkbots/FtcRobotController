@@ -41,8 +41,8 @@ public class AutoRightBlue extends AutoBase {
                 .build();
 
         TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(dropPropPixelRight.end())
-                .lineToLinearHeading(c.leftBackdropIntermediateCenter)
-                .lineToLinearHeading(c.leftBackdropLeft, SampleMecanumDrive.getVelocityConstraint(SLOWERVELOCITY, SLOWERANGULARVELOCITY, DriveConstants.TRACK_WIDTH),
+                .lineToLinearHeading(c.backdropIntermediateCenter)
+                .lineToLinearHeading(c.backdropLeft, SampleMecanumDrive.getVelocityConstraint(SLOWERVELOCITY, SLOWERANGULARVELOCITY, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
