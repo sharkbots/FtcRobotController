@@ -14,6 +14,8 @@ import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
 
+import java.util.ArrayList;
+
 //@Autonomous(name="Autonomous Base")
 public abstract class AutoBase extends LinearOpMode {
 
@@ -166,8 +168,6 @@ public abstract class AutoBase extends LinearOpMode {
     static final double SLOWERVELOCITY = 15;
     static final double SLOWERANGULARVELOCITY = 2.5;
 
-    public abstract void runAutonomous(Robot robot, SampleMecanumDrive drive, TeamPropDetection.propLocation propLoc);
-
     abstract void Setup();
 
     @Override
@@ -200,6 +200,8 @@ public abstract class AutoBase extends LinearOpMode {
         Robot.clawPitch.setPosition(Robot.clawPitchIntake);
         Robot.clawYaw.setPosition(Robot.clawYawIntake);
 
+        TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
+        ArrayList<TrajectorySequence> finalTrajectory;
 
         while (!isStarted() && !isStopRequested())
         {
@@ -211,81 +213,32 @@ public abstract class AutoBase extends LinearOpMode {
             }
         }
 
-
-
-
-
-
-
-
         myLocalizer.setPoseEstimate(c.preStartPose);
         drive.setPoseEstimate(c.preStartPose); // !!!!!
 
-        Pose2d teamPropCoordinate;
-        Pose2d backdropCoordinate;
         if (propLoc == TeamPropDetection.propLocation.LEFT) {
-            teamPropCoordinate = c.leftTeamProp;
-            backdropCoordinate = c.backdropLeft;
+            finalTrajectory = trajectoryBuilder.trajectorySequenceLeft;
         }
         else if (propLoc == TeamPropDetection.propLocation.CENTER) {
-            teamPropCoordinate = c.centerTeamProp;
-            backdropCoordinate = c.backdropCenter;
+            finalTrajectory = trajectoryBuilder.trajectorySequenceCenter;
         }
         else {
-            teamPropCoordinate = c.rightTeamProp;
-            backdropCoordinate = c.backdropRight;
+            finalTrajectory = trajectoryBuilder.trajectorySequenceRight;
         }
-
-        // hardware map to get motors and sensors
-        TrajectorySequence purpleDrop = drive.trajectorySequenceBuilder(c.preStartPose)
-                //.lineTo(c.leftTeamProp)
-                //.lineTo(c.centerTeamProp)
-                .lineToLinearHeading(c.startPose)
-                .lineToLinearHeading(teamPropCoordinate)
-                .build();
-
-        TrajectorySequence setupForBackdrop = drive.trajectorySequenceBuilder(purpleDrop.end())
-                .back(3.5)
-                .forward(3)
-                .lineTo(new Vector2d(-32, 11))
-                .lineTo(new Vector2d(-50, 11))
-                .lineTo(new Vector2d(-50, 35))
-                .build();
-
-        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(setupForBackdrop.end())
-                .lineToLinearHeading(c.backdropIntermediateCenter)
-                .lineToLinearHeading(backdropCoordinate, SampleMecanumDrive.getVelocityConstraint(SLOWERVELOCITY, SLOWERANGULARVELOCITY, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .build();
-
-        TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdrop.end())
-                .forward(8)
-                .lineToLinearHeading(c.parkIntermediate)
-                .lineToLinearHeading(c.parkFinal)
-                .build();
-
-
 
         robot.closeClaw = true;
         robot.updateSync();
         // Test propLoc here
-        drive.followTrajectorySequence(purpleDrop);
+        drive.followTrajectorySequence(finalTrajectory.get(0));
 
-        robot.outtakePixels = true;
-        robot.updateSync();
-        drive.followTrajectorySequence(goToBackdrop);
-        robot.closeClaw = false;
-        robot.updateSync();
-        drive.followTrajectorySequence(parkRight);
-
-
-
-
-
-
-
-
-
+        if (c.CloseSide) {
+            robot.outtakePixels = true;
+            robot.updateSync();
+            drive.followTrajectorySequence(finalTrajectory.get(1));
+            robot.closeClaw = false;
+            robot.updateSync();
+            drive.followTrajectorySequence(finalTrajectory.get(2));
+        }
 
 
         waitForStart();
