@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
+import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
 import org.firstinspires.ftc.teamcode.tools.Robot;
@@ -91,6 +94,7 @@ public abstract class AutoBase extends LinearOpMode {
         public Coordinates(Boolean BlueAlliance, Boolean CloseSide) {
             this.BlueAlliance = BlueAlliance;
             this.CloseSide = CloseSide;
+            AutoDataStorage.redSide = false;
 
             // Default is blue alliance close side
 
@@ -112,6 +116,8 @@ public abstract class AutoBase extends LinearOpMode {
                 
                 parkIntermediate = flipAcrossX(parkIntermediate);
                 parkFinal = flipAcrossX(parkFinal);
+
+                AutoDataStorage.redSide = true;
 
                 // Close side
                 if (CloseSide){
@@ -156,14 +162,17 @@ public abstract class AutoBase extends LinearOpMode {
             return new Pose2d(pose.getX(), pose.getY()-72, (-pose.getHeading())%360);
         }
     }
-    Coordinates c = new Coordinates(true, true); // change values later
+    Coordinates c; //= new Coordinates(true, true); // change values later
     static final double SLOWERVELOCITY = 15;
     static final double SLOWERANGULARVELOCITY = 2.5;
 
     public abstract void runAutonomous(Robot robot, SampleMecanumDrive drive, TeamPropDetection.propLocation propLoc);
 
+    abstract void Setup();
+
     @Override
     public void runOpMode() throws InterruptedException {
+        Setup();
         Global.telemetry = telemetry;
         Robot robot = new Robot(hardwareMap, gamepad1, gamepad2, true);
 
@@ -203,9 +212,85 @@ public abstract class AutoBase extends LinearOpMode {
         }
 
 
+
+
+
+
+
+
+        myLocalizer.setPoseEstimate(c.preStartPose);
+        drive.setPoseEstimate(c.preStartPose); // !!!!!
+
+        Pose2d teamPropCoordinate;
+        Pose2d backdropCoordinate;
+        if (propLoc == TeamPropDetection.propLocation.LEFT) {
+            teamPropCoordinate = c.leftTeamProp;
+            backdropCoordinate = c.backdropLeft;
+        }
+        else if (propLoc == TeamPropDetection.propLocation.CENTER) {
+            teamPropCoordinate = c.centerTeamProp;
+            backdropCoordinate = c.backdropCenter;
+        }
+        else {
+            teamPropCoordinate = c.rightTeamProp;
+            backdropCoordinate = c.backdropRight;
+        }
+
+        // hardware map to get motors and sensors
+        TrajectorySequence purpleDrop = drive.trajectorySequenceBuilder(c.preStartPose)
+                //.lineTo(c.leftTeamProp)
+                //.lineTo(c.centerTeamProp)
+                .lineToLinearHeading(c.startPose)
+                .lineToLinearHeading(teamPropCoordinate)
+                .build();
+
+        TrajectorySequence setupForBackdrop = drive.trajectorySequenceBuilder(purpleDrop.end())
+                .back(3.5)
+                .forward(3)
+                .lineTo(new Vector2d(-32, 11))
+                .lineTo(new Vector2d(-50, 11))
+                .lineTo(new Vector2d(-50, 35))
+                .build();
+
+        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(setupForBackdrop.end())
+                .lineToLinearHeading(c.backdropIntermediateCenter)
+                .lineToLinearHeading(backdropCoordinate, SampleMecanumDrive.getVelocityConstraint(SLOWERVELOCITY, SLOWERANGULARVELOCITY, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();
+
+        TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdrop.end())
+                .forward(8)
+                .lineToLinearHeading(c.parkIntermediate)
+                .lineToLinearHeading(c.parkFinal)
+                .build();
+
+
+
+        robot.closeClaw = true;
+        robot.updateSync();
+        // Test propLoc here
+        drive.followTrajectorySequence(purpleDrop);
+
+        robot.outtakePixels = true;
+        robot.updateSync();
+        drive.followTrajectorySequence(goToBackdrop);
+        robot.closeClaw = false;
+        robot.updateSync();
+        drive.followTrajectorySequence(parkRight);
+
+
+
+
+
+
+
+
+
+
+
         waitForStart();
 
-        runAutonomous(robot, drive, propLoc);
+        //runAutonomous(robot, drive, propLoc);
         AutoDataStorage.currentPose = drive.getPoseEstimate();
         AutoDataStorage.comingFromAutonomous = true;
     }
