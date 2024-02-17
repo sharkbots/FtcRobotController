@@ -314,7 +314,7 @@ public class Robot {
 
     Gamepad gamepad1, gamepad2;
     ActionBuilder actionBuilder;
-    ElapsedTime timer;
+    ElapsedTime timer = new ElapsedTime();
 
     private void updateButtons(){
         handlerA.updateButton(gamepad2);

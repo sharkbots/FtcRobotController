@@ -53,9 +53,9 @@ public class TrajectoryBuilder {
         TrajectorySequence setupForBackdrop = drive.trajectorySequenceBuilder(purpleDrop.end())
                 .back(3.5)
                 .forward(3)
-                .lineTo(new Vector2d(-32, 11))
-                .lineTo(new Vector2d(-50, 11))
-                .lineTo(new Vector2d(-50, 35))
+                .lineTo(new Vector2d(51, 11))
+                .lineTo(new Vector2d(-8.5, 11))
+                //.lineTo(new Vector2d(-8.5, 35))
                 .build();
         finalTrajectory.add(setupForBackdrop);
         if (c.CloseSide) {

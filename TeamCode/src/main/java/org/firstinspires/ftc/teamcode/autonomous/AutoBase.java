@@ -68,8 +68,10 @@ public abstract class AutoBase extends LinearOpMode {
         Pose2d preStartPose = new Pose2d(9.5, 63, Math.toRadians(90)); //robot needs to strafe 2 inches to the actual start pose
         Pose2d startPose = new Pose2d(14, 63, Math.toRadians(90));
         Pose2d rightTeamProp = new Pose2d(10.5, 32, Math.toRadians(0.00));
+        //Pose2d rightTeamProp = new Pose2d(9.5, 28, Math.toRadians(180.00));
         Pose2d centerTeamProp = new Pose2d(12, 34.5, Math.toRadians(90.00));
         Pose2d leftTeamProp = new Pose2d(9.5, 28, Math.toRadians(180.00));
+        //Pose2d leftTeamProp = new Pose2d(10.5, 32, Math.toRadians(0.00));
 
         /*//Blue far side
         Pose2d preStartPoseBlueRight = new Pose2d(-9.5, 63, Math.toRadians(90));
