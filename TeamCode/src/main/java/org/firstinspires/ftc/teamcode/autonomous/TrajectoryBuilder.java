@@ -31,14 +31,17 @@ public class TrajectoryBuilder {
         if (propLoc == propLocations.LEFT) {
             teamPropCoordinate = c.leftTeamProp;
             backdropCoordinate = c.backdropLeft;
+            backdropIntermediateCoordinate = c.backdropIntermediateLeft;
         }
         else if (propLoc == propLocations.RIGHT) {
             teamPropCoordinate = c.rightTeamProp;
             backdropCoordinate = c.backdropRight;
+            backdropIntermediateCoordinate = c.backdropIntermediateRight;
         }
         else {
             teamPropCoordinate = c.centerTeamProp;
             backdropCoordinate = c.backdropCenter;
+            backdropIntermediateCoordinate = c.backdropIntermediateCenter;
         }
 
         assert drive != null;
@@ -53,9 +56,9 @@ public class TrajectoryBuilder {
         TrajectorySequence setupForBackdrop = drive.trajectorySequenceBuilder(purpleDrop.end())
                 .back(3.5)
                 .forward(3)
-                .lineTo(new Vector2d(51, 11))
-                .lineTo(new Vector2d(-8.5, 11))
-                //.lineTo(new Vector2d(-8.5, 35))
+                .lineTo(new Vector2d(11, 32))
+                .lineTo(new Vector2d(11, 50))
+                .lineTo(new Vector2d(35, 50))
                 .build();
         finalTrajectory.add(setupForBackdrop);
         if (c.CloseSide) {
@@ -63,7 +66,7 @@ public class TrajectoryBuilder {
         }
 
         TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(setupForBackdrop.end())
-                .lineToLinearHeading(c.backdropIntermediateCenter)
+                .lineToLinearHeading(backdropIntermediateCoordinate)
                 .lineToLinearHeading(backdropCoordinate, SampleMecanumDrive.getVelocityConstraint(SLOWERVELOCITY, SLOWERANGULARVELOCITY, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
@@ -96,5 +99,6 @@ public class TrajectoryBuilder {
 
     Pose2d teamPropCoordinate;
     Pose2d backdropCoordinate;
+    Pose2d backdropIntermediateCoordinate;
 
 }
