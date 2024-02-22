@@ -131,9 +131,9 @@ public abstract class AutoBase extends LinearOpMode {
 
                     preStartPose = flipAcrossX(preStartPose);
                     startPose = flipAcrossX(startPose);
-                    rightTeamProp = flipAcrossX(rightTeamProp);
+                    rightTeamProp = flipTeamPropAcrossX(leftTeamProp); //only y is negated. x doesn't change.
                     centerTeamProp = flipAcrossX(centerTeamProp);
-                    leftTeamProp = flipAcrossX(leftTeamProp);
+                    leftTeamProp = flipTeamPropAcrossX(rightTeamProp); //only y is negated. x doesn't change.
                 }
 
                 // Far side
@@ -150,7 +150,11 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Blue alliance to red alliance
         public Pose2d flipAcrossX(Pose2d pose){
-            return new Pose2d(pose.getX(), -pose.getY(), (-pose.getHeading())%360);
+            return new Pose2d(pose.getX(), -pose.getY(), (pose.getHeading()-180)%360);
+        }
+
+        public Pose2d flipTeamPropAcrossX(Pose2d pose){
+            return new Pose2d(pose.getX(), -pose.getY(), pose.getHeading());
         }
 
         // Close side to far side
@@ -159,7 +163,7 @@ public abstract class AutoBase extends LinearOpMode {
         }
 
         public Pose2d flipAcrossCenter(Pose2d pose) {
-            return flipCloseToFarSide(flipAcrossX(pose));
+            return flipAcrossX(flipCloseToFarSide(pose));
         }
 
         public Pose2d flipBackDrop(Pose2d pose){
@@ -234,12 +238,14 @@ public abstract class AutoBase extends LinearOpMode {
         drive.followTrajectorySequence(finalTrajectory.get(0));
 
         if (c.CloseSide) {
+            drive.followTrajectorySequence(finalTrajectory.get(1));
             robot.outtakePixels = true;
             robot.updateSync();
-            drive.followTrajectorySequence(finalTrajectory.get(1));
+            drive.followTrajectorySequence(finalTrajectory.get(2));
             robot.closeClaw = false;
             robot.updateSync();
-            drive.followTrajectorySequence(finalTrajectory.get(2));
+            drive.followTrajectorySequence(finalTrajectory.get(3));
+            robot.updateSync();
         }
 
 

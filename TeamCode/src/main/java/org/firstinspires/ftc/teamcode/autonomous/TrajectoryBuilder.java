@@ -60,7 +60,6 @@ public class TrajectoryBuilder {
                 .lineTo(new Vector2d(11, 50))
                 .lineTo(new Vector2d(35, 50))
                 .build();
-        finalTrajectory.add(setupForBackdrop);
         if (c.CloseSide) {
             finalTrajectory.add(setupForBackdrop);
         }
@@ -79,7 +78,6 @@ public class TrajectoryBuilder {
                 .lineToLinearHeading(c.parkIntermediate)
                 .lineToLinearHeading(c.parkFinal)
                 .build();
-        finalTrajectory.add(parkRight);
         if (c.CloseSide) {
             finalTrajectory.add(parkRight);
         }
