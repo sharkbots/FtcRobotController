@@ -147,9 +147,10 @@ public abstract class AutoBase extends LinearOpMode {
                 if (!CloseSide){
                     preStartPose = flipAcrossCenter(preStartPose);
                     startPose = flipAcrossCenter(startPose);
-                    rightTeamProp = flipAcrossCenter(rightTeamProp);
-                    centerTeamProp = flipAcrossCenter(centerTeamProp);
-                    leftTeamProp = flipAcrossCenter(leftTeamProp);
+                    Pose2d tempRightTeamProp = rightTeamProp;
+                    rightTeamProp = flipTeamPropAcrossCenter(leftTeamProp);
+                    centerTeamProp = flipTeamPropAcrossCenter(centerTeamProp);
+                    leftTeamProp = flipTeamPropAcrossCenter(tempRightTeamProp);
                 }
             }
         }
@@ -174,7 +175,11 @@ public abstract class AutoBase extends LinearOpMode {
         }
 
         public Pose2d flipAcrossCenter(Pose2d pose) {
-            return flipAcrossX(flipCloseToFarSide(pose));
+            return new Pose2d(pose.getX()-48, -pose.getY(),(-pose.getHeading())%360);
+        }
+
+        public Pose2d flipTeamPropAcrossCenter(Pose2d pose){
+            return new Pose2d(pose.getX()-48, -pose.getY(), pose.getHeading());
         }
 
         public Pose2d flipBackDrop(Pose2d pose){
@@ -250,6 +255,7 @@ public abstract class AutoBase extends LinearOpMode {
         drive.followTrajectorySequence(finalTrajectory.get(0));
 
         if (c.CloseSide) {
+            telemetry.addLine("A is: " + c.setUpForBackdropA + "\n B is: " + c.setUpForBackdropB + "\n C is: " + c.setUpForBackdropC);
             drive.followTrajectorySequence(finalTrajectory.get(1));
             robot.outtakePixels = true;
             robot.updateSync();
