@@ -1,16 +1,11 @@
 package org.firstinspires.ftc.teamcode.tools;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp(name = "servoTesting", group = "Testing")
 public class servoTesting extends LinearOpMode {
@@ -35,7 +30,7 @@ public class servoTesting extends LinearOpMode {
 
     DcMotor hangerMotor;
 
-    DcMotor backRightMotor;
+    DcMotor hangerEncoder;
 
     double clawYawIntake, clawYawLeftHorizontal, clawYawLeftSlantedUp, clawYawLeftSlantedDown,  clawYawRightHorizontal, clawYawRightSlantedUp, clawYawRightSlantedDown;
     double armPosition, rotationPosition, liftPosition, hangerPosition;
@@ -67,11 +62,11 @@ public class servoTesting extends LinearOpMode {
         liftMotor = (DcMotorEx) hardwareMap.dcMotor.get("liftMotor");
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        hangerMotor = (DcMotorEx) hardwareMap.dcMotor.get("hangerMotor");
+        hangerMotor = (DcMotorEx) hardwareMap.dcMotor.get("skyHookMotor");
         hangerMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        backRightMotor = (DcMotorEx) hardwareMap.dcMotor.get("backRightMotor");
-        backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hangerEncoder = (DcMotorEx) hardwareMap.dcMotor.get("backRightMotor");
+        hangerEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     @Override
@@ -83,34 +78,17 @@ public class servoTesting extends LinearOpMode {
             hangerMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             liftPosition = liftMotor.getCurrentPosition();
-            hangerPosition = backRightMotor.getCurrentPosition();
-
-            if (handlerDPad_Up.On()){
-                hangerPower = 1;
-                telemetry.addLine("hello");
-            }
-            else if (handlerDPad_Down.On()){
-                hangerPower = -1;
-            }
-            else {
-                hangerPower = 0;
-            }
+            hangerPosition = hangerEncoder.getCurrentPosition();
 
             if (handlerDPad_Right.Pressed()){
                 hangerMotor.setPower(1);
                 sleep(5);
+                hangerMotor.setPower(0);
             }
             if (handlerDPad_Left.Pressed()){
                 hangerMotor.setPower(-1);
                 sleep(5);
-            }
-
-            if (hangerPosition >= 10800 && hangerPower > 0){
-                hangerPower = 0;
-            }
-
-            if (hangerPosition < 100 && hangerPower < 0){
-                hangerPower = 0;
+                hangerMotor.setPower(0);
             }
 
             clawPitch.setPosition(0);
