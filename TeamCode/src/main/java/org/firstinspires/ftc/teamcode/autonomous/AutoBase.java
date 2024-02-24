@@ -49,7 +49,10 @@ public abstract class AutoBase extends LinearOpMode {
         Pose2d backdropIntermediateCenter = new Pose2d(35, 36, Math.toRadians(180.00));
         Pose2d backdropIntermediateRight = new Pose2d(30, 30, Math.toRadians(180.00));
 
-
+        // vectors to set up for backdrop
+        Vector2d setUpForBackdropA = new Vector2d(11, 32);
+        Vector2d setUpForBackdropB = new Vector2d(11, 50);
+        Vector2d setUpForBackdropC = new Vector2d(35, 50);
 
         /*// red backdrop
         Pose2d rightBackdropLeft = new Pose2d(50, -29, Math.toRadians(180.00));
@@ -114,6 +117,10 @@ public abstract class AutoBase extends LinearOpMode {
             // Red alliance
             if (!BlueAlliance){
                 // Red backdrop
+                setUpForBackdropA = flipVectorAcrossX(setUpForBackdropA);
+                setUpForBackdropB = flipVectorAcrossX(setUpForBackdropB);
+                setUpForBackdropC = flipVectorAcrossX(setUpForBackdropC);
+
                 backdropIntermediateLeft = flipBackDrop(backdropIntermediateLeft);
                 backdropIntermediateCenter = flipBackDrop(backdropIntermediateCenter);
                 backdropIntermediateRight = flipBackDrop(backdropIntermediateRight);
@@ -150,11 +157,15 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Blue alliance to red alliance
         public Pose2d flipAcrossX(Pose2d pose){
-            return new Pose2d(pose.getX(), -pose.getY(), (pose.getHeading()-180)%360);
+            return new Pose2d(pose.getX(), -pose.getY(), (-pose.getHeading())%360);
         }
 
         public Pose2d flipTeamPropAcrossX(Pose2d pose){
             return new Pose2d(pose.getX(), -pose.getY(), pose.getHeading());
+        }
+
+        public Vector2d flipVectorAcrossX(Vector2d vector2d){
+            return new Vector2d(vector2d.getX(), -vector2d.getY());
         }
 
         // Close side to far side

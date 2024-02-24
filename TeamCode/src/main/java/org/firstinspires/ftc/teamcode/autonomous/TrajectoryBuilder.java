@@ -28,6 +28,10 @@ public class TrajectoryBuilder {
     public ArrayList<TrajectorySequence> computeTrajectory(propLocations propLoc, SampleMecanumDrive drive, AutoBase.Coordinates c) {
         ArrayList<TrajectorySequence> finalTrajectory = new ArrayList<>();
 
+        Vector2d setUpForBackdropA = c.setUpForBackdropA;
+        Vector2d setUpForBackdropB = c.setUpForBackdropB;
+        Vector2d setUpForBackdropC = c.setUpForBackdropC;
+
         if (propLoc == propLocations.LEFT) {
             teamPropCoordinate = c.leftTeamProp;
             backdropCoordinate = c.backdropLeft;
@@ -56,9 +60,9 @@ public class TrajectoryBuilder {
         TrajectorySequence setupForBackdrop = drive.trajectorySequenceBuilder(purpleDrop.end())
                 .back(3.5)
                 .forward(3)
-                .lineTo(new Vector2d(11, 32))
-                .lineTo(new Vector2d(11, 50))
-                .lineTo(new Vector2d(35, 50))
+                .lineTo(setUpForBackdropA)
+                .lineTo(setUpForBackdropB)
+                .lineTo(setUpForBackdropC)
                 .build();
         if (c.CloseSide) {
             finalTrajectory.add(setupForBackdrop);
