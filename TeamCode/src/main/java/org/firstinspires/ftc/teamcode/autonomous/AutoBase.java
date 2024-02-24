@@ -22,8 +22,8 @@ public abstract class AutoBase extends LinearOpMode {
     protected StandardTrackingWheelLocalizer myLocalizer;
 
     public class Coordinates{
-        final Boolean BlueAlliance;
-        final Boolean CloseSide;
+        Boolean BlueAlliance;
+        Boolean CloseSide;
 
         // Blue alliance parking
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
@@ -114,6 +114,9 @@ public abstract class AutoBase extends LinearOpMode {
             // Red alliance
             if (!BlueAlliance){
                 // Red backdrop
+                backdropIntermediateLeft = flipBackDrop(backdropIntermediateLeft);
+                backdropIntermediateCenter = flipBackDrop(backdropIntermediateCenter);
+                backdropIntermediateRight = flipBackDrop(backdropIntermediateRight);
                 backdropLeft = flipBackDrop(backdropLeft);
                 backdropCenter = flipBackDrop(backdropCenter);
                 backdropRight = flipBackDrop(backdropRight);
@@ -125,15 +128,12 @@ public abstract class AutoBase extends LinearOpMode {
 
                 // Close side
                 if (CloseSide){
-                    backdropIntermediateLeft = flipBackDrop(backdropIntermediateLeft);
-                    backdropIntermediateCenter = flipBackDrop(backdropIntermediateCenter);
-                    backdropIntermediateRight = flipBackDrop(backdropIntermediateRight);
-
                     preStartPose = flipAcrossX(preStartPose);
                     startPose = flipAcrossX(startPose);
-                    rightTeamProp = flipTeamPropAcrossX(leftTeamProp); //only y is negated. x doesn't change.
+                    Pose2d tempRightTeamProp = rightTeamProp;
+                    rightTeamProp = flipTeamPropAcrossX(leftTeamProp); //blue left spike mark is symmetrical to red right spike mark
                     centerTeamProp = flipAcrossX(centerTeamProp);
-                    leftTeamProp = flipTeamPropAcrossX(rightTeamProp); //only y is negated. x doesn't change.
+                    leftTeamProp = flipTeamPropAcrossX(tempRightTeamProp); //ibid
                 }
 
                 // Far side
@@ -169,6 +169,7 @@ public abstract class AutoBase extends LinearOpMode {
         public Pose2d flipBackDrop(Pose2d pose){
             return new Pose2d(pose.getX(), pose.getY()-72, (-pose.getHeading())%360);
         }
+
     }
     Coordinates c; //= new Coordinates(true, true); // change values later
     static final double SLOWERVELOCITY = 15;
