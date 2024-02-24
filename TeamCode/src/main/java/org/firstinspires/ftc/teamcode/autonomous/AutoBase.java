@@ -5,7 +5,6 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
@@ -27,7 +26,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Blue alliance parking
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
-        Pose2d parkFinal = new Pose2d(50, 11.5, Math.toRadians(180.00));
+        Pose2d parkFinalRight = new Pose2d(50, 11.5, Math.toRadians(180.00));
         /*Pose2d leftParkIntermediateRedRight = new Pose2d(42, -11.5, Math.toRadians(180.00));
         Pose2d leftParkFinalRedRight = new Pose2d(50, -11.5, Math.toRadians(180.00));*/
 
@@ -54,6 +53,11 @@ public abstract class AutoBase extends LinearOpMode {
         Vector2d setUpForBackdropB = new Vector2d(11, 50);
         Vector2d setUpForBackdropC = new Vector2d(35, 50);
 
+        //blue far side
+        Vector2d prepareFarDrop = new Vector2d(-37, 63);
+        Vector2d parkFinalLeft = new Vector2d(50, 60);
+        Vector2d backdropIntermediateFar = new Vector2d(14, 63);
+
         /*// red backdrop
         Pose2d rightBackdropLeft = new Pose2d(50, -29, Math.toRadians(180.00));
         Pose2d rightBackdropCenter = new Pose2d(50, -36, Math.toRadians(180.00));
@@ -69,7 +73,7 @@ public abstract class AutoBase extends LinearOpMode {
         // Purple spike mark locations
         //Blue close side
         Pose2d preStartPose = new Pose2d(9.5, 63, Math.toRadians(90)); //robot needs to strafe 2 inches to the actual start pose
-        Pose2d startPose = new Pose2d(14, 63, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(11, 63, Math.toRadians(90));
         Pose2d rightTeamProp = new Pose2d(10.5, 32, Math.toRadians(0.00));
         //Pose2d rightTeamProp = new Pose2d(9.5, 28, Math.toRadians(180.00));
         Pose2d centerTeamProp = new Pose2d(12, 34.5, Math.toRadians(90.00));
@@ -129,7 +133,9 @@ public abstract class AutoBase extends LinearOpMode {
                 backdropRight = flipBackDrop(backdropRight);
                 
                 parkIntermediate = flipAcrossX(parkIntermediate);
-                parkFinal = flipAcrossX(parkFinal);
+                parkFinalRight = flipAcrossX(parkFinalRight);
+                parkFinalLeft = flipVectorAcrossX(parkFinalLeft);
+                backdropIntermediateFar = flipVectorAcrossX(backdropIntermediateFar);
 
                 AutoDataStorage.redSide = true;
 
@@ -138,9 +144,9 @@ public abstract class AutoBase extends LinearOpMode {
                     preStartPose = flipAcrossX(preStartPose);
                     startPose = flipAcrossX(startPose);
                     Pose2d tempRightTeamProp = rightTeamProp;
-                    rightTeamProp = flipTeamPropAcrossX(leftTeamProp); //blue left spike mark is symmetrical to red right spike mark
+                    rightTeamProp = flipAcrossXKeepHeading(leftTeamProp); //blue left spike mark is symmetrical to red right spike mark
                     centerTeamProp = flipAcrossX(centerTeamProp);
-                    leftTeamProp = flipTeamPropAcrossX(tempRightTeamProp); //ibid
+                    leftTeamProp = flipAcrossXKeepHeading(tempRightTeamProp); //ibid
                 }
 
                 // Far side
@@ -151,6 +157,8 @@ public abstract class AutoBase extends LinearOpMode {
                     rightTeamProp = flipTeamPropAcrossCenter(leftTeamProp);
                     centerTeamProp = flipTeamPropAcrossCenter(centerTeamProp);
                     leftTeamProp = flipTeamPropAcrossCenter(tempRightTeamProp);
+
+                    prepareFarDrop = flipAcrossXKeepHeadingVector(prepareFarDrop);
                 }
             }
         }
@@ -161,10 +169,12 @@ public abstract class AutoBase extends LinearOpMode {
             return new Pose2d(pose.getX(), -pose.getY(), (-pose.getHeading())%360);
         }
 
-        public Pose2d flipTeamPropAcrossX(Pose2d pose){
+        public Pose2d flipAcrossXKeepHeading(Pose2d pose){ //needed for team prop and prepare far drop
             return new Pose2d(pose.getX(), -pose.getY(), pose.getHeading());
         }
-
+        public Vector2d flipAcrossXKeepHeadingVector(Vector2d vector2d){ //needed for team prop and prepare far drop
+            return new Vector2d(vector2d.getX(), -vector2d.getY());
+        }
         public Vector2d flipVectorAcrossX(Vector2d vector2d){
             return new Vector2d(vector2d.getX(), -vector2d.getY());
         }
@@ -251,20 +261,20 @@ public abstract class AutoBase extends LinearOpMode {
 
         robot.closeClaw = true;
         robot.updateSync();
+        robot.outtakePixelsLow = true;
+        robot.updateSync();
         // Test propLoc here
         drive.followTrajectorySequence(finalTrajectory.get(0));
-
-        if (c.CloseSide) {
-            telemetry.addLine("A is: " + c.setUpForBackdropA + "\n B is: " + c.setUpForBackdropB + "\n C is: " + c.setUpForBackdropC);
-            drive.followTrajectorySequence(finalTrajectory.get(1));
-            robot.outtakePixels = true;
-            robot.updateSync();
-            drive.followTrajectorySequence(finalTrajectory.get(2));
-            robot.closeClaw = false;
-            robot.updateSync();
-            drive.followTrajectorySequence(finalTrajectory.get(3));
-            robot.updateSync();
-        }
+        drive.followTrajectorySequence(finalTrajectory.get(1));
+        robot.outtakePixelsLow = false;
+        robot.updateSync();
+        drive.followTrajectorySequence(finalTrajectory.get(2));
+        robot.outtakePixels = true;
+        robot.updateSync();
+        robot.closeClaw = false;
+        robot.updateSync();
+        drive.followTrajectorySequence(finalTrajectory.get(3));
+        robot.updateSync();
 
 
         waitForStart();

@@ -96,6 +96,7 @@ public class Robot {
         // Adding states to stateMachine
         stateMachine.addState(intakingPixels);
         stateMachine.addState(holdingPixels);
+        stateMachine.addState(holdingPixelsLow);
         stateMachine.addState(idle);
         stateMachine.addState(outTakingPixels);
         stateMachine.addState(exitingOutTake);
@@ -179,6 +180,12 @@ public class Robot {
                 .stopMotor(lift.liftMotor)
                 .servoRunToPosition(clawPitch, clawPitchOutTake));
 
+        autoOutTakeYellowLow = new Actions(new ActionBuilder()
+                .startMotor(lift.liftMotor, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingLow)
+                .stopMotor(lift.liftMotor)
+                .servoRunToPosition(clawPitch, clawPitchOutTake));
+
         autoOutTakeToIdle = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawOpen)
                 .resetTimer(timer)
@@ -197,24 +204,29 @@ public class Robot {
 
     public Boolean closeClaw = false;
     public Boolean outtakePixels = false;
+    public Boolean outtakePixelsLow = false;
 
     private void createAutoStateTransitions() {
         // button triggers
         BooleanSupplier closeClawSupplier = () -> closeClaw;
         BooleanSupplier openClawSupplier = () -> (!closeClaw);
         BooleanSupplier outtakePixelsSupplier = () -> outtakePixels;
+        BooleanSupplier outtakePixelsSupplierLow = () -> outtakePixelsLow;
 
         // adding transitions
-        idle.addTransitionTo(holdingPixels, closeClawSupplier,
-                autoHoldOnePixel);
+        //idle.addTransitionTo(holdingPixels, closeClawSupplier, autoHoldOnePixel);
+
+        idle.addTransitionTo(holdingPixelsLow,outtakePixelsSupplierLow, autoOutTakeYellowLow);
+
+        holdingPixelsLow.addTransitionTo(holdingPixels, outtakePixelsSupplier, autoHoldOnePixel);
 
         // rejecting pixels
 //        holdingPixels.addTransitionTo(idle, openClawSupplier,
 //                new ActionBuilder()
 //                        .servoRunToPosition(clawGrip, clawOpen));
 
-        holdingPixels.addTransitionTo(outTakingPixels, outtakePixelsSupplier,
-                autoOutTakeYellow);
+        holdingPixels.addTransitionTo(outTakingPixels, closeClawSupplier, autoOutTakeYellow);
+
 
 
         outTakingPixels.addTransitionTo(idle, openClawSupplier, autoOutTakeToIdle
@@ -279,6 +291,7 @@ public class Robot {
     public static Lift lift;
     public StateMachine.State intakingPixels;
     public StateMachine.State holdingPixels;
+    public StateMachine.State holdingPixelsLow;
     public StateMachine.State idle;
     public StateMachine.State outTakingPixels;
     public StateMachine.State exitingOutTake;
@@ -292,7 +305,7 @@ public class Robot {
             holdingPixelsToIdle, idleToHoldingPixels, holdingPixelsToOutTakingPixels, exitingOutTakeToIdle;
 
     //Autonomous Actions
-    public Actions autoHoldOnePixel, autoOutTakeYellow, autoOutTakeToIdle;
+    public Actions autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowLow, autoOutTakeToIdle;
 
     // Motors
 
