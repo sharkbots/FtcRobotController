@@ -53,22 +53,24 @@ public class Robot {
         clawPitch = hardwareMap.servo.get("clawPitch");
         clawYaw = hardwareMap.servo.get("clawYaw");
         clawGrip = hardwareMap.servo.get("clawGrip");
+        droneAngle = hardwareMap.servo.get("droneAngle");
 
        // clawGrip.scaleRange(0.02, 0.22);  //old values
-        clawGrip.scaleRange(0.05, 0.35);
+        clawGrip.scaleRange(0.03, 0.25);
         //clawPitch.scaleRange(0.755, 0.950);
-        clawPitch.scaleRange(0.755, 0.973);
+        clawPitch.scaleRange(0.07, 0.25);
         clawYaw.scaleRange(0.0725, 1);
+        droneAngle.scaleRange(0.5, 0.73);
 
         // Touch Sensors
         liftTouchDown = hardwareMap.touchSensor.get("liftTouchDown");
 
         clawOpen = 1;
-        clawClose = 0.30;
+        clawClose = 0.19;
         clawCloseOnePixel = 0;
-        clawPitchGoDown = 1;
-        clawPitchIntake = 0.894;
-        clawPitchOutTake = 0;
+
+        clawPitchIntake = 0;
+        clawPitchOutTake = 1;
 
         clawYawIntake = 0.5;
         // Slanted is 60 degrees, allows us to drop pixels vertically for mosaics
@@ -80,6 +82,8 @@ public class Robot {
         clawYawRightHorizontal = clawYawRightSlantedUp+0.21;
         clawYawRightSlantedDown = clawYawRightHorizontal+0.21;
 
+        droneStore = 1;
+        droneLaunch = 0;
 
         stateMachine = new StateMachine();
 
@@ -118,7 +122,7 @@ public class Robot {
         intakingToHoldingPixels = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawClose)
                 .stopMotor(intakeMotor)
-                .servoRunToPosition(clawPitch, clawPitchGoDown)
+                .servoRunToPosition(clawPitch, Robot.clawPitchIntake)
                 .resetTimer(timer)
                 .waitUntil(timer, 150)
                 .startMotor(lift.liftMotor, 1)
@@ -156,7 +160,7 @@ public class Robot {
                 .startMotor(lift.liftMotor, 1)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
                 .servoRunToPosition(clawYaw, clawYawIntake)
-                .servoRunToPosition(clawPitch, clawPitchGoDown)
+                .servoRunToPosition(clawPitch, Robot.clawPitchIntake)
                 .startMotor(lift.liftMotor, -1)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
@@ -297,13 +301,15 @@ public class Robot {
     public static Hanger skyHook;
     public static DcMotor planeLauncher;
     // Servos
-    public static Servo clawPitch, clawYaw, clawGrip;
+    public static Servo clawPitch, clawYaw, clawGrip, droneAngle;
     // TouchSensors
     public static TouchSensor liftTouchDown;
 
-    public static double clawPitchGoDown, clawPitchIntake, clawPitchOutTake;
+    public static double clawPitchIntake, clawPitchOutTake;
     public static double clawOpen, clawClose, clawCloseOnePixel, clawYawIntake,
             clawYawLeftSlantedUp, clawYawLeftHorizontal, clawYawLeftSlantedDown, clawYawRightSlantedUp, clawYawRightHorizontal, clawYawRightSlantedDown;
+
+    public static double droneStore, droneLaunch;
     int liftOutTake;
 
     public static Button handlerA, handlerB, handlerX, handlerY, handlerLeftBumper,
