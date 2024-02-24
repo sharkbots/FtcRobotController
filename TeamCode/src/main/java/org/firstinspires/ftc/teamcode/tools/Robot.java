@@ -59,7 +59,7 @@ public class Robot {
         clawGrip.scaleRange(0.03, 0.25);
         //clawPitch.scaleRange(0.755, 0.950);
         clawPitch.scaleRange(0.07, 0.25);
-        clawYaw.scaleRange(0.0725, 1);
+        clawYaw.scaleRange(0, 1);
         droneAngle.scaleRange(0.5, 0.73);
 
         // Touch Sensors
@@ -86,6 +86,9 @@ public class Robot {
         droneLaunch = 0;
 
         stateMachine = new StateMachine();
+
+        // Timer
+        timer = new ElapsedTime();
 
         // States
         intakingPixels = new StateMachine.State("pixelTransition");
@@ -185,8 +188,6 @@ public class Robot {
                 .resetTimer(timer)
                 .waitUntil(timer, 300));
 
-        // Timer
-        timer = new ElapsedTime();
 
         if (isAutonomousMode) {
             createAutoStateTransitions();
