@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.tools;
 
 import static android.os.SystemClock.sleep;
 
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -54,6 +55,12 @@ public class Robot {
         clawYaw = hardwareMap.servo.get("clawYaw");
         clawGrip = hardwareMap.servo.get("clawGrip");
         droneAngle = hardwareMap.servo.get("droneAngle");
+
+        clawYawAnalogSensor = hardwareMap.get(AnalogInput.class, "rotationPositionInput");
+        clawPitchAnalogSensor = hardwareMap.get(AnalogInput.class, "armPositionInput");
+
+        analog_ClawYaw_ResetPosition = 180;
+        analog_ClawPitch_ResetPosition = 323;
 
        // clawGrip.scaleRange(0.02, 0.22);  //old values
         clawGrip.scaleRange(0.03, 0.25);
@@ -128,9 +135,7 @@ public class Robot {
                 .servoRunToPosition(clawPitch, Robot.clawPitchIntake)
                 .resetTimer(timer)
                 .waitUntil(timer, 150)
-                .startMotor(lift.liftMotor, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingTeleop)
-                .stopMotor(lift.liftMotor));
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderHoldingTeleop, 1));
 
         holdingPixelsToIntakingPixels = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawPitch, clawPitchIntake)
@@ -148,22 +153,22 @@ public class Robot {
                 .servoRunToPosition(clawGrip, clawClose)
                 .resetTimer(timer)
                 .waitUntil(timer, 200)
-                .startMotor(lift.liftMotor, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingTeleop)
-                .stopMotor(lift.liftMotor));
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderHoldingTeleop, 1));
 
         holdingPixelsToOutTakingPixels = new Actions(new ActionBuilder()
-                .startMotor(lift.liftMotor, 1)
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
-                .stopMotor(lift.liftMotor)
                 .servoRunToPosition(clawPitch, clawPitchOutTake));
 
         exitingOutTakeToIdle = new Actions(new ActionBuilder()
                 // Guarantees lift was not manually put below claw movement limit
-                .startMotor(lift.liftMotor, 1)
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
                 .servoRunToPosition(clawYaw, clawYawIntake)
-                .servoRunToPosition(clawPitch, Robot.clawPitchIntake)
+                .waitForAnalogSensorAtPosition(clawYawAnalogSensor, analog_ClawYaw_ResetPosition, 5)
+                .servoRunToPosition(clawPitch, clawPitchIntake)
+                .resetTimer(timer)
+                .waitUntil(timer,300)
                 .startMotor(lift.liftMotor, -1)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
@@ -303,6 +308,7 @@ public class Robot {
     public static DcMotor planeLauncher;
     // Servos
     public static Servo clawPitch, clawYaw, clawGrip, droneAngle;
+    public static AnalogInput clawYawAnalogSensor, clawPitchAnalogSensor;
     // TouchSensors
     public static TouchSensor liftTouchDown;
 
@@ -311,6 +317,8 @@ public class Robot {
             clawYawLeftSlantedUp, clawYawLeftHorizontal, clawYawLeftSlantedDown, clawYawRightSlantedUp, clawYawRightHorizontal, clawYawRightSlantedDown;
 
     public static double droneStore, droneLaunch;
+
+    public static double analog_ClawYaw_ResetPosition, analog_ClawPitch_ResetPosition;
     int liftOutTake;
 
     public static Button handlerA, handlerB, handlerX, handlerY, handlerLeftBumper,

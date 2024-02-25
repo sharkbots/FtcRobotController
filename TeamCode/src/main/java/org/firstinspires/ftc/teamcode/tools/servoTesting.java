@@ -5,7 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @TeleOp(name = "servoTesting", group = "Testing")
 public class servoTesting extends LinearOpMode {
@@ -35,6 +39,8 @@ public class servoTesting extends LinearOpMode {
     double clawYawIntake, clawYawLeftHorizontal, clawYawLeftSlantedUp, clawYawLeftSlantedDown,  clawYawRightHorizontal, clawYawRightSlantedUp, clawYawRightSlantedDown;
     double armPosition, rotationPosition, liftPosition, hangerPosition;
 
+    ArrayList list;
+
     int hangerPower;
 
     public void Setup() {
@@ -56,7 +62,7 @@ public class servoTesting extends LinearOpMode {
 
         clawGrip.scaleRange(0.03, 0.25);
         //clawPitch.scaleRange(0.755, 0.950);
-        clawPitch.scaleRange(0.07, 0.25);
+        clawPitch.scaleRange(0, 1);
         clawYaw.scaleRange(0, 1);
 
         liftMotor = (DcMotorEx) hardwareMap.dcMotor.get("liftMotor");
@@ -74,6 +80,7 @@ public class servoTesting extends LinearOpMode {
         Setup();
         waitForStart();
         while (opModeIsActive()) {
+
             hangerMotor.setPower(hangerPower);
             hangerMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -91,7 +98,6 @@ public class servoTesting extends LinearOpMode {
                 hangerMotor.setPower(0);
             }
 
-            clawPitch.setPosition(0);
             clawYaw.setPosition(0.5);
 
             // From axon 4th position wire plugged into the analog port

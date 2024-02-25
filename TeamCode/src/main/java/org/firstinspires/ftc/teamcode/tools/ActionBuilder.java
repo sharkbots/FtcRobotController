@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.tools;
 
 import java.util.ArrayList;
 
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -71,6 +72,17 @@ public class ActionBuilder {
         };
         String name = "test if motor " + motor.getDeviceName() +
                 " is at or above target pos " + expectedPosition;
+        return add(name, function);
+    }
+
+    public ActionBuilder waitForAnalogSensorAtPosition(AnalogInput analogSensor, double expectedPosition, int tolerance) {
+        ActionFunction function = () -> {
+            double currentPosition = analogSensor.getVoltage() / 3.3 * 360;
+
+            return Math.abs(expectedPosition - currentPosition) <= tolerance;
+        };
+        String name = "test if servo analog sensor " + analogSensor.getDeviceName() +
+                " is sufficiently close to target pos " + expectedPosition;
         return add(name, function);
     }
 
