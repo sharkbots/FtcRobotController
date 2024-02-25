@@ -184,9 +184,9 @@ public class Robot {
                 .startMotor(lift.liftMotor, 1)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingLow)
                 .stopMotor(lift.liftMotor)
-                .servoRunToPosition(clawPitch, clawPitchOutTake));
+                /*.servoRunToPosition(clawPitch, clawPitchOutTake)*/);
 
-        autoOutTakeToIdle = new Actions(new ActionBuilder()
+        autoOpenClaw = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawOpen)
                 .resetTimer(timer)
                 .waitUntil(timer, 300));
@@ -200,37 +200,6 @@ public class Robot {
         else {
             createTeleopStateTransitions();
         }
-    }
-
-    public Boolean closeClaw = false;
-    public Boolean outtakePixels = false;
-    public Boolean outtakePixelsLow = false;
-
-    private void createAutoStateTransitions() {
-        // button triggers
-        BooleanSupplier closeClawSupplier = () -> closeClaw;
-        BooleanSupplier openClawSupplier = () -> (!closeClaw);
-        BooleanSupplier outtakePixelsSupplier = () -> outtakePixels;
-        BooleanSupplier outtakePixelsSupplierLow = () -> outtakePixelsLow;
-
-        // adding transitions
-        //idle.addTransitionTo(holdingPixels, closeClawSupplier, autoHoldOnePixel);
-
-        idle.addTransitionTo(holdingPixelsLow,outtakePixelsSupplierLow, autoOutTakeYellowLow);
-
-        holdingPixelsLow.addTransitionTo(holdingPixels, outtakePixelsSupplier, autoHoldOnePixel);
-
-        // rejecting pixels
-//        holdingPixels.addTransitionTo(idle, openClawSupplier,
-//                new ActionBuilder()
-//                        .servoRunToPosition(clawGrip, clawOpen));
-
-        holdingPixels.addTransitionTo(outTakingPixels, closeClawSupplier, autoOutTakeYellow);
-
-
-
-        outTakingPixels.addTransitionTo(idle, openClawSupplier, autoOutTakeToIdle
-                );
     }
 
 
@@ -305,7 +274,7 @@ public class Robot {
             holdingPixelsToIdle, idleToHoldingPixels, holdingPixelsToOutTakingPixels, exitingOutTakeToIdle;
 
     //Autonomous Actions
-    public Actions autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowLow, autoOutTakeToIdle;
+    public Actions autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowLow, autoOpenClaw;
 
     // Motors
 

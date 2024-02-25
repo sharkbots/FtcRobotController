@@ -35,6 +35,7 @@ public class TrajectoryBuilder {
         Vector2d prepareFarDrop = c.prepareFarDrop;
         Vector2d parkFinalLeft = c.parkFinalLeft;
         Vector2d backdropIntermediateFar = c.backdropIntermediateFar;
+        Vector2d intermediateDropFar = c.intermediateDropFar;
 
         if (propLoc == propLocations.LEFT) {
             teamPropCoordinate = c.leftTeamProp;
@@ -86,9 +87,14 @@ public class TrajectoryBuilder {
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        TrajectorySequence gotoBackdropFar = drive.trajectorySequenceBuilder(setupForBackdropFar.end())
+        /*TrajectorySequence gotoBackdropFar = drive.trajectorySequenceBuilder(setupForBackdropFar.end())
                 .lineToLinearHeading(backdropCoordinate, SampleMecanumDrive.getVelocityConstraint(SLOWERVELOCITY, SLOWERANGULARVELOCITY, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();*/
+        TrajectorySequence gotoBackdropFar = drive.trajectorySequenceBuilder(setupForBackdropFar.end())
+                .lineTo(intermediateDropFar)
+                .lineToLinearHeading(backdropIntermediateCoordinate)
+                .lineToLinearHeading(backdropCoordinate)
                 .build();
 
         if (c.CloseSide) {

@@ -57,6 +57,7 @@ public abstract class AutoBase extends LinearOpMode {
         Vector2d prepareFarDrop = new Vector2d(-37, 63);
         Vector2d parkFinalLeft = new Vector2d(50, 60);
         Vector2d backdropIntermediateFar = new Vector2d(14, 63);
+        Vector2d intermediateDropFar = new Vector2d(50, 63);
 
         /*// red backdrop
         Pose2d rightBackdropLeft = new Pose2d(50, -29, Math.toRadians(180.00));
@@ -259,24 +260,38 @@ public abstract class AutoBase extends LinearOpMode {
             finalTrajectory = trajectoryBuilder.trajectorySequenceRight;
         }
 
-        robot.closeClaw = true;
-        robot.updateSync();
-        robot.outtakePixelsLow = true;
+        //robot.closeClaw = true;
+
+
+
+        //robot.outtakePixelsLow = true;
+
+
+
+
         robot.updateSync();
         // Test propLoc here
+
+        //Raise lift so the pixel doesn't drag on the ground
+        robot.autoOutTakeYellowLow.performAll();
+
+        // Deposit purple pixel on spike mark
         drive.followTrajectorySequence(finalTrajectory.get(0));
+
+        // Position the robot in front of the backdrop
         drive.followTrajectorySequence(finalTrajectory.get(1));
-        robot.outtakePixelsLow = false;
-        robot.updateSync();
+
+        // Raise lift more + angle the claw to outtake
+        robot.autoOutTakeYellow.performAll();
+
+        // Go to the backdrop
         drive.followTrajectorySequence(finalTrajectory.get(2));
-        robot.outtakePixels = true;
-        robot.updateSync();
-        robot.closeClaw = false;
-        robot.updateSync();
+
+        // Drop yellow pixel
+        robot.autoOpenClaw.performAll();
+
+        // Park
         drive.followTrajectorySequence(finalTrajectory.get(3));
-        robot.updateSync();
-
-
         waitForStart();
 
         //runAutonomous(robot, drive, propLoc);
