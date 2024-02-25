@@ -71,7 +71,7 @@ public class servoTesting extends LinearOpMode {
         hangerMotor = (DcMotorEx) hardwareMap.dcMotor.get("skyHookMotor");
         hangerMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        hangerEncoder = (DcMotorEx) hardwareMap.dcMotor.get("backRightMotor");
+        hangerEncoder = (DcMotorEx) hardwareMap.dcMotor.get("frontLeftMotor");
         hangerEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
@@ -88,12 +88,12 @@ public class servoTesting extends LinearOpMode {
             hangerPosition = hangerEncoder.getCurrentPosition();
 
             if (handlerDPad_Right.Pressed()){
-                hangerMotor.setPower(1);
+                hangerMotor.setPower(-1);
                 sleep(5);
                 hangerMotor.setPower(0);
             }
             if (handlerDPad_Left.Pressed()){
-                hangerMotor.setPower(-1);
+                hangerMotor.setPower(1);
                 sleep(5);
                 hangerMotor.setPower(0);
             }

@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.tools.Button;
+import org.firstinspires.ftc.teamcode.tools.Global;
 
 public class Hanger {
     private final DcMotor hangerMotor;
@@ -21,19 +23,22 @@ public class Hanger {
     public Hanger(HardwareMap hardwareMap, Button handlerDPadDown, Button handlerDPadUp) {
         hangerMotor = hardwareMap.dcMotor.get("skyHookMotor");
         hangerMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        hangerMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Hanger encoder is plugged into a different port than the hanger motor
-        hangerEncoder = hardwareMap.dcMotor.get("backRightMotor");
-        //hangerMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hangerEncoder = hardwareMap.dcMotor.get("frontLeftMotor");
+        hangerEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         this.handlerDPadDown = handlerDPadDown;
         this.handlerDPadUp = handlerDPadUp;
     }
 
     public void update(Button button) {
-        //TelemetryManager.getTelemetry().addData("Hanger Pos: ", hangerMotor.getCurrentPosition());
+        //Global.telemetry.addLine("Skyhook position is: " + hangerEncoder.getCurrentPosition());
+        //Global.telemetry.update();
+
         if(handlerDPadUp.On()){
-            if(hangerEncoder.getCurrentPosition() >= maxSkyHookPosition) {
+            if(-hangerEncoder.getCurrentPosition() >= maxSkyHookPosition) { // Hanger encoder is negative, because motor direction is flipped
                 hangerMotor.setPower(0);
             }
             else {
@@ -47,7 +52,7 @@ public class Hanger {
             //int targetPosition = (int)(countsPerRev * HANGER_REVOLUTIONS); // cast to int
             //hangerMotor.setTargetPosition(0);
             //hangerMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            if(hangerEncoder.getCurrentPosition() <= minSkyHookPosition) {
+            if(-hangerEncoder.getCurrentPosition() <= minSkyHookPosition) { // Hanger encoder is negative, because motor direction is flipped
                 hangerMotor.setPower(0);
             }
             else {
@@ -55,6 +60,9 @@ public class Hanger {
                 //hangerMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 //hangerMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
+        }
+        else{
+            hangerMotor.setPower(0);
         }
     }
 

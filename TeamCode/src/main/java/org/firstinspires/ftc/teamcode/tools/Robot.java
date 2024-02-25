@@ -65,7 +65,7 @@ public class Robot {
        // clawGrip.scaleRange(0.02, 0.22);  //old values
         clawGrip.scaleRange(0.03, 0.25);
         //clawPitch.scaleRange(0.755, 0.950);
-        clawPitch.scaleRange(0.07, 0.25);
+        clawPitch.scaleRange(0.07, 0.28);
         clawYaw.scaleRange(0, 1);
         droneAngle.scaleRange(0.5, 0.73);
 
@@ -122,12 +122,12 @@ public class Robot {
                 .servoRunToPosition(clawGrip, clawOpen)
                 .resetTimer(timer)
                 .waitUntil(timer, 150)
-                .startMotor(lift.liftMotor, -1)
+                .startMotor(lift.liftMotor, -1, true)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
                 .resetMotorEncoder(lift.liftMotor)
                 .servoRunToPosition(clawPitch, clawPitchIntake)
-                .startMotor(intakeMotor, 0.15));
+                .startMotor(intakeMotor, 1, false));
 
         intakingToHoldingPixels = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawClose)
@@ -140,11 +140,11 @@ public class Robot {
         holdingPixelsToIntakingPixels = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawPitch, clawPitchIntake)
                 .servoRunToPosition(clawGrip, clawOpen)
-                .startMotor(lift.liftMotor, -1)
+                .startMotor(lift.liftMotor, -1, true)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
                 .resetMotorEncoder(lift.liftMotor)
-                .startMotor(intakeMotor, 0.15));
+                .startMotor(intakeMotor, 1, false));
 
         holdingPixelsToIdle = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawOpen));
@@ -161,15 +161,16 @@ public class Robot {
                 .servoRunToPosition(clawPitch, clawPitchOutTake));
 
         exitingOutTakeToIdle = new Actions(new ActionBuilder()
+                .servoRunToPosition(clawYaw, clawYawIntake)
+                .waitForAnalogSensorAtPosition(clawYawAnalogSensor, analog_ClawYaw_ResetPosition, 5)
+                .servoRunToPosition(clawYaw,clawYawIntake)
                 // Guarantees lift was not manually put below claw movement limit
                 .setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
-                .servoRunToPosition(clawYaw, clawYawIntake)
-                .waitForAnalogSensorAtPosition(clawYawAnalogSensor, analog_ClawYaw_ResetPosition, 5)
                 .servoRunToPosition(clawPitch, clawPitchIntake)
-                .resetTimer(timer)
-                .waitUntil(timer,300)
-                .startMotor(lift.liftMotor, -1)
+                .waitForAnalogSensorAtPosition(clawPitchAnalogSensor, analog_ClawPitch_ResetPosition, 10)
+                .servoRunToPosition(clawPitch, clawPitchIntake)
+                .startMotor(lift.liftMotor, -1, true)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
                 .resetMotorEncoder(lift.liftMotor));
@@ -178,12 +179,12 @@ public class Robot {
         autoHoldOnePixel = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawCloseOnePixel)
                 .waitUntil(timer, 500)
-                .startMotor(lift.liftMotor, 1)
+                .startMotor(lift.liftMotor, 1, true)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHolding)
                 .stopMotor(lift.liftMotor));
 
         autoOutTakeYellow = new Actions(new ActionBuilder()
-                .startMotor(lift.liftMotor, 1)
+                .startMotor(lift.liftMotor, 1, true)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHolding+400)
                 .stopMotor(lift.liftMotor)
                 .servoRunToPosition(clawPitch, clawPitchOutTake));
@@ -352,15 +353,18 @@ public class Robot {
 
         // Manages Reject mode on Roomba as an override of its current power and state
         if(handlerLeftTrigger.Pressed()) {
-            intakeMotor.setOverridePower(-0.4);
+            intakeMotor.setOverridePower(-1);
         } else if (handlerLeftTrigger.Released()) {
             intakeMotor.cancelOverridePower();
         }
         if(handlerX.On()) {
-            planeLauncher.setPower(1);
+            droneAngle.setPosition(droneLaunch);
+            sleep(500);
+            planeLauncher.setPower(-1);
             sleep(200);
         }
         else{
+            droneAngle.setPosition(droneStore);
             planeLauncher.setPower(0);
         }
         if(!(stateMachine.getCurrentState() == outTakingPixels)){

@@ -35,9 +35,11 @@ public class ActionBuilder {
                 "set motor " + motor.getDeviceName() + " to target pos " + targetPosition + " with power" + power;
         return add(name, function);
     }
-    public ActionBuilder startMotor(DcMotor motor, double power) {
+    public ActionBuilder startMotor(DcMotor motor, double power, boolean encoderOrNo) {
         ActionFunction function = () -> {
-            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            if(encoderOrNo){ motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); }
+            else { motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
+
             motor.setPower(power);
             return true;
         };
