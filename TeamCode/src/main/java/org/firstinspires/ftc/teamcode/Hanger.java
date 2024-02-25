@@ -28,6 +28,7 @@ public class Hanger {
         // Hanger encoder is plugged into a different port than the hanger motor
         hangerEncoder = hardwareMap.dcMotor.get("frontLeftMotor");
         hangerEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hangerEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); // ugh this took 2 hours to debug. I over-rode the other drive mode oops
 
         this.handlerDPadDown = handlerDPadDown;
         this.handlerDPadUp = handlerDPadUp;
@@ -52,7 +53,7 @@ public class Hanger {
             //int targetPosition = (int)(countsPerRev * HANGER_REVOLUTIONS); // cast to int
             //hangerMotor.setTargetPosition(0);
             //hangerMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            if(-hangerEncoder.getCurrentPosition() <= minSkyHookPosition) { // Hanger encoder is negative, because motor direction is flipped
+            if(-hangerEncoder.getCurrentPosition() <= minSkyHookPosition) { //  Hanger encoder is negative, because motor direction is flipped
                 hangerMotor.setPower(0);
             }
             else {

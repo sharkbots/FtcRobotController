@@ -67,7 +67,7 @@ public class Robot {
         //clawPitch.scaleRange(0.755, 0.950);
         clawPitch.scaleRange(0.07, 0.28);
         clawYaw.scaleRange(0, 1);
-        droneAngle.scaleRange(0.5, 0.73);
+        droneAngle.scaleRange(0.45, 0.73);
 
         // Touch Sensors
         liftTouchDown = hardwareMap.touchSensor.get("liftTouchDown");

@@ -36,6 +36,9 @@ public class servoTesting extends LinearOpMode {
 
     DcMotor hangerEncoder;
 
+    DcMotor motor;
+    DcMotor motor2;
+
     double clawYawIntake, clawYawLeftHorizontal, clawYawLeftSlantedUp, clawYawLeftSlantedDown,  clawYawRightHorizontal, clawYawRightSlantedUp, clawYawRightSlantedDown;
     double armPosition, rotationPosition, liftPosition, hangerPosition;
 
@@ -52,6 +55,9 @@ public class servoTesting extends LinearOpMode {
 
         rotationPositionInput = hardwareMap.get(AnalogInput.class, "rotationPositionInput");
         armPositionInput = hardwareMap.get(AnalogInput.class, "armPositionInput");
+
+        motor = hardwareMap.dcMotor.get("frontLeftMotor"); // for debugging
+        motor2 = hardwareMap.dcMotor.get("backRightMotor"); // for debugging
 
         // map buttons
         handlerDPad_Left = new Button(gamepad2, Button.NAME.DPAD_LEFT);
@@ -80,6 +86,11 @@ public class servoTesting extends LinearOpMode {
         Setup();
         waitForStart();
         while (opModeIsActive()) {
+
+            motor.setPower(1);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motor2.setPower(1);
+            motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             hangerMotor.setPower(hangerPower);
             hangerMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
