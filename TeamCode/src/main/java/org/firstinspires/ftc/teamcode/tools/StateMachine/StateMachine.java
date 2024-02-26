@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tools;
+package org.firstinspires.ftc.teamcode.tools.StateMachine;
 
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
@@ -45,7 +45,7 @@ public class StateMachine {
 
             // Method to determine if all actions for this transition are complete
             public boolean isTransitionComplete() {
-                return actions.areActionsComplete();
+                return actions.isComplete();
             }
 
             // Method to get the state that this transition leads to

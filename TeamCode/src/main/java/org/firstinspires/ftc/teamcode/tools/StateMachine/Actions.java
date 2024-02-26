@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tools;
+package org.firstinspires.ftc.teamcode.tools.StateMachine;
 
 import java.util.ArrayList;
 
@@ -13,11 +13,11 @@ public class Actions {
     }
 
     public void performAll (){
-        while (!areActionsComplete()){
+        while (!isComplete()){
             // do nothing
         }
     }
-    public boolean areActionsComplete() {
+    public boolean isComplete() {
         // Iterate through all actions to see if they are complete
         for (; currentActionIndex < actions.size(); currentActionIndex++) {
             if (!(actions.get(currentActionIndex).evaluate())) {
@@ -29,6 +29,6 @@ public class Actions {
     }
 
     public void update(){
-        areActionsComplete();
+        isComplete();
     }
 }

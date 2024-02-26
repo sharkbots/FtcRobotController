@@ -12,6 +12,7 @@ public class Lift {
 
     public final int liftEncoderHolding = 800; // Set your minimum encoder value here
     public final int liftEncoderHoldingTeleop = 50; // Set your minimum encoder value here
+    public final int liftEncoderHoldingLow = 150; // Set your minimum encoder value here
     public final int liftEncoderMin = 1600; // Set your minimum encoder value here
     private final int liftEncoderMax = 3600;
     public DcMotorEx liftMotor;
