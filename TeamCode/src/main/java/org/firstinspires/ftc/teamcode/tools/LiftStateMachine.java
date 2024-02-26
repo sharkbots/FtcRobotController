@@ -1,16 +1,11 @@
 package org.firstinspires.ftc.teamcode.tools;
 
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-import java.util.function.BooleanSupplier;
+import org.firstinspires.ftc.teamcode.tools.StateMachine.StateMachine;
 
 public class LiftStateMachine extends StateMachine {
 
-    /*private State.Transition.org.firstinspires.ftc.teamcode.tools.Action setMotor(DcMotor motor, int position){
-        return new State.Transition.org.firstinspires.ftc.teamcode.tools.Action(()->{motor.setTargetPosition(position);
+    /*private State.Transition.org.firstinspires.ftc.teamcode.tools.StateMachine.Action setMotor(DcMotor motor, int position){
+        return new State.Transition.org.firstinspires.ftc.teamcode.tools.StateMachine.Action(()->{motor.setTargetPosition(position);
             return true;
         });
     }*/

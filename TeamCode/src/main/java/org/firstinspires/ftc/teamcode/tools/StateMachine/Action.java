@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode.tools;
+package org.firstinspires.ftc.teamcode.tools.StateMachine;
+
+import org.firstinspires.ftc.teamcode.tools.Global;
 
 public class Action {
         private final ActionFunction performAction; // A function that performs the action and returns true if the action is complete
