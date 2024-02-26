@@ -301,14 +301,12 @@ public class Robot {
     public static double droneStore, droneLaunch;
 
     public static double analog_ClawYaw_ResetPosition, analog_ClawPitch_ResetPosition;
-    int liftOutTake;
 
     public static Button handlerA, handlerB, handlerX, handlerY, handlerLeftBumper,
             handlerRightBumper, handlerLeftTrigger, handlerRightTrigger, handlerDPad_Down, handlerDPad_Up, handlerDPad_Left, handlerDPad_Right;
 
     Gamepad gamepad1, gamepad2;
-    ActionBuilder actionBuilder;
-    ElapsedTime timer = new ElapsedTime();
+    ElapsedTime timer;
 
     private void updateButtons(){
         handlerA.updateButton(gamepad2);
