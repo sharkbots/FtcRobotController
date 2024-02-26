@@ -44,7 +44,7 @@ public class Robot {
         intakeMotor = new OverrideMotor(hardwareMap.dcMotor.get("intakeMotor"));
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up);//hardwareMap.dcMotor.get("skyHookMotor");
+        skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up, handlerY);//hardwareMap.dcMotor.get("skyHookMotor");
 
 
         planeLauncher = hardwareMap.dcMotor.get("planeLauncher");
@@ -63,7 +63,7 @@ public class Robot {
         analog_ClawPitch_ResetPosition = 323;
 
        // clawGrip.scaleRange(0.02, 0.22);  //old values
-        clawGrip.scaleRange(0.03, 0.25);
+        clawGrip.scaleRange(0, 0.23);
         //clawPitch.scaleRange(0.755, 0.950);
         clawPitch.scaleRange(0.07, 0.28);
         clawYaw.scaleRange(0, 1);
@@ -73,7 +73,7 @@ public class Robot {
         liftTouchDown = hardwareMap.touchSensor.get("liftTouchDown");
 
         clawOpen = 1;
-        clawClose = 0.19;
+        clawClose = 0.15;
         clawCloseOnePixel = 0;
 
         clawPitchIntake = 0;
@@ -163,13 +163,11 @@ public class Robot {
         exitingOutTakeToIdle = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawYaw, clawYawIntake)
                 .waitForAnalogSensorAtPosition(clawYawAnalogSensor, analog_ClawYaw_ResetPosition, 5)
-                .servoRunToPosition(clawYaw,clawYawIntake)
                 // Guarantees lift was not manually put below claw movement limit
                 .setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
                 .servoRunToPosition(clawPitch, clawPitchIntake)
                 .waitForAnalogSensorAtPosition(clawPitchAnalogSensor, analog_ClawPitch_ResetPosition, 10)
-                .servoRunToPosition(clawPitch, clawPitchIntake)
                 .startMotor(lift.liftMotor, -1, true)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)

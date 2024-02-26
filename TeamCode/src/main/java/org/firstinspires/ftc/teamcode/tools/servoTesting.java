@@ -77,7 +77,7 @@ public class servoTesting extends LinearOpMode {
         hangerMotor = (DcMotorEx) hardwareMap.dcMotor.get("skyHookMotor");
         hangerMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        hangerEncoder = (DcMotorEx) hardwareMap.dcMotor.get("frontLeftMotor");
+        hangerEncoder = (DcMotorEx) hardwareMap.dcMotor.get("frontRightMotor");
         hangerEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
@@ -87,10 +87,10 @@ public class servoTesting extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            motor.setPower(1);
-            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            motor2.setPower(1);
-            motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            //motor.setPower(1);
+            //motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            //motor2.setPower(1);
+            //motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             hangerMotor.setPower(hangerPower);
             hangerMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

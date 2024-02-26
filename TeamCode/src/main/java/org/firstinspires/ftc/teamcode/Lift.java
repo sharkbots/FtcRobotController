@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.teamcode.tools.Global;
 
@@ -31,7 +32,7 @@ public class Lift {
 
     public void update() {
 
-        // Bit of a monkey patch (so that when it comes from state machine target pos is not 0)
+        // Bit of a hack (so that when it comes from state machine target pos is not 0)
         lastSetPosition = liftMotor.getTargetPosition();
 
         // If the handler does not want to move motor, then hold the last position set by the handler
@@ -51,17 +52,26 @@ public class Lift {
             setLiftPowerBasedOnGamepad(gamepad2);
             lastSetPosition = liftMotor.getCurrentPosition();
 
-            // Monkey patch continued :-)
+            // Hack continued :-)
             liftMotor.setTargetPosition(lastSetPosition);
         }
-
-        Global.telemetry.addData("right_stick_y: ", gamepad2.right_stick_y);
-        Global.telemetry.update();
     }
 
     public void setLiftPowerBasedOnGamepad(Gamepad gamepad) {
         double power = -gamepad.right_stick_y;
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        PIDFCoefficients coeffs = liftMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+        //Global.telemetry.addData("f: ", coeffs.f); // 0
+        //Global.telemetry.addData("p: ", coeffs.p); // 10
+        //Global.telemetry.addData("i: ", coeffs.i); // 3
+        //Global.telemetry.addData("d: ", coeffs.d); // 0
+        //Global.telemetry.update();
+        coeffs.p = 10;
+        coeffs.i = 3;
+        coeffs.d = 0;
+
+        liftMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coeffs);
 
         if ((liftMotor.getCurrentPosition() > liftEncoderMax*0.95) && power > 0){
             power = 0;
@@ -70,7 +80,7 @@ public class Lift {
             power = 0;
         }
 
-        if (power > handlerLiftDeadzone || power < -handlerLiftDeadzone){
+        if (power < -handlerLiftDeadzone || power > handlerLiftDeadzone){
             liftMotor.setPower(power);
         }
         else {
