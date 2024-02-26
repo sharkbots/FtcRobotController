@@ -32,6 +32,11 @@ public class TrajectoryBuilder {
         Vector2d setUpForBackdropB = c.setUpForBackdropB;
         Vector2d setUpForBackdropC = c.setUpForBackdropC;
 
+        Vector2d prepareFarDrop = c.prepareFarDrop;
+        Vector2d parkFinalLeft = c.parkFinalLeft;
+        Vector2d backdropIntermediateFar = c.backdropIntermediateFar;
+        Vector2d intermediateDropFar = c.intermediateDropFar;
+
         if (propLoc == propLocations.LEFT) {
             teamPropCoordinate = c.leftTeamProp;
             backdropCoordinate = c.backdropLeft;
@@ -57,33 +62,61 @@ public class TrajectoryBuilder {
                 .build();
         finalTrajectory.add(purpleDrop);
 
-        TrajectorySequence setupForBackdrop = drive.trajectorySequenceBuilder(purpleDrop.end())
+        TrajectorySequence setupForBackdropClose = drive.trajectorySequenceBuilder(purpleDrop.end())
                 .back(3.5)
                 .forward(3)
                 .lineTo(setUpForBackdropA)
                 .lineTo(setUpForBackdropB)
                 .lineTo(setUpForBackdropC)
                 .build();
+
+        TrajectorySequence setupForBackdropFar = drive.trajectorySequenceBuilder(purpleDrop.end())
+                .lineTo(prepareFarDrop)
+                .lineTo(backdropIntermediateFar)
+                .build();
+
         if (c.CloseSide) {
-            finalTrajectory.add(setupForBackdrop);
+            finalTrajectory.add(setupForBackdropClose);
+        } else{
+            finalTrajectory.add(setupForBackdropFar);
         }
 
-        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(setupForBackdrop.end())
+        TrajectorySequence goToBackdropClose = drive.trajectorySequenceBuilder(setupForBackdropClose.end())
                 .lineToLinearHeading(backdropIntermediateCoordinate)
                 .lineToLinearHeading(backdropCoordinate, SampleMecanumDrive.getVelocityConstraint(SLOWERVELOCITY, SLOWERANGULARVELOCITY, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
+
+        /*TrajectorySequence gotoBackdropFar = drive.trajectorySequenceBuilder(setupForBackdropFar.end())
+                .lineToLinearHeading(backdropCoordinate, SampleMecanumDrive.getVelocityConstraint(SLOWERVELOCITY, SLOWERANGULARVELOCITY, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();*/
+        TrajectorySequence gotoBackdropFar = drive.trajectorySequenceBuilder(setupForBackdropFar.end())
+                .lineTo(intermediateDropFar)
+                .lineToLinearHeading(backdropIntermediateCoordinate)
+                .lineToLinearHeading(backdropCoordinate)
+                .build();
+
         if (c.CloseSide) {
-            finalTrajectory.add(goToBackdrop);
+            finalTrajectory.add(goToBackdropClose);
+        }else{
+            finalTrajectory.add(gotoBackdropFar);
         }
 
-        TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdrop.end())
+        TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdropClose.end())
                 .forward(8)
                 .lineToLinearHeading(c.parkIntermediate)
-                .lineToLinearHeading(c.parkFinal)
+                .lineToLinearHeading(c.parkFinalRight)
                 .build();
+
+        TrajectorySequence parkLeft = drive.trajectorySequenceBuilder(gotoBackdropFar.end())
+                .lineTo(parkFinalLeft)
+                .build();
+
         if (c.CloseSide) {
             finalTrajectory.add(parkRight);
+        }else{
+            finalTrajectory.add(parkLeft);
         }
 
         return finalTrajectory;
