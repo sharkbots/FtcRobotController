@@ -192,7 +192,7 @@ public class Robot {
                 .servoRunToPosition(clawPitch, clawPitchOutTake));
 
         autoOutTakeYellowLow = new Actions(new ActionBuilder()
-                .startMotor(lift.liftMotor, 1)
+                .startMotor(lift.liftMotor, 1, true)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingLow)
                 .stopMotor(lift.liftMotor)
                 /*.servoRunToPosition(clawPitch, clawPitchOutTake)*/);
@@ -203,12 +203,10 @@ public class Robot {
                 .waitUntil(timer, 300));
 
 
-        if (isAutonomousMode) {
-            createAutoStateTransitions();
-        }
-        else {
+        if (!isAutonomousMode) { // no state machine to create in autonomous
             createTeleopStateTransitions();
         }
+
     }
 
 
@@ -219,16 +217,16 @@ public class Robot {
         // button triggers
         BooleanSupplier handlerButtonAPressed = handlerA::Pressed;
         BooleanSupplier handlerButtonBPressed = handlerB::Pressed;
-        BooleanSupplier handlerButtonXPressed = handlerX::Pressed;
-        BooleanSupplier handlerButtonYPressed = handlerY::Pressed;
-        BooleanSupplier handlerButtonLeftBumperPressed = handlerLeftBumper::Pressed;
-        BooleanSupplier handlerButtonRightBumperPressed = handlerRightBumper::Pressed;
+        // BooleanSupplier handlerButtonXPressed = handlerX::Pressed;
+        // BooleanSupplier handlerButtonYPressed = handlerY::Pressed;
+        // BooleanSupplier handlerButtonLeftBumperPressed = handlerLeftBumper::Pressed;
+        // BooleanSupplier handlerButtonRightBumperPressed = handlerRightBumper::Pressed;
         BooleanSupplier handlerButtonLeftTriggerPressed = handlerLeftTrigger::Pressed;
-        BooleanSupplier handlerButtonRightTriggerPressed = handlerRightTrigger::Pressed;
-        BooleanSupplier handlerDPad_DownPressed = handlerDPad_Down::Pressed;
-        BooleanSupplier handlerDPad_UpPressed = handlerDPad_Up::Pressed;
-        BooleanSupplier handlerDPad_LeftPressed = handlerDPad_Left::Pressed;
-        BooleanSupplier handlerDPad_RightPressed = handlerDPad_Right::Pressed;
+        // BooleanSupplier handlerButtonRightTriggerPressed = handlerRightTrigger::Pressed;
+        // BooleanSupplier handlerDPad_DownPressed = handlerDPad_Down::Pressed;
+        // BooleanSupplier handlerDPad_UpPressed = handlerDPad_Up::Pressed;
+        // BooleanSupplier handlerDPad_LeftPressed = handlerDPad_Left::Pressed;
+        // BooleanSupplier handlerDPad_RightPressed = handlerDPad_Right::Pressed;
 
         BooleanSupplier alwaysTrue = ()-> true;
 
