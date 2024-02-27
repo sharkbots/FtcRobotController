@@ -53,14 +53,18 @@ import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(7, 0, 3);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(7.5, 1.1, 1.2);
+    //public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(7, 0, 3);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 1);
+    //public static PIDCoefficients HEADING_PID = new PIDCoefficients(7.5, 1.1, 1.2);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(6, 1.1, 0.1);
 
     public static double LATERAL_MULTIPLIER = 1;
 
+    /*
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
+    */
 
     private TrajectorySequenceRunner trajectorySequenceRunner;
 
@@ -69,14 +73,13 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private TrajectoryFollower follower;
 
-    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
-    private List<DcMotorEx> motors;
+    private final DcMotorEx leftFront, leftRear, rightRear, rightFront;
+    private final List<DcMotorEx> motors;
 
-    private IMU imu;
-    private VoltageSensor batteryVoltageSensor;
+    private final VoltageSensor batteryVoltageSensor;
 
-    private List<Integer> lastEncPositions = new ArrayList<>();
-    private List<Integer> lastEncVels = new ArrayList<>();
+    private final List<Integer> lastEncPositions = new ArrayList<>();
+    private final List<Integer> lastEncVels = new ArrayList<>();
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
@@ -233,7 +236,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public void setWeightedDrivePower(Pose2d drivePower) {
         Pose2d vel = drivePower;
-
+/*
         if (Math.abs(drivePower.getX()) + Math.abs(drivePower.getY())
                 + Math.abs(drivePower.getHeading()) > 1) {
             // re-normalize the powers according to the weights
@@ -247,7 +250,7 @@ public class SampleMecanumDrive extends MecanumDrive {
                     OMEGA_WEIGHT * drivePower.getHeading()
             ).div(denom);
         }
-
+*/
         setDrivePower(vel);
     }
 

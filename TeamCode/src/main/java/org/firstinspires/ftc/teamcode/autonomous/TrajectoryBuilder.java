@@ -64,7 +64,7 @@ public class TrajectoryBuilder {
 
         TrajectorySequence setupForBackdropClose = drive.trajectorySequenceBuilder(purpleDrop.end())
                 .back(3.5)
-                .forward(3)
+                //.forward(3)
                 .lineTo(setUpForBackdropA)
                 .lineTo(setUpForBackdropB)
                 .lineTo(setUpForBackdropC)

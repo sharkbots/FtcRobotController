@@ -54,10 +54,10 @@ public class Robot {
         planeLauncher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Servos
+        planeAngle = hardwareMap.servo.get("planeAngle");
         clawPitch = hardwareMap.servo.get("clawPitch");
         clawYaw = hardwareMap.servo.get("clawYaw");
         clawGrip = hardwareMap.servo.get("clawGrip");
-        droneAngle = hardwareMap.servo.get("droneAngle");
 
         clawYawAnalogSensor = hardwareMap.get(AnalogInput.class, "rotationPositionInput");
         clawPitchAnalogSensor = hardwareMap.get(AnalogInput.class, "armPositionInput");
@@ -65,12 +65,10 @@ public class Robot {
         analog_ClawYaw_ResetPosition = 180;
         analog_ClawPitch_ResetPosition = 323;
 
-       // clawGrip.scaleRange(0.02, 0.22);  //old values
+        planeAngle.scaleRange(0.56, 0.77);
         clawGrip.scaleRange(0, 0.23);
-        //clawPitch.scaleRange(0.755, 0.950);
         clawPitch.scaleRange(0.07, 0.28);
         clawYaw.scaleRange(0, 1);
-        droneAngle.scaleRange(0.45, 0.73);
 
         // Touch Sensors
         liftTouchDown = hardwareMap.touchSensor.get("liftTouchDown");
@@ -92,8 +90,8 @@ public class Robot {
         clawYawRightHorizontal = clawYawRightSlantedUp+0.21;
         clawYawRightSlantedDown = clawYawRightHorizontal+0.21;
 
-        droneStore = 1;
-        droneLaunch = 0;
+        planeAngleStore = 1;
+        planeAngleLaunch = 0;
 
         stateMachine = new StateMachine();
 
@@ -181,21 +179,17 @@ public class Robot {
         autoHoldOnePixel = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawCloseOnePixel)
                 .waitUntil(timer, 500)
-                .startMotor(lift.liftMotor, 1, true)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHolding)
-                .stopMotor(lift.liftMotor));
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderHolding, 1));
+
 
         autoOutTakeYellow = new Actions(new ActionBuilder()
-                .startMotor(lift.liftMotor, 1, true)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHolding+400)
-                .stopMotor(lift.liftMotor)
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin-400, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin-400)
                 .servoRunToPosition(clawPitch, clawPitchOutTake));
 
         autoOutTakeYellowLow = new Actions(new ActionBuilder()
-                .startMotor(lift.liftMotor, 1, true)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingLow)
-                .stopMotor(lift.liftMotor)
-                /*.servoRunToPosition(clawPitch, clawPitchOutTake)*/);
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderHoldingLow, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingLow));
 
         autoOpenClaw = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawOpen)
@@ -289,7 +283,7 @@ public class Robot {
     public static Hanger skyHook;
     public static DcMotor planeLauncher;
     // Servos
-    public static Servo clawPitch, clawYaw, clawGrip, droneAngle;
+    public static Servo clawPitch, clawYaw, clawGrip, planeAngle;
     public static AnalogInput clawYawAnalogSensor, clawPitchAnalogSensor;
     // TouchSensors
     public static TouchSensor liftTouchDown;
@@ -298,7 +292,7 @@ public class Robot {
     public static double clawOpen, clawClose, clawCloseOnePixel, clawYawIntake,
             clawYawLeftSlantedUp, clawYawLeftHorizontal, clawYawLeftSlantedDown, clawYawRightSlantedUp, clawYawRightHorizontal, clawYawRightSlantedDown;
 
-    public static double droneStore, droneLaunch;
+    public static double planeAngleStore, planeAngleLaunch;
 
     public static double analog_ClawYaw_ResetPosition, analog_ClawPitch_ResetPosition;
 
@@ -337,13 +331,13 @@ public class Robot {
             intakeMotor.cancelOverridePower();
         }
         if(handlerX.On()) {
-            droneAngle.setPosition(droneLaunch);
+            planeAngle.setPosition(planeAngleLaunch);
             sleep(500);
-            planeLauncher.setPower(-1);
+            planeLauncher.setPower(1);
             sleep(200);
         }
         else{
-            droneAngle.setPosition(droneStore);
+            planeAngle.setPosition(planeAngleStore);
             planeLauncher.setPower(0);
         }
         if(!(stateMachine.getCurrentState() == outTakingPixels)){

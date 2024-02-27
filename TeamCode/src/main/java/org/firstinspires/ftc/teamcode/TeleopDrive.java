@@ -21,7 +21,7 @@ public class TeleopDrive extends LinearOpMode {
 
     public void Setup(){
         Global.telemetry = telemetry;
-        driveMotors = new SetDriveMotors(hardwareMap, gamepad1);
+        driveMotors = new SetDriveMotors(hardwareMap);
 
         robot = new Robot(hardwareMap, gamepad1, gamepad2, false);
 
@@ -31,7 +31,7 @@ public class TeleopDrive extends LinearOpMode {
         Robot.clawPitch.setPosition(Robot.clawPitchIntake); // clawPitchIntake
         Robot.clawYaw.setPosition(Robot.clawYawIntake);
         Robot.clawGrip.setPosition(Robot.clawOpen);
-        Robot.droneAngle.setPosition(Robot.droneStore);
+        Robot.planeAngle.setPosition(Robot.planeAngleStore);
         sleep(1000);
 
         while(!isStarted() && !isStopRequested()){
@@ -89,7 +89,7 @@ public class TeleopDrive extends LinearOpMode {
 
             robot.update();
 
-            if(robot.currentState()== robot.outTakingPixels){
+            if(robot.currentState()==robot.outTakingPixels){
 
                 //telemetry.addData("Requested position: ", Robot.clawYaw.getPosition());
 
