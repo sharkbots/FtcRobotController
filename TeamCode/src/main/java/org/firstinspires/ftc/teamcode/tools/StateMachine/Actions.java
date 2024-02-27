@@ -12,11 +12,23 @@ public class Actions {
         currentActionIndex = 0;
     }
 
-    public void performAll (){
+    public void runAll(){
         while (!isComplete()){
             // do nothing
         }
     }
+
+    public void runAsync(){
+        class MyRunnable implements Runnable {
+            @Override
+            public void run() {
+                runAll();
+            }
+        }
+        Thread thread = new Thread(new MyRunnable());
+        thread.start();
+    }
+
     public boolean isComplete() {
         // Iterate through all actions to see if they are complete
         for (; currentActionIndex < actions.size(); currentActionIndex++) {

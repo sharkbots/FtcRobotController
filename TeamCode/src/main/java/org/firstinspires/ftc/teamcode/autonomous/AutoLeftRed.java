@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 
 
-@Autonomous(name="Autonomous Left Red")
+@Autonomous(name="Far Red", group="Auto")
 public class AutoLeftRed extends AutoBase {
     void Setup() {
         c = new Coordinates(false, false);

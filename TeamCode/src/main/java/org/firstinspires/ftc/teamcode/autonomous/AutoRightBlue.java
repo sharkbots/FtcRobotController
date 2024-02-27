@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
 import org.firstinspires.ftc.teamcode.tools.Robot;
-@Autonomous(name="Autonomous Right Blue")
+@Autonomous(name="Far Blue", group="Auto")
 public class AutoRightBlue extends AutoBase {
    @Override
     void Setup() {

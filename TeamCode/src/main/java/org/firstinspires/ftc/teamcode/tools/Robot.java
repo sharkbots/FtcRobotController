@@ -183,8 +183,8 @@ public class Robot {
 
 
         autoOutTakeYellow = new Actions(new ActionBuilder()
-                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin-400, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin-400)
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin+150, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin+150)
                 .servoRunToPosition(clawPitch, clawPitchOutTake));
 
         autoOutTakeYellowLow = new Actions(new ActionBuilder()
@@ -194,7 +194,10 @@ public class Robot {
         autoOpenClaw = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawOpen)
                 .resetTimer(timer)
-                .waitUntil(timer, 300));
+                .waitUntil(timer, 300)
+                .servoRunToPosition(clawPitch, clawPitchIntake)
+                .resetTimer(timer)
+                .waitUntil(timer, 150));
 
 
         if (!isAutonomousMode) { // no state machine to create in autonomous
