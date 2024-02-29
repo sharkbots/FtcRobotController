@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 
-@Autonomous(name="Autonomous Left Blue")
+@Autonomous(name="Near Blue", group="Auto")
 public class AutoLeftBlue extends AutoBase {
     void Setup() {
         c = new Coordinates(true, true);

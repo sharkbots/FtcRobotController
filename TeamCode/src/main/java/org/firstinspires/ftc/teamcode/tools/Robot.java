@@ -165,9 +165,14 @@ public class Robot {
         exitingOutTakeToIdle = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawYaw, clawYawIntake)
                 .waitForAnalogSensorAtPosition(clawYawAnalogSensor, analog_ClawYaw_ResetPosition, 5)
-                // Guarantees lift was not manually put below claw movement limit
-                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
+
+                // To get lift going down as fast as possible, bring it down with motor power instead of servo
+                // servo will act as maintaining a linear speed and it's slower than just motor power with help of gravity
+                .startMotor(lift.liftMotor, -1, false)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
+                .stopMotor(lift.liftMotor)
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
+
                 .servoRunToPosition(clawPitch, clawPitchIntake)
                 .waitForAnalogSensorAtPosition(clawPitchAnalogSensor, analog_ClawPitch_ResetPosition, 10)
                 .startMotor(lift.liftMotor, -1, false)
@@ -183,8 +188,8 @@ public class Robot {
 
 
         autoOutTakeYellow = new Actions(new ActionBuilder()
-                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin-400, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin-400)
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin+150, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin+150)
                 .servoRunToPosition(clawPitch, clawPitchOutTake));
 
         autoOutTakeYellowLow = new Actions(new ActionBuilder()
@@ -194,7 +199,10 @@ public class Robot {
         autoOpenClaw = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawOpen)
                 .resetTimer(timer)
-                .waitUntil(timer, 300));
+                .waitUntil(timer, 300)
+                .servoRunToPosition(clawPitch, clawPitchIntake)
+                .resetTimer(timer)
+                .waitUntil(timer, 150));
 
 
         if (!isAutonomousMode) { // no state machine to create in autonomous

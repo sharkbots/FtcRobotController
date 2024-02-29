@@ -168,7 +168,10 @@ public class SetDriveMotors extends OpMode {
 
             // If redSide is true, adjust the heading by 180 degrees
             if (AutoDataStorage.redSide) {
-                input = input.rotated(Math.toRadians(180)); // Rotate by 180 degrees
+                input = input.rotated(Math.toRadians(90)); // Rotate by 180 degrees
+            }
+            else {
+                input = input.rotated(Math.toRadians(-90)); // Rotate by 180 degrees
             }
 
             if (alignToCardinalPoint){
