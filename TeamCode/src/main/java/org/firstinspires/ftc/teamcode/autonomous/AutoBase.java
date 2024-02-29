@@ -211,7 +211,7 @@ public abstract class AutoBase extends LinearOpMode {
 
 
         //Raise lift so the pixel doesn't drag on the ground
-        robot.autoOutTakeYellowLow.runAll();
+        robot.autoOutTakeYellowLow.run();
 
         // Deposit purple pixel on spike mark
         drive.followTrajectorySequence(finalTrajectory.get(0));
@@ -228,7 +228,7 @@ public abstract class AutoBase extends LinearOpMode {
         drive.followTrajectorySequence(finalTrajectory.get(2));
 
         // Drop yellow pixel
-        robot.autoOpenClaw.runAll();
+        robot.autoOpenClaw.run();
 
         // Park
         robot.exitingOutTakeToIdle.runAsync();

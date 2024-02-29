@@ -12,7 +12,7 @@ public class Actions {
         currentActionIndex = 0;
     }
 
-    public void runAll(){
+    public void run(){
         while (!isComplete()){
             // do nothing
         }
@@ -22,7 +22,7 @@ public class Actions {
         class MyRunnable implements Runnable {
             @Override
             public void run() {
-                runAll();
+                Actions.this.run();
             }
         }
         Thread thread = new Thread(new MyRunnable());

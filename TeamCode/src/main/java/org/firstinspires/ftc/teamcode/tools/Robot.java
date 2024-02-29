@@ -165,12 +165,17 @@ public class Robot {
         exitingOutTakeToIdle = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawYaw, clawYawIntake)
                 .waitForAnalogSensorAtPosition(clawYawAnalogSensor, analog_ClawYaw_ResetPosition, 5)
-                // Guarantees lift was not manually put below claw movement limit
-                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
+
+                // To get lift going down as fast as possible, bring it down with motor power instead of servo
+                // servo will act as maintaining a linear speed and it's slower than just motor power with help of gravity
+                .startMotor(lift.liftMotor, -1, false)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
+                .stopMotor(lift.liftMotor)
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
+
                 .servoRunToPosition(clawPitch, clawPitchIntake)
                 .waitForAnalogSensorAtPosition(clawPitchAnalogSensor, analog_ClawPitch_ResetPosition, 10)
-                .startMotor(lift.liftMotor, -1, true)
+                .startMotor(lift.liftMotor, -1, false)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
                 .resetMotorEncoder(lift.liftMotor));

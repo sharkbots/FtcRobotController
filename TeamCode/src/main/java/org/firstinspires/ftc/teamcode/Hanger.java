@@ -16,7 +16,7 @@ public class Hanger {
     private final double HANGER_REVOLUTIONS = 0.4; //need to test to see how many revolutions
     private final Button handlerDPadDown, handlerDPadUp, handlerY;
 
-    private final int maxSkyHookPosition = 10800;
+    private final int maxSkyHookPosition = 3600;
     private final int minSkyHookPosition = 100;
 
     private int autoMoveHanger = 0; // 0 means nothing, 1 means up, -1 means down for the auto go up
