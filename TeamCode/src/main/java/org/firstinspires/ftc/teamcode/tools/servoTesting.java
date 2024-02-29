@@ -51,7 +51,7 @@ public class servoTesting extends LinearOpMode {
         clawYaw = hardwareMap.servo.get("clawYaw");
         clawPitch = hardwareMap.servo.get("clawPitch");
         clawGrip = hardwareMap.servo.get("clawGrip");
-        droneAngle = hardwareMap.servo.get("droneAngle");
+        droneAngle = hardwareMap.servo.get("planeAngle");
 
         rotationPositionInput = hardwareMap.get(AnalogInput.class, "rotationPositionInput");
         armPositionInput = hardwareMap.get(AnalogInput.class, "armPositionInput");

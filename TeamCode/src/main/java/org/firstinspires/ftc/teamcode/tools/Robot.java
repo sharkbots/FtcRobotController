@@ -170,7 +170,7 @@ public class Robot {
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
                 .servoRunToPosition(clawPitch, clawPitchIntake)
                 .waitForAnalogSensorAtPosition(clawPitchAnalogSensor, analog_ClawPitch_ResetPosition, 10)
-                .startMotor(lift.liftMotor, -1, true)
+                .startMotor(lift.liftMotor, -1, false)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
                 .resetMotorEncoder(lift.liftMotor));

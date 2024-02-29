@@ -16,8 +16,10 @@ public class Hanger {
     private final double HANGER_REVOLUTIONS = 0.4; //need to test to see how many revolutions
     private final Button handlerDPadDown, handlerDPadUp, handlerY;
 
-    private final int maxSkyHookPosition = 10800;
+    private final int maxSkyHookPosition = 3600;
     private final int minSkyHookPosition = 100;
+
+    private double hangerPower = 0;
 
     private int autoMoveHanger = 0; // 0 means nothing, 1 means up, -1 means down for the auto go up
 
@@ -43,14 +45,14 @@ public class Hanger {
 
         if(handlerDPadUp.On()){
             autoMoveHanger = 0;
-            hangerMotor.setPower(1);
+            hangerPower = 1;
         }
         else if(handlerDPadDown.On()){ // button is pressed
             autoMoveHanger = 0;
-            hangerMotor.setPower(-1);
+            hangerPower = -1;
         }
         else if (autoMoveHanger == 0){ // We stop the motor only in manual mode
-            hangerMotor.setPower(0);
+            hangerPower = 0;
         }
 
         if(handlerY.Pressed()){
@@ -58,13 +60,15 @@ public class Hanger {
                 autoMoveHanger = -1; // We're flipping the value each time. We start with -1
             }
             autoMoveHanger = -autoMoveHanger;
-            hangerMotor.setPower(autoMoveHanger);
+            hangerPower = autoMoveHanger;
         }
-        if (hangerMotor.getPower() < 0 && hangerEncoder.getCurrentPosition() <= minSkyHookPosition) {
-            hangerMotor.setPower(0);
+        if (hangerPower < 0 && hangerEncoder.getCurrentPosition() <= minSkyHookPosition) {
+            hangerPower = 0;
         }
-        else if (hangerMotor.getPower() > 0 && hangerEncoder.getCurrentPosition() >= maxSkyHookPosition){
-            hangerMotor.setPower(0);
+        else if (hangerPower > 0 && hangerEncoder.getCurrentPosition() >= maxSkyHookPosition){
+            hangerPower = 0;
         }
+
+        hangerMotor.setPower(hangerPower);
     }
 }
