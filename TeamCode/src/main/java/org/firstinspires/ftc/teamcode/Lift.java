@@ -34,19 +34,15 @@ public class Lift {
     public void update() {
 
         // Bit of a hack (so that when it comes from state machine target pos is not 0)
-        lastSetPosition = liftMotor.getTargetPosition();
+        lastSetPosition = Global.ensureWithin(liftMotor.getTargetPosition(), liftEncoderMin, liftEncoderMax);
 
         // If the handler does not want to move motor, then hold the last position set by the handler
         // Else, move the motor normally
-        if (Math.abs(gamepad2.right_stick_y)<handlerLiftDeadzone){
-            // Makes sure lift does not go past its limits
-            if (lastSetPosition < liftEncoderMin){
-                lastSetPosition = liftEncoderMin;
-            }
-            else if (lastSetPosition > liftEncoderMax){
-                lastSetPosition = liftEncoderMax;
-            }
+        if ((Math.abs(gamepad2.right_stick_y)<handlerLiftDeadzone) ||
+                (-gamepad2.right_stick_y>0 && lastSetPosition==liftEncoderMax) ||
+                (-gamepad2.right_stick_y<0 && lastSetPosition==liftEncoderMin)
 
+        ){
             holdPosition(lastSetPosition);
         }
         else{
@@ -54,7 +50,7 @@ public class Lift {
             lastSetPosition = liftMotor.getCurrentPosition();
 
             // Hack continued :-)
-            liftMotor.setTargetPosition(lastSetPosition);
+            liftMotor.setTargetPosition(Global.ensureWithin(lastSetPosition, liftEncoderMin, liftEncoderMax));
         }
     }
 
@@ -62,19 +58,7 @@ public class Lift {
         double power = -gamepad.right_stick_y;
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        PIDFCoefficients coeffs = liftMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
-        //Global.telemetry.addData("f: ", coeffs.f); // 0
-        //Global.telemetry.addData("p: ", coeffs.p); // 10
-        //Global.telemetry.addData("i: ", coeffs.i); // 3
-        //Global.telemetry.addData("d: ", coeffs.d); // 0
-        //Global.telemetry.update();
-        coeffs.p = 10;
-        coeffs.i = 3;
-        coeffs.d = 0;
-
-        liftMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coeffs);
-
-        if ((liftMotor.getCurrentPosition() > liftEncoderMax*0.95) && power > 0){
+        if ((liftMotor.getCurrentPosition() > liftEncoderMax*1.05) && power > 0){
             power = 0;
         }
         if ((liftMotor.getCurrentPosition() < liftEncoderMin*0.95) && power < 0){
@@ -86,6 +70,7 @@ public class Lift {
         }
         else {
             liftMotor.setPower(0);
+            power = 0;
         }
 
         Global.telemetry.addData("power: ", power);
