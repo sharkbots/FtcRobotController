@@ -166,14 +166,14 @@ public class Robot {
                 .servoRunToPosition(clawYaw, clawYawIntake)
                 .waitForAnalogSensorAtPosition(clawYawAnalogSensor, analog_ClawYaw_ResetPosition, 5)
 
-                // To get lift going down as fast as possible, bring it down with motor power instead of servo
-                // servo will act as maintaining a linear speed and it's slower than just motor power with help of gravity
-                .startMotor(lift.liftMotor, -1, false)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
-                .stopMotor(lift.liftMotor)
                 .setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
 
                 .servoRunToPosition(clawPitch, clawPitchIntake)
+
+                // To get lift going down as fast as possible, bring it down with motor power instead of servo
+                // servo will act as maintaining a linear speed and it's slower than just motor power with help of gravity
+
                 .waitForAnalogSensorAtPosition(clawPitchAnalogSensor, analog_ClawPitch_ResetPosition, 10)
                 .startMotor(lift.liftMotor, -1, false)
                 .waitForTouchSensorPressed(liftTouchDown)
@@ -342,7 +342,7 @@ public class Robot {
             planeAngle.setPosition(planeAngleLaunch);
             sleep(500);
             planeLauncher.setPower(1);
-            sleep(200);
+            sleep(500);
         }
         else{
             planeAngle.setPosition(planeAngleStore);
