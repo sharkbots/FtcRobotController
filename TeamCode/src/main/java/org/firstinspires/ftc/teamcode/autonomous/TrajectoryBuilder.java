@@ -24,39 +24,45 @@ public class TrajectoryBuilder {
     public ArrayList<TrajectorySequence> computeTrajectory(propLocations propLoc, SampleMecanumDrive drive, AutoBase.Coordinates c) {
         ArrayList<TrajectorySequence> finalTrajectory = new ArrayList<>();
 
-        Vector2d prepareFarDrop = c.prepareFarDrop;
         Vector2d backdropIntermediateFar = c.backdropIntermediateFar;
         Vector2d intermediateDropFar = c.intermediateDropFar;
 
         if (propLoc == propLocations.LEFT) {
             teamPropCoordinate = c.leftTeamProp;
-            backdropCoordinate = c.backdropLeft;
             backdropIntermediateCoordinate = c.backdropIntermediateLeft;
+            backdropCoordinate = c.backdropLeft;
+            backdropStrafeCoordinate = c.backdropCenter;
         }
         else if (propLoc == propLocations.RIGHT) {
             teamPropCoordinate = c.rightTeamProp;
-            backdropCoordinate = c.backdropRight;
             backdropIntermediateCoordinate = c.backdropIntermediateRight;
+            backdropCoordinate = c.backdropRight;
+            backdropStrafeCoordinate = c.backdropCenter;
+
         }
         else {
             teamPropCoordinate = c.centerTeamProp;
-            backdropCoordinate = c.backdropCenter;
             backdropIntermediateCoordinate = c.backdropIntermediateCenter;
+            backdropCoordinate = c.backdropCenter;
+            backdropStrafeCoordinate = c.backdropLeft; // arbitrary left, could be right
+
         }
 
         assert drive != null;
         TrajectorySequence purpleDrop = drive.trajectorySequenceBuilder(c.startPose)
                 .lineToLinearHeading(teamPropCoordinate)
                 .build();
-        finalTrajectory.add(purpleDrop);
+        finalTrajectory.add(purpleDrop); //get 0
+
+
+
 
         TrajectorySequence setupForBackdropNear = drive.trajectorySequenceBuilder(purpleDrop.end())
-                //.forward(6)
                 .lineTo(c.setupForBackdrop)
                 .build();
 
         TrajectorySequence setupForBackdropFar = drive.trajectorySequenceBuilder(purpleDrop.end())
-                .lineTo(prepareFarDrop)
+                .lineTo(c.prepareFarDrop)
                 .lineTo(backdropIntermediateFar)
                 .build();
 
@@ -67,33 +73,24 @@ public class TrajectoryBuilder {
         } else{
             finalTrajectory.add(setupForBackdropFar);
             endPurpledrop = setupForBackdropFar.end();
-        }
+        } // get 1
 
-        TrajectorySequence goToBackdropNear = drive.trajectorySequenceBuilder(endPurpledrop)
-                //.lineToLinearHeading(backdropIntermediateCoordinate)
+        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(endPurpledrop)
                 .lineToLinearHeading(backdropCoordinate)
+                .back(3)
                 .build();
 
-        TrajectorySequence gotoBackdropFar = drive.trajectorySequenceBuilder(setupForBackdropFar.end())
-                .lineTo(intermediateDropFar)
-                .lineToLinearHeading(backdropIntermediateCoordinate)
-                .lineToLinearHeading(backdropCoordinate)
-                .build();
+        finalTrajectory.add(goToBackdrop); // get 2
 
-        if (c.isNearSide) {
-            finalTrajectory.add(goToBackdropNear);
-        }else{
-            finalTrajectory.add(gotoBackdropFar);
-        }
-
-        TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdropNear.end())
+        TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdrop.end())
                 //.forward(8)
                 //.lineToLinearHeading(c.parkIntermediate)
                 //.lineToLinearHeading(c.parkBetweenBackdrops)
                 .lineTo(c.parkInCorner)
+                .back(10)
                 .build();
 
-        TrajectorySequence parkLeft = drive.trajectorySequenceBuilder(gotoBackdropFar.end())
+        TrajectorySequence parkLeft = drive.trajectorySequenceBuilder(goToBackdrop.end())
                 .lineTo(c.parkBetweenBackdrops)
                 .build();
 
@@ -118,6 +115,7 @@ public class TrajectoryBuilder {
 
     Pose2d teamPropCoordinate;
     Pose2d backdropCoordinate;
+    Pose2d backdropStrafeCoordinate;
     Pose2d backdropIntermediateCoordinate;
 
 }

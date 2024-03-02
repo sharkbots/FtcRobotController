@@ -31,7 +31,7 @@ public abstract class AutoBase extends LinearOpMode {
         Pose2d rightTeamProp = new Pose2d(9, 32, Math.toRadians(0.00));
 
         // vectors to set up for backdrop
-        Vector2d setupForBackdrop = new Vector2d(30, 50);
+        Vector2d setupForBackdrop = new Vector2d(25, 50);
 
         // near side
         Pose2d backdropIntermediateLeft = new Pose2d(30, 42, Math.toRadians(180.00));
@@ -39,9 +39,9 @@ public abstract class AutoBase extends LinearOpMode {
         Pose2d backdropIntermediateRight = new Pose2d(30, 30, Math.toRadians(180.00));
 
         //Blue backdrop
-        Pose2d backdropLeft = new Pose2d(49.5, 44, Math.toRadians(180.00));
-        Pose2d backdropCenter = new Pose2d(49.5, 36, Math.toRadians(180.00));
-        Pose2d backdropRight = new Pose2d(49.5, 28, Math.toRadians(180.00));
+        Pose2d backdropLeft = new Pose2d(47, 45, Math.toRadians(180.00));
+        Pose2d backdropCenter = new Pose2d(47, 36, Math.toRadians(180.00));
+        Pose2d backdropRight = new Pose2d(47, 30, Math.toRadians(180.00));
 
         // Blue alliance parking
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
@@ -49,10 +49,10 @@ public abstract class AutoBase extends LinearOpMode {
         Vector2d parkInCorner = new Vector2d(45, 62);
 
         //blue far side
-        Vector2d prepareFarDrop = new Vector2d(-37, 62);
+        Vector2d prepareFarDrop = new Vector2d(-37, 59);
 
-        Vector2d backdropIntermediateFar = new Vector2d(14, 62);
-        Vector2d intermediateDropFar = new Vector2d(50, 62);
+        Vector2d backdropIntermediateFar = new Vector2d(18, 59);
+        Vector2d intermediateDropFar = new Vector2d(35, 59);
 
 
 
@@ -66,9 +66,10 @@ public abstract class AutoBase extends LinearOpMode {
             // Blue alliance far side
             if(isBlueAlliance && !isNearSide){
                 startPose = flipToFarSide(startPose);
-                rightTeamProp = flipToFarSide(rightTeamProp);
+                Pose2d tempRightTeamProp = rightTeamProp;
+                rightTeamProp = flipToFarSide(leftTeamProp);
                 centerTeamProp = flipToFarSide(centerTeamProp);
-                leftTeamProp = flipToFarSide(leftTeamProp);
+                leftTeamProp = flipToFarSide(tempRightTeamProp);
             }
 
             // Red alliance
@@ -218,11 +219,15 @@ public abstract class AutoBase extends LinearOpMode {
 
 
         // Raise lift more + angle the claw to outtake
-        robot.autoOutTakeYellow.runAsync();
-
+        if(c.isNearSide) {
+            robot.autoOutTakeYellow.runAsync();
+        }
         // Position the robot in front of the backdrop
         drive.followTrajectorySequence(finalTrajectory.get(1));
 
+        if(!c.isNearSide) {
+            robot.autoOutTakeYellow.runAsync();
+        }
 
         // Go to the backdrop
         drive.followTrajectorySequence(finalTrajectory.get(2));

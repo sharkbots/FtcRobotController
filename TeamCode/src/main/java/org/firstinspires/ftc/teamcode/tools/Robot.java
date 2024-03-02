@@ -188,8 +188,8 @@ public class Robot {
 
 
         autoOutTakeYellow = new Actions(new ActionBuilder()
-                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin+150, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin+150)
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin-300, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin-300)
                 .servoRunToPosition(clawPitch, clawPitchOutTake));
 
         autoOutTakeYellowLow = new Actions(new ActionBuilder()
@@ -197,6 +197,9 @@ public class Robot {
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingLow));
 
         autoOpenClaw = new Actions(new ActionBuilder()
+                .servoRunToPosition(clawGrip, clawOpen/2)
+                .resetTimer(timer)
+                .waitUntil(timer, 300)
                 .servoRunToPosition(clawGrip, clawOpen)
                 .resetTimer(timer)
                 .waitUntil(timer, 300)
