@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
@@ -35,12 +36,13 @@ public abstract class AutoBase extends LinearOpMode {
 
         // near side
         Pose2d backdropIntermediateLeft = new Pose2d(47, 43, Math.toRadians(180.00));
-        Pose2d backdropIntermediateCenter = new Pose2d(47, 39, Math.toRadians(180.00));
+        Pose2d backdropIntermediateCenter = new Pose2d(47, 37, Math.toRadians(180.00));
         Pose2d backdropIntermediateRight = new Pose2d(47, 33, Math.toRadians(180.00));
 
         //Blue backdrop
+        Pose2d backdropStrafeForCenter = new Pose2d(51, 45, Math.toRadians(180.00));
         Pose2d backdropLeft = new Pose2d(51, 43, Math.toRadians(180.00));
-        Pose2d backdropCenter = new Pose2d(51, 39, Math.toRadians(180.00));
+        Pose2d backdropCenter = new Pose2d(51, 37, Math.toRadians(180.00));
         Pose2d backdropRight = new Pose2d(51, 33, Math.toRadians(180.00));
 
         // Blue alliance parking
@@ -66,10 +68,11 @@ public abstract class AutoBase extends LinearOpMode {
             // Blue alliance far side
             if(isBlueAlliance && !isNearSide){
                 startPose = flipToFarSide(startPose);
-                Pose2d tempRightTeamProp = rightTeamProp;
-                rightTeamProp = flipToFarSide(leftTeamProp);
+                Pose2d tempLeftTeamProp = leftTeamProp;
+                leftTeamProp = flipToFarSide(rightTeamProp);
                 centerTeamProp = flipToFarSide(centerTeamProp);
-                leftTeamProp = flipToFarSide(tempRightTeamProp);
+                rightTeamProp = flipToFarSide(tempLeftTeamProp);
+
             }
 
             // Red alliance
@@ -77,13 +80,17 @@ public abstract class AutoBase extends LinearOpMode {
                 // Red backdrop
                 setupForBackdrop = flipVectorAcrossX(setupForBackdrop);
 
-//                backdropIntermediateLeft = flipBackDrop(backdropIntermediateLeft);
-//                backdropIntermediateCenter = flipBackDrop(backdropIntermediateCenter);
-//                backdropIntermediateRight = flipBackDrop(backdropIntermediateRight);
-                backdropLeft = flipBackDrop(backdropLeft);
-                backdropCenter = flipBackDrop(backdropCenter);
-                backdropRight = flipBackDrop(backdropRight);
-                
+                Pose2d tempLeftPose = backdropIntermediateLeft;
+                backdropIntermediateLeft = flipAcrossX(backdropIntermediateRight);
+                backdropIntermediateCenter = flipAcrossX(backdropIntermediateCenter);
+                backdropIntermediateRight = flipAcrossX(tempLeftPose);
+
+                tempLeftPose = backdropLeft;
+                backdropLeft = flipAcrossX(backdropRight);
+                backdropCenter = flipAcrossX(backdropCenter);
+                backdropStrafeForCenter = flipAcrossX(backdropStrafeForCenter);
+                backdropRight = flipAcrossX(tempLeftPose);
+
                 parkIntermediate = flipAcrossX(parkIntermediate);
                 parkInCorner = flipVectorAcrossX(parkInCorner);
                 parkBetweenBackdrops = flipVectorAcrossX(parkBetweenBackdrops);
@@ -94,19 +101,18 @@ public abstract class AutoBase extends LinearOpMode {
                 // Near side
                 if (isNearSide){
                     startPose = flipAcrossX(startPose);
-                    Pose2d tempRightTeamProp = rightTeamProp;
-                    rightTeamProp = flipAcrossX(leftTeamProp); //blue left spike mark is symmetrical to red right spike mark
+                    Pose2d tempLeftTeamProp = leftTeamProp;
+                    leftTeamProp = flipAcrossX(rightTeamProp);//blue left spike mark is symmetrical to red right spike mark
                     centerTeamProp = flipAcrossX(centerTeamProp);
-                    leftTeamProp = flipAcrossX(tempRightTeamProp); //ibid
+                    rightTeamProp = flipAcrossX(tempLeftTeamProp);
                 }
 
                 // Far side
                 if (!isNearSide){
                     startPose = flipAcrossCenter(startPose);
-                    Pose2d tempRightTeamProp = rightTeamProp;
-                    rightTeamProp = flipAcrossCenter(leftTeamProp);
+                    leftTeamProp = flipAcrossCenter(leftTeamProp);
                     centerTeamProp = flipAcrossCenter(centerTeamProp);
-                    leftTeamProp = flipAcrossCenter(tempRightTeamProp);
+                    rightTeamProp = flipAcrossCenter(rightTeamProp);
 
                     prepareFarDrop = flipVectorAcrossX(prepareFarDrop);
                 }
@@ -141,9 +147,9 @@ public abstract class AutoBase extends LinearOpMode {
             return new Pose2d(pose.getX()-48, -pose.getY(), pose.getHeading());
         }
 
-        public Pose2d flipBackDrop(Pose2d pose){
-            return new Pose2d(pose.getX(), pose.getY()-72, (-pose.getHeading())%Math.toRadians(360));
-        }
+//        public Pose2d flipBackDrop(Pose2d pose){
+//            return new Pose2d(pose.getX(), pose.getY()-72, (-pose.getHeading())%Math.toRadians(360));
+//        }
 
     }
     Coordinates c; //= new Coordinates(true, true); // change values later
@@ -190,13 +196,13 @@ public abstract class AutoBase extends LinearOpMode {
             if(currentPropLoc!=TeamPropDetection.propLocation.NULL) {
                 propLoc = currentPropLoc;
                 telemetry.addLine("Detected:" + propLoc);
-                //telemetry.update();
+                telemetry.update();
             }
-            Global.telemetry.addData("startPose: ", c.startPose);
-            Global.telemetry.addData("rightTeamProp: ", c.rightTeamProp);
-            Global.telemetry.addData("centerTeamProp: ", c.centerTeamProp);
-            Global.telemetry.addData("leftTeamProp: ", c.leftTeamProp);
-            Global.telemetry.update();
+//            Global.telemetry.addData("startPose: ", c.startPose);
+//            Global.telemetry.addData("rightTeamProp: ", c.rightTeamProp);
+//            Global.telemetry.addData("centerTeamProp: ", c.centerTeamProp);
+//            Global.telemetry.addData("leftTeamProp: ", c.leftTeamProp);
+//            Global.telemetry.update();
         }
 
         myLocalizer.setPoseEstimate(c.startPose);
@@ -230,6 +236,10 @@ public abstract class AutoBase extends LinearOpMode {
         drive.followTrajectorySequence(finalTrajectory.get(1));
 
         if(!c.isNearSide) {
+            ElapsedTime timer = new ElapsedTime();
+            while(timer.seconds() < 8) {
+                continue;
+            }
             robot.autoOutTakeYellow.runAsync();
         }
 
