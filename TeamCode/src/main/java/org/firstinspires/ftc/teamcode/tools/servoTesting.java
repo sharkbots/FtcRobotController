@@ -110,6 +110,11 @@ public class servoTesting extends LinearOpMode {
             }
 
             clawYaw.setPosition(0.5);
+            liftMotor.setTargetPosition(1500);
+            liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            liftMotor.setPower(1);
+
+            clawPitch.setPosition(0.28);
 
             // From axon 4th position wire plugged into the analog port
             // See https://docs.axon-robotics.com/axon-servos/analog-jst-board

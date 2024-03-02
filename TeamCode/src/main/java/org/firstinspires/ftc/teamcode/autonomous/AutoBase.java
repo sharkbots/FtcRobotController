@@ -198,11 +198,6 @@ public abstract class AutoBase extends LinearOpMode {
                 telemetry.addLine("Detected:" + propLoc);
                 telemetry.update();
             }
-//            Global.telemetry.addData("startPose: ", c.startPose);
-//            Global.telemetry.addData("rightTeamProp: ", c.rightTeamProp);
-//            Global.telemetry.addData("centerTeamProp: ", c.centerTeamProp);
-//            Global.telemetry.addData("leftTeamProp: ", c.leftTeamProp);
-//            Global.telemetry.update();
         }
 
         myLocalizer.setPoseEstimate(c.startPose);
@@ -232,15 +227,24 @@ public abstract class AutoBase extends LinearOpMode {
         if(c.isNearSide) {
             robot.autoOutTakeYellow.runAsync();
         }
+        else {
+            ElapsedTime timer = new ElapsedTime();
+            while(timer.seconds() < 9) {
+                continue;
+            }
+        }
         // Position the robot in front of the backdrop
         drive.followTrajectorySequence(finalTrajectory.get(1));
 
         if(!c.isNearSide) {
-            ElapsedTime timer = new ElapsedTime();
-            while(timer.seconds() < 8) {
-                continue;
+
+            if(propLoc == TeamPropDetection.propLocation.CENTER)
+                robot.autoOutTakeYellowHigh.runAsync();
+            else {
+                robot.autoOutTakeYellow.runAsync();
+
             }
-            robot.autoOutTakeYellow.runAsync();
+
         }
 
         // Go to the backdrop

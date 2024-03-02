@@ -174,7 +174,9 @@ public class Robot {
                 // To get lift going down as fast as possible, bring it down with motor power instead of servo
                 // servo will act as maintaining a linear speed and it's slower than just motor power with help of gravity
 
+                .servoRunToPosition(clawPitch, clawPitchIntake)
                 .waitForAnalogSensorAtPosition(clawPitchAnalogSensor, analog_ClawPitch_ResetPosition, 10)
+
                 .startMotor(lift.liftMotor, -1, false)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
@@ -188,8 +190,13 @@ public class Robot {
 
 
         autoOutTakeYellow = new Actions(new ActionBuilder()
-                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin-300, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin-300)
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin-100, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin-100)
+                .servoRunToPosition(clawPitch, clawPitchOutTake));
+
+        autoOutTakeYellowHigh = new Actions(new ActionBuilder()
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin+300, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin+300)
                 .servoRunToPosition(clawPitch, clawPitchOutTake));
 
         autoOutTakeYellowLow = new Actions(new ActionBuilder()
@@ -286,7 +293,7 @@ public class Robot {
             holdingPixelsToIdle, idleToHoldingPixels, holdingPixelsToOutTakingPixels, exitingOutTakeToIdle;
 
     //Autonomous Actions
-    public Actions autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowLow, autoOpenClaw;
+    public Actions autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autoOpenClaw;
 
     // Motors
 

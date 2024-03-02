@@ -82,7 +82,6 @@ public class ActionBuilder {
     public ActionBuilder waitForAnalogSensorAtPosition(AnalogInput analogSensor, double expectedPosition, int tolerance) {
         ActionFunction function = () -> {
             double currentPosition = analogSensor.getVoltage() / 3.3 * 360;
-
             return Math.abs(expectedPosition - currentPosition) <= tolerance;
         };
         String name = "test if servo analog sensor " + analogSensor.getDeviceName() +

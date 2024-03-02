@@ -13,7 +13,7 @@ public class Lift {
     public final int liftEncoderHolding = 800; // Set your minimum encoder value here
     public final int liftEncoderHoldingTeleop = 50; // Set your minimum encoder value here
     public final int liftEncoderHoldingLow = 150; // Set your minimum encoder value here
-    public final int liftEncoderMin = 1600; // Set your minimum encoder value here
+    public final int liftEncoderMin = 1400; // Set your minimum encoder value here
     private final int liftEncoderMax = 3600;
     public DcMotorEx liftMotor;
     Gamepad gamepad2;
@@ -73,10 +73,6 @@ public class Lift {
             power = 0;
         }
 
-        Global.telemetry.addData("power: ", power);
-        Global.telemetry.addData("right_stick_y: ", gamepad.right_stick_y);
-        Global.telemetry.addData("position: ", liftMotor.getCurrentPosition());
-        Global.telemetry.update();
     }
 
     public void holdPosition(int position) {

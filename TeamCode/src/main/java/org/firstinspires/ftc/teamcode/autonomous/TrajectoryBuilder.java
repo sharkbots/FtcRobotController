@@ -81,24 +81,43 @@ public class TrajectoryBuilder {
         } // get 1
 
         TrajectorySequence goToBackdrop;
+        TrajectorySequenceBuilder goToBackdropBuilder = drive.trajectorySequenceBuilder(endPurpledrop);
         if (c.isNearSide) {
-            goToBackdrop = drive.trajectorySequenceBuilder(endPurpledrop)
+            goToBackdropBuilder = goToBackdropBuilder
                     .lineToSplineHeading(backdropIntermediateCoordinate)
-                    .lineToLinearHeading(backdropCoordinate)
-                                .build();
+                    .lineToLinearHeading(backdropCoordinate);
+
+            if (c.startPose.getHeading()!=teamPropCoordinate.getHeading()){
+                if (c.isBlueAlliance) {
+                    goToBackdropBuilder = goToBackdropBuilder.strafeLeft(4);
+                } else {
+                    goToBackdropBuilder = goToBackdropBuilder.strafeRight(6);
+                }
+            }
         }
         else {
-            goToBackdrop = drive.trajectorySequenceBuilder(endPurpledrop)
+            if (propLoc != propLocations.CENTER) {
+                goToBackdropBuilder = goToBackdropBuilder
                     // Stop 3 inches before touching backdrop so that heading / robot pivoting is smooth and doesn't scratch backdrop
                     .lineToSplineHeading(new Pose2d(backdropStrafeCoordinate.getX() - 3,
                             backdropStrafeCoordinate.getY(),
                             backdropStrafeCoordinate.getHeading()))
                     .back(3)
                     .lineToLinearHeading(backdropCoordinate, SampleMecanumDrive.getVelocityConstraint(15, 15, DriveConstants.TRACK_WIDTH),
-                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                    .build();
+                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL));
+            }
+            else {
+                goToBackdropBuilder = goToBackdropBuilder
+                        .lineToSplineHeading(backdropIntermediateCoordinate)
+                        .lineToLinearHeading(backdropCoordinate);
+                if (c.isBlueAlliance) {
+                    goToBackdropBuilder = goToBackdropBuilder.strafeRight(1);
+                } else {
+                    goToBackdropBuilder = goToBackdropBuilder.strafeLeft(3);
+                }
+            }
         }
-
+        goToBackdrop = goToBackdropBuilder.build();
         finalTrajectory.add(goToBackdrop); // get 2
 
         TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdrop.end())
