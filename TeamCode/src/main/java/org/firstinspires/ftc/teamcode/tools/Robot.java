@@ -97,6 +97,9 @@ public class Robot {
 
         // Timer
         timer = new ElapsedTime();
+        timerForPlane = new ElapsedTime();
+        isPlaneTimerReset = false;
+        isPlaneLaunchTriggered = false;
 
         // States
         intakingPixels = new StateMachine.State("pixelTransition");
@@ -318,7 +321,8 @@ public class Robot {
             handlerRightBumper, handlerLeftTrigger, handlerRightTrigger, handlerDPad_Down, handlerDPad_Up, handlerDPad_Left, handlerDPad_Right;
 
     Gamepad gamepad1, gamepad2;
-    ElapsedTime timer;
+    ElapsedTime timer, timerForPlane;
+    boolean isPlaneTimerReset, isPlaneLaunchTriggered = false;
 
     private void updateButtons(){
         handlerA.updateButton(gamepad2);
@@ -349,14 +353,37 @@ public class Robot {
             intakeMotor.cancelOverridePower();
         }
         if(handlerX.On()) {
+            isPlaneLaunchTriggered = true;
+            if(!isPlaneTimerReset) {
+                timerForPlane.reset();
+                isPlaneTimerReset = true;
+            }
+
             planeAngle.setPosition(planeAngleLaunch);
-            sleep(500);
-            planeLauncher.setPower(1);
-            sleep(500);
+
+            if(timerForPlane.milliseconds() >= 500) {
+                planeLauncher.setPower(1);
+                timerForPlane.reset();
+                isPlaneTimerReset = true;
+            }
         }
         else{
-            planeAngle.setPosition(planeAngleStore);
-            planeLauncher.setPower(0);
+            if(isPlaneLaunchTriggered &&  timerForPlane.milliseconds() >= 500) {
+                planeLauncher.setPower(1);
+                isPlaneLaunchTriggered = false;
+                timerForPlane.reset();
+                isPlaneTimerReset = true;
+            }
+            else {
+                if(timerForPlane.milliseconds() >= 500) {
+                    isPlaneTimerReset = false;
+                    planeAngle.setPosition(planeAngleStore);
+                    planeLauncher.setPower(0);
+                    isPlaneLaunchTriggered = false;
+                }
+            }
+
+
         }
         if(!(stateMachine.getCurrentState() == outTakingPixels)){
             skyHook.update(handlerDPad_Down);
