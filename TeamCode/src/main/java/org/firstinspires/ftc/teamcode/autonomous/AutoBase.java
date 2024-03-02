@@ -185,7 +185,6 @@ public abstract class AutoBase extends LinearOpMode {
         Robot.clawGrip.setPosition(Robot.clawCloseOnePixel);
         Robot.clawPitch.setPosition(Robot.clawPitchIntake);
         Robot.clawYaw.setPosition(Robot.clawYawIntake);
-        Robot.planeAngle.setPosition(Robot.planeAngleStore);
 
         TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
         ArrayList<TrajectorySequence> finalTrajectory;
@@ -221,6 +220,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Deposit purple pixel on spike mark
         drive.followTrajectorySequence(finalTrajectory.get(0));
+        Robot.planeAngle.setPosition(Robot.planeAngleStore);
 
 
         // Raise lift more + angle the claw to outtake
