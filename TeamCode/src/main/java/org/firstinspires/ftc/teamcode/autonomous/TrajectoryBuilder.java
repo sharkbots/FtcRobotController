@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
+import org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
 
@@ -25,19 +26,18 @@ public class TrajectoryBuilder {
         ArrayList<TrajectorySequence> finalTrajectory = new ArrayList<>();
 
         Vector2d backdropIntermediateFar = c.backdropIntermediateFar;
-        Vector2d intermediateDropFar = c.intermediateDropFar;
-
+        Pose2d backdropIntermediateCoordinate;
         if (propLoc == propLocations.LEFT) {
             teamPropCoordinate = c.leftTeamProp;
             backdropIntermediateCoordinate = c.backdropIntermediateLeft;
             backdropCoordinate = c.backdropLeft;
-            backdropStrafeCoordinate = c.backdropCenter;
+            backdropStrafeCoordinate = c.backdropRight;
         }
         else if (propLoc == propLocations.RIGHT) {
             teamPropCoordinate = c.rightTeamProp;
             backdropIntermediateCoordinate = c.backdropIntermediateRight;
             backdropCoordinate = c.backdropRight;
-            backdropStrafeCoordinate = c.backdropCenter;
+            backdropStrafeCoordinate = c.backdropLeft;
 
         }
         else {
@@ -53,8 +53,6 @@ public class TrajectoryBuilder {
                 .lineToLinearHeading(teamPropCoordinate)
                 .build();
         finalTrajectory.add(purpleDrop); //get 0
-
-
 
 
         TrajectorySequence setupForBackdropNear = drive.trajectorySequenceBuilder(purpleDrop.end())
@@ -75,17 +73,28 @@ public class TrajectoryBuilder {
             endPurpledrop = setupForBackdropFar.end();
         } // get 1
 
-        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(endPurpledrop)
-                .lineToLinearHeading(backdropCoordinate)
-                .back(3)
-                .build();
+        TrajectorySequence goToBackdrop;
+        if (c.isNearSide) {
+            goToBackdrop = drive.trajectorySequenceBuilder(endPurpledrop)
+                    .lineToLinearHeading(backdropIntermediateCoordinate)
+                    .lineToLinearHeading(backdropCoordinate)
+                                .build();
+        }
+        else {
+            goToBackdrop = drive.trajectorySequenceBuilder(endPurpledrop)
+                    // Stop 3 inches before touching backdrop so that heading / robot pivoting is smooth and doesn't scratch backdrop
+                    .lineToLinearHeading(new Pose2d(backdropStrafeCoordinate.getX() - 3,
+                            backdropStrafeCoordinate.getY(),
+                            backdropStrafeCoordinate.getHeading()))
+                    .back(3)
+                    .lineToLinearHeading(backdropCoordinate, SampleMecanumDrive.getVelocityConstraint(15, 15, DriveConstants.TRACK_WIDTH),
+                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                    .build();
+        }
 
         finalTrajectory.add(goToBackdrop); // get 2
 
         TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdrop.end())
-                //.forward(8)
-                //.lineToLinearHeading(c.parkIntermediate)
-                //.lineToLinearHeading(c.parkBetweenBackdrops)
                 .lineTo(c.parkInCorner)
                 .back(10)
                 .build();
@@ -116,6 +125,5 @@ public class TrajectoryBuilder {
     Pose2d teamPropCoordinate;
     Pose2d backdropCoordinate;
     Pose2d backdropStrafeCoordinate;
-    Pose2d backdropIntermediateCoordinate;
 
 }

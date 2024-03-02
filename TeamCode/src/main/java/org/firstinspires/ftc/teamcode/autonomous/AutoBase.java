@@ -25,28 +25,28 @@ public abstract class AutoBase extends LinearOpMode {
         Boolean isNearSide;
 
         //Blue near side
-        Pose2d startPose = new Pose2d(12, 62, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(12, 62, Math.toRadians(90.0));
         Pose2d leftTeamProp = new Pose2d(20, 38, Math.toRadians(90.0));
         Pose2d centerTeamProp = new Pose2d(12, 32, Math.toRadians(90.00));
         Pose2d rightTeamProp = new Pose2d(9, 32, Math.toRadians(0.00));
 
         // vectors to set up for backdrop
-        Vector2d setupForBackdrop = new Vector2d(25, 50);
+        Vector2d setupForBackdrop = new Vector2d(30, 50);
 
         // near side
-        Pose2d backdropIntermediateLeft = new Pose2d(30, 42, Math.toRadians(180.00));
-        Pose2d backdropIntermediateCenter = new Pose2d(35, 36, Math.toRadians(180.00));
-        Pose2d backdropIntermediateRight = new Pose2d(30, 30, Math.toRadians(180.00));
+        Pose2d backdropIntermediateLeft = new Pose2d(47, 43, Math.toRadians(180.00));
+        Pose2d backdropIntermediateCenter = new Pose2d(47, 39, Math.toRadians(180.00));
+        Pose2d backdropIntermediateRight = new Pose2d(47, 33, Math.toRadians(180.00));
 
         //Blue backdrop
-        Pose2d backdropLeft = new Pose2d(47, 45, Math.toRadians(180.00));
-        Pose2d backdropCenter = new Pose2d(47, 36, Math.toRadians(180.00));
-        Pose2d backdropRight = new Pose2d(47, 30, Math.toRadians(180.00));
+        Pose2d backdropLeft = new Pose2d(51, 43, Math.toRadians(180.00));
+        Pose2d backdropCenter = new Pose2d(51, 39, Math.toRadians(180.00));
+        Pose2d backdropRight = new Pose2d(51, 33, Math.toRadians(180.00));
 
         // Blue alliance parking
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
         Vector2d parkBetweenBackdrops = new Vector2d(50, 11.5);
-        Vector2d parkInCorner = new Vector2d(45, 62);
+        Vector2d parkInCorner = new Vector2d(47, 62);
 
         //blue far side
         Vector2d prepareFarDrop = new Vector2d(-37, 59);
@@ -77,9 +77,9 @@ public abstract class AutoBase extends LinearOpMode {
                 // Red backdrop
                 setupForBackdrop = flipVectorAcrossX(setupForBackdrop);
 
-                backdropIntermediateLeft = flipBackDrop(backdropIntermediateLeft);
-                backdropIntermediateCenter = flipBackDrop(backdropIntermediateCenter);
-                backdropIntermediateRight = flipBackDrop(backdropIntermediateRight);
+//                backdropIntermediateLeft = flipBackDrop(backdropIntermediateLeft);
+//                backdropIntermediateCenter = flipBackDrop(backdropIntermediateCenter);
+//                backdropIntermediateRight = flipBackDrop(backdropIntermediateRight);
                 backdropLeft = flipBackDrop(backdropLeft);
                 backdropCenter = flipBackDrop(backdropCenter);
                 backdropRight = flipBackDrop(backdropRight);
@@ -104,11 +104,11 @@ public abstract class AutoBase extends LinearOpMode {
                 if (!isNearSide){
                     startPose = flipAcrossCenter(startPose);
                     Pose2d tempRightTeamProp = rightTeamProp;
-                    rightTeamProp = flipTeamPropAcrossCenter(leftTeamProp);
-                    centerTeamProp = flipTeamPropAcrossCenter(centerTeamProp);
-                    leftTeamProp = flipTeamPropAcrossCenter(tempRightTeamProp);
+                    rightTeamProp = flipAcrossCenter(leftTeamProp);
+                    centerTeamProp = flipAcrossCenter(centerTeamProp);
+                    leftTeamProp = flipAcrossCenter(tempRightTeamProp);
 
-                    prepareFarDrop = flipAcrossXKeepHeadingVector(prepareFarDrop);
+                    prepareFarDrop = flipVectorAcrossX(prepareFarDrop);
                 }
             }
         }
@@ -116,26 +116,25 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Blue alliance to red alliance
         public Pose2d flipAcrossX(Pose2d pose){
-            return new Pose2d(pose.getX(), -pose.getY(), (-pose.getHeading())%360);
+            return new Pose2d(pose.getX(), -pose.getY(), (-pose.getHeading())%Math.toRadians(360));
         }
 
         public Pose2d flipAcrossXKeepHeading(Pose2d pose){ //needed for team prop and prepare far drop
             return new Pose2d(pose.getX(), -pose.getY(), pose.getHeading());
         }
-        public Vector2d flipAcrossXKeepHeadingVector(Vector2d vector2d){ //needed for team prop and prepare far drop
-            return new Vector2d(vector2d.getX(), -vector2d.getY());
-        }
+
         public Vector2d flipVectorAcrossX(Vector2d vector2d){
             return new Vector2d(vector2d.getX(), -vector2d.getY());
         }
 
         // Near side to far side
         public Pose2d flipToFarSide(Pose2d pose){
-            return new Pose2d(pose.getX()-48, pose.getY(), pose.getHeading());
+            return new Pose2d(-(pose.getX()+24), pose.getY(), (Math.toRadians(180)-pose.getHeading())%Math.toRadians(360));
         }
 
         public Pose2d flipAcrossCenter(Pose2d pose) {
-            return new Pose2d(pose.getX()-48, -pose.getY(),(-pose.getHeading())%360);
+            return flipAcrossX(flipToFarSide(pose));
+            //return new Pose2d(pose.getX()-48, -pose.getY(),(-pose.getHeading())%Math.toRadians(360));
         }
 
         public Pose2d flipTeamPropAcrossCenter(Pose2d pose){
@@ -143,7 +142,7 @@ public abstract class AutoBase extends LinearOpMode {
         }
 
         public Pose2d flipBackDrop(Pose2d pose){
-            return new Pose2d(pose.getX(), pose.getY()-71, (-pose.getHeading())%360);
+            return new Pose2d(pose.getX(), pose.getY()-72, (-pose.getHeading())%Math.toRadians(360));
         }
 
     }
@@ -191,8 +190,13 @@ public abstract class AutoBase extends LinearOpMode {
             if(currentPropLoc!=TeamPropDetection.propLocation.NULL) {
                 propLoc = currentPropLoc;
                 telemetry.addLine("Detected:" + propLoc);
-                telemetry.update();
+                //telemetry.update();
             }
+            Global.telemetry.addData("startPose: ", c.startPose);
+            Global.telemetry.addData("rightTeamProp: ", c.rightTeamProp);
+            Global.telemetry.addData("centerTeamProp: ", c.centerTeamProp);
+            Global.telemetry.addData("leftTeamProp: ", c.leftTeamProp);
+            Global.telemetry.update();
         }
 
         myLocalizer.setPoseEstimate(c.startPose);
