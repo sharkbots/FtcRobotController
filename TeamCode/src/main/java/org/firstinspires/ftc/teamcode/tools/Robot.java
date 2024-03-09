@@ -47,38 +47,30 @@ public class Robot {
         intakeMotor = new OverrideMotor(hardwareMap.dcMotor.get("intakeMotor"));
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up, handlerY);//hardwareMap.dcMotor.get("skyHookMotor");
+        skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up);//hardwareMap.dcMotor.get("skyHookMotor");
 
 
         planeLauncher = hardwareMap.dcMotor.get("planeLauncher");
         planeLauncher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Servos
-        planeAngle = hardwareMap.servo.get("planeAngle");
         clawPitch = hardwareMap.servo.get("clawPitch");
         clawYaw = hardwareMap.servo.get("clawYaw");
         clawGrip = hardwareMap.servo.get("clawGrip");
 
-        clawYawAnalogSensor = hardwareMap.get(AnalogInput.class, "rotationPositionInput");
-        clawPitchAnalogSensor = hardwareMap.get(AnalogInput.class, "armPositionInput");
-
-        analog_ClawYaw_ResetPosition = 180;
-        analog_ClawPitch_ResetPosition = 323;
-
-        planeAngle.scaleRange(0.56, 0.77);
-        clawGrip.scaleRange(0, 0.23);
-        clawPitch.scaleRange(0.07, 0.28);
-        clawYaw.scaleRange(0, 1);
+        clawGrip.scaleRange(0.05, 0.35);
+        clawPitch.scaleRange(0.755, 0.973);
+        clawYaw.scaleRange(0.0725, 1);
 
         // Touch Sensors
         liftTouchDown = hardwareMap.touchSensor.get("liftTouchDown");
 
         clawOpen = 1;
-        clawClose = 0.15;
+        clawClose = 0.30;
         clawCloseOnePixel = 0;
-
-        clawPitchIntake = 0;
-        clawPitchOutTake = 1;
+        clawPitchGoDown = 1;
+        clawPitchIntake = 0.894;
+        clawPitchOutTake = 0;
 
         clawYawIntake = 0.5;
         // Slanted is 60 degrees, allows us to drop pixels vertically for mosaics
@@ -90,8 +82,6 @@ public class Robot {
         clawYawRightHorizontal = clawYawRightSlantedUp+0.21;
         clawYawRightSlantedDown = clawYawRightHorizontal+0.21;
 
-        planeAngleStore = 1;
-        planeAngleLaunch = 0;
 
         stateMachine = new StateMachine();
 
@@ -166,20 +156,11 @@ public class Robot {
                 .servoRunToPosition(clawPitch, clawPitchOutTake));
 
         exitingOutTakeToIdle = new Actions(new ActionBuilder()
-                .servoRunToPosition(clawYaw, clawYawIntake)
-                .waitForAnalogSensorAtPosition(clawYawAnalogSensor, analog_ClawYaw_ResetPosition, 5)
-
-                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
+                // Guarantees lift was not manually put below claw movement limit
+                .startMotor(lift.liftMotor, 1, false)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
-
-                .servoRunToPosition(clawPitch, clawPitchIntake)
-
-                // To get lift going down as fast as possible, bring it down with motor power instead of servo
-                // servo will act as maintaining a linear speed and it's slower than just motor power with help of gravity
-
-                .servoRunToPosition(clawPitch, clawPitchIntake)
-                .waitForAnalogSensorAtPosition(clawPitchAnalogSensor, analog_ClawPitch_ResetPosition, 10)
-
+                .servoRunToPosition(clawYaw, clawYawIntake)
+                .servoRunToPosition(clawPitch, clawPitchGoDown)
                 .startMotor(lift.liftMotor, -1, false)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
@@ -304,12 +285,12 @@ public class Robot {
     public static Hanger skyHook;
     public static DcMotor planeLauncher;
     // Servos
-    public static Servo clawPitch, clawYaw, clawGrip, planeAngle;
+    public static Servo clawPitch, clawYaw, clawGrip;
     public static AnalogInput clawYawAnalogSensor, clawPitchAnalogSensor;
     // TouchSensors
     public static TouchSensor liftTouchDown;
 
-    public static double clawPitchIntake, clawPitchOutTake;
+    public static double clawPitchIntake, clawPitchOutTake, clawPitchGoDown;
     public static double clawOpen, clawClose, clawCloseOnePixel, clawYawIntake,
             clawYawLeftSlantedUp, clawYawLeftHorizontal, clawYawLeftSlantedDown, clawYawRightSlantedUp, clawYawRightHorizontal, clawYawRightSlantedDown;
 
@@ -359,8 +340,6 @@ public class Robot {
                 isPlaneTimerReset = true;
             }
 
-            planeAngle.setPosition(planeAngleLaunch);
-
             if(timerForPlane.milliseconds() >= 500) {
                 planeLauncher.setPower(1);
                 timerForPlane.reset();
@@ -377,7 +356,6 @@ public class Robot {
             else {
                 if(timerForPlane.milliseconds() >= 500) {
                     isPlaneTimerReset = false;
-                    planeAngle.setPosition(planeAngleStore);
                     planeLauncher.setPower(0);
                     isPlaneLaunchTriggered = false;
                 }

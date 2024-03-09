@@ -220,7 +220,6 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Deposit purple pixel on spike mark
         drive.followTrajectorySequence(finalTrajectory.get(0));
-        Robot.planeAngle.setPosition(Robot.planeAngleStore);
 
 
         // Raise lift more + angle the claw to outtake

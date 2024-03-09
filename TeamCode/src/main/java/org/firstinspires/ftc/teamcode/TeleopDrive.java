@@ -31,7 +31,6 @@ public class TeleopDrive extends LinearOpMode {
         Robot.clawPitch.setPosition(Robot.clawPitchIntake); // clawPitchIntake
         Robot.clawYaw.setPosition(Robot.clawYawIntake);
         Robot.clawGrip.setPosition(Robot.clawOpen);
-        Robot.planeAngle.setPosition(Robot.planeAngleStore);
         sleep(1000);
 
         while(!isStarted() && !isStopRequested()){
