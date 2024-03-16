@@ -17,7 +17,7 @@ public class ActionBuilder {
     // Return a list to be used by the state machine
     public ArrayList<Action> getList() { return list; }
 
-    public ActionBuilder resetMotorEncoder(DcMotor motor) {
+    public ActionBuilder resetMotorEncoder(DcMotor motor) {     // motor
         ActionFunction function = () -> {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             return true;
@@ -26,7 +26,7 @@ public class ActionBuilder {
                 "stop and reset " + motor.getDeviceName();
         return add(name, function);
     }
-    public ActionBuilder setMotorPosition(DcMotor motor, int targetPosition, double power) {
+    public ActionBuilder setMotorPosition(DcMotor motor, int targetPosition, double power) {  // done
         ActionFunction function = () -> {
             motor.setTargetPosition(targetPosition);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -37,7 +37,8 @@ public class ActionBuilder {
                 "set motor " + motor.getDeviceName() + " to target pos " + targetPosition + " with power" + power;
         return add(name, function);
     }
-    public ActionBuilder startMotor(DcMotor motor, double power, boolean encoderOrNo) {
+
+    public ActionBuilder startMotor(DcMotor motor, double power, boolean encoderOrNo) {  // done
         ActionFunction function = () -> {
             if(encoderOrNo){ motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); }
             else { motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); }
@@ -50,7 +51,7 @@ public class ActionBuilder {
         return add(name, function);
     }
 
-    public ActionBuilder stopMotor(DcMotor motor) {
+    public ActionBuilder stopMotor(DcMotor motor) {     // motor
         ActionFunction function = () -> {
             motor.setPower(0);
             return true;
@@ -60,7 +61,7 @@ public class ActionBuilder {
         return add(name, function);
     }
 
-    public ActionBuilder servoRunToPosition(Servo servo, double targetPosition) {
+    public ActionBuilder servoRunToPosition(Servo servo, double targetPosition) {       //  done
         ActionFunction function = () -> {
             servo.setPosition(targetPosition);
             return true;
@@ -70,7 +71,7 @@ public class ActionBuilder {
         return add(name, function);
     }
 
-    public ActionBuilder waitForMotorAbovePosition(DcMotor motor, int expectedPosition) {
+    public ActionBuilder waitForMotorAbovePosition(DcMotor motor, int expectedPosition) {   //  lift
         ActionFunction function = () -> {
             return motor.getCurrentPosition() >= expectedPosition*0.95;
         };
@@ -79,7 +80,7 @@ public class ActionBuilder {
         return add(name, function);
     }
 
-    public ActionBuilder waitForAnalogSensorAtPosition(AnalogInput analogSensor, double expectedPosition, int tolerance) {
+    public ActionBuilder waitForAnalogSensorAtPosition(AnalogInput analogSensor, double expectedPosition, int tolerance) { // lift --> servo
         ActionFunction function = () -> {
             double currentPosition = analogSensor.getVoltage() / 3.3 * 360;
             return Math.abs(expectedPosition - currentPosition) <= tolerance;
@@ -98,7 +99,7 @@ public class ActionBuilder {
         return add(name, function);
     }
 
-    public ActionBuilder waitForTouchSensorPressed(TouchSensor touchSensor) {
+    public ActionBuilder waitForTouchSensorPressed(TouchSensor touchSensor) {      // lift --> sensor
         ActionFunction function = touchSensor::isPressed;
         String name = "test touchSensor " + touchSensor.getDeviceName() +
                 " is pressed ";

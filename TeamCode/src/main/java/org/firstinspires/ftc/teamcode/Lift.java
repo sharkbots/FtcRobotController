@@ -4,17 +4,22 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.teamcode.tools.Global;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Lift {
 
-    public final int liftEncoderHolding = 800; // Set your minimum encoder value here
-    public final int liftEncoderHoldingTeleop = 50; // Set your minimum encoder value here
-    public final int liftEncoderHoldingLow = 150; // Set your minimum encoder value here
-    public final int liftEncoderMin = 1400; // Set your minimum encoder value here
-    private final int liftEncoderMax = 3600;
+    public static final int liftEncoderHolding = 800; // Set your minimum encoder value here
+    public static final int liftEncoderHoldingTeleop = 50; // Set your minimum encoder value here
+    public static final int liftEncoderHoldingLow = 150; // Set your minimum encoder value here
+    public static final int liftEncoderMin = 1400; // Set your minimum encoder value here
+    private static final int liftEncoderMax = 3600;
+    private static final int liftEncoderMinYellowLow = liftEncoderMin-100;
+    private static final int liftEncoderMinYellowHigh = liftEncoderMin+300;
+    private static final Map<liftPositions, Integer> liftPositionValues = new HashMap<>();
     public DcMotorEx liftMotor;
     Gamepad gamepad2;
 
@@ -22,6 +27,25 @@ public class Lift {
 
     private int lastSetPosition = 0;
 
+    public enum liftPositions {
+        ENCODER_HOLDING,
+        ENCODER_HOLDING_TELEOP,
+        ENCODER_HOLDING_LOW,
+        ENCODER_MIN,
+        ENCODER_MAX,
+        ENCODER_MIN_YELLOW_LOW,
+        ENCODER_MIN_YELLOW_HIGH
+    }
+
+    static {
+        liftPositionValues.put(liftPositions.ENCODER_HOLDING, liftEncoderHolding);
+        liftPositionValues.put(liftPositions.ENCODER_HOLDING_TELEOP, liftEncoderHoldingTeleop);
+        liftPositionValues.put(liftPositions.ENCODER_HOLDING_LOW, liftEncoderHoldingLow);
+        liftPositionValues.put(liftPositions.ENCODER_MIN, liftEncoderMin);
+        liftPositionValues.put(liftPositions.ENCODER_MAX, liftEncoderMax);
+        liftPositionValues.put(liftPositions.ENCODER_MIN_YELLOW_LOW, liftEncoderMinYellowLow);
+        liftPositionValues.put(liftPositions.ENCODER_MIN_YELLOW_HIGH, liftEncoderMinYellowHigh);
+    }
 
     public Lift(HardwareMap hardwareMap, Gamepad gamepad2){
         liftMotor = (DcMotorEx) hardwareMap.dcMotor.get("liftMotor");
@@ -81,4 +105,22 @@ public class Lift {
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         liftMotor.setPower(0.7);
     }
+
+    public void setLiftPosition(liftPositions liftPosition) {
+        if (liftPositionValues.containsKey(liftPosition)) {
+            liftMotor.setTargetPosition(liftPositionValues.get(liftPosition));
+            liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            liftMotor.setPower(1);
+        }
+    }
+
+    public void startMotorEncoder() {
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftMotor.setPower(-1);
+    }
+    public void startMotorNoEncoder() {
+        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftMotor.setPower(-1);
+    }
+
 }

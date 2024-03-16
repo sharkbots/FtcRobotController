@@ -55,40 +55,11 @@ public class Robot {
 
         // Servos
         planeAngle = hardwareMap.servo.get("planeAngle");
-        clawPitch = hardwareMap.servo.get("clawPitch");
-        clawYaw = hardwareMap.servo.get("clawYaw");
-        clawGrip = hardwareMap.servo.get("clawGrip");
-
-        clawYawAnalogSensor = hardwareMap.get(AnalogInput.class, "rotationPositionInput");
-        clawPitchAnalogSensor = hardwareMap.get(AnalogInput.class, "armPositionInput");
-
-        analog_ClawYaw_ResetPosition = 180;
-        analog_ClawPitch_ResetPosition = 323;
 
         planeAngle.scaleRange(0.56, 0.77);
-        clawGrip.scaleRange(0, 0.23);
-        clawPitch.scaleRange(0.07, 0.28);
-        clawYaw.scaleRange(0, 1);
 
         // Touch Sensors
         liftTouchDown = hardwareMap.touchSensor.get("liftTouchDown");
-
-        clawOpen = 1;
-        clawClose = 0.15;
-        clawCloseOnePixel = 0;
-
-        clawPitchIntake = 0;
-        clawPitchOutTake = 1;
-
-        clawYawIntake = 0.5;
-        // Slanted is 60 degrees, allows us to drop pixels vertically for mosaics
-        clawYawLeftSlantedUp = 1;
-        clawYawLeftHorizontal = clawYawLeftSlantedUp-0.21;
-        clawYawLeftSlantedDown = clawYawLeftHorizontal-0.21;
-
-        clawYawRightSlantedUp = 0;
-        clawYawRightHorizontal = clawYawRightSlantedUp+0.21;
-        clawYawRightSlantedDown = clawYawRightHorizontal+0.21;
 
         planeAngleStore = 1;
         planeAngleLaunch = 0;
