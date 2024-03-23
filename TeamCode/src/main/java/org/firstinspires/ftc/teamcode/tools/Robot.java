@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.tools;
 
-import static android.os.SystemClock.sleep;
-
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -41,20 +39,20 @@ public class Robot {
         handlerDPad_Right = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
 
 
+        // Robot functionality objects
         lift = new Lift(hardwareMap, gamepad2);
+        planeLauncher = new PlaneLauncher(hardwareMap, handlerX);
+        //sideStackAngle = new SideStackAngle(hardwareMap, gamepad2);
+        skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up, handlerY);//hardwareMap.dcMotor.get("skyHookMotor");
+
 
         // Motors
         intakeMotor = new OverrideMotor(hardwareMap.dcMotor.get("intakeMotor"));
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up, handlerY);//hardwareMap.dcMotor.get("skyHookMotor");
 
-
-        planeLauncher = hardwareMap.dcMotor.get("planeLauncher");
-        planeLauncher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Servos
-        planeAngle = hardwareMap.servo.get("planeAngle");
         clawPitch = hardwareMap.servo.get("clawPitch");
         clawYaw = hardwareMap.servo.get("clawYaw");
         clawGrip = hardwareMap.servo.get("clawGrip");
@@ -65,7 +63,6 @@ public class Robot {
         analog_ClawYaw_ResetPosition = 180;
         analog_ClawPitch_ResetPosition = 323;
 
-        planeAngle.scaleRange(0.56, 0.77);
         clawGrip.scaleRange(0, 0.23);
         clawPitch.scaleRange(0.07, 0.28);
         clawYaw.scaleRange(0, 1);
@@ -90,16 +87,12 @@ public class Robot {
         clawYawRightHorizontal = clawYawRightSlantedUp+0.21;
         clawYawRightSlantedDown = clawYawRightHorizontal+0.21;
 
-        planeAngleStore = 1;
-        planeAngleLaunch = 0;
 
         stateMachine = new StateMachine();
 
         // Timer
+        teleopTimer = new ElapsedTime();
         timer = new ElapsedTime();
-        timerForPlane = new ElapsedTime();
-        isPlaneTimerReset = false;
-        isPlaneLaunchTriggered = false;
 
         // States
         intakingPixels = new StateMachine.State("pixelTransition");
@@ -279,7 +272,6 @@ public class Robot {
 
     // States
     StateMachine stateMachine;
-    public static Lift lift;
     public StateMachine.State intakingPixels;
     public StateMachine.State holdingPixels;
     public StateMachine.State holdingPixelsLow;
@@ -287,6 +279,10 @@ public class Robot {
     public StateMachine.State outTakingPixels;
     public StateMachine.State exitingOutTake;
 
+    // Functionality objects
+    public static Lift lift;
+    public static PlaneLauncher planeLauncher;
+    public static SideStackAngle sideStackAngle;
 
     // Actions
     public Actions empty;
@@ -302,9 +298,8 @@ public class Robot {
 
     public static OverrideMotor intakeMotor;
     public static Hanger skyHook;
-    public static DcMotor planeLauncher;
     // Servos
-    public static Servo clawPitch, clawYaw, clawGrip, planeAngle;
+    public static Servo clawPitch, clawYaw, clawGrip;
     public static AnalogInput clawYawAnalogSensor, clawPitchAnalogSensor;
     // TouchSensors
     public static TouchSensor liftTouchDown;
@@ -313,7 +308,6 @@ public class Robot {
     public static double clawOpen, clawClose, clawCloseOnePixel, clawYawIntake,
             clawYawLeftSlantedUp, clawYawLeftHorizontal, clawYawLeftSlantedDown, clawYawRightSlantedUp, clawYawRightHorizontal, clawYawRightSlantedDown;
 
-    public static double planeAngleStore, planeAngleLaunch;
 
     public static double analog_ClawYaw_ResetPosition, analog_ClawPitch_ResetPosition;
 
@@ -321,8 +315,9 @@ public class Robot {
             handlerRightBumper, handlerLeftTrigger, handlerRightTrigger, handlerDPad_Down, handlerDPad_Up, handlerDPad_Left, handlerDPad_Right;
 
     Gamepad gamepad1, gamepad2;
-    ElapsedTime timer, timerForPlane;
-    boolean isPlaneTimerReset, isPlaneLaunchTriggered = false;
+    ElapsedTime timer, teleopTimer;
+
+    private boolean isEndgame = false;
 
     private void updateButtons(){
         handlerA.updateButton(gamepad2);
@@ -346,47 +341,20 @@ public class Robot {
     public void update(){
         updateButtons();
 
+        if (teleopTimer.seconds() >= 120 || handlerLeftBumper.Pressed()){
+            isEndgame = true;
+        }
+
+
         // Manages Reject mode on Roomba as an override of its current power and state
         if(handlerLeftTrigger.Pressed()) {
             intakeMotor.setOverridePower(-1);
         } else if (handlerLeftTrigger.Released()) {
             intakeMotor.cancelOverridePower();
         }
-        if(handlerX.On()) {
-            isPlaneLaunchTriggered = true;
-            if(!isPlaneTimerReset) {
-                timerForPlane.reset();
-                isPlaneTimerReset = true;
-            }
 
-            planeAngle.setPosition(planeAngleLaunch);
-
-            if(timerForPlane.milliseconds() >= 500) {
-                planeLauncher.setPower(1);
-                timerForPlane.reset();
-                isPlaneTimerReset = true;
-            }
-        }
-        else{
-            if(isPlaneLaunchTriggered &&  timerForPlane.milliseconds() >= 500) {
-                planeLauncher.setPower(1);
-                isPlaneLaunchTriggered = false;
-                timerForPlane.reset();
-                isPlaneTimerReset = true;
-            }
-            else {
-                if(timerForPlane.milliseconds() >= 500) {
-                    isPlaneTimerReset = false;
-                    planeAngle.setPosition(planeAngleStore);
-                    planeLauncher.setPower(0);
-                    isPlaneLaunchTriggered = false;
-                }
-            }
-
-
-        }
-        if(!(stateMachine.getCurrentState() == outTakingPixels)){
-            skyHook.update(handlerDPad_Down);
+        if(!(stateMachine.getCurrentState() == outTakingPixels) && isEndgame){
+            skyHook.update();
         }
 
 
@@ -394,6 +362,7 @@ public class Robot {
 
         if(stateMachine.getCurrentState() == outTakingPixels){
             lift.update();
+            planeLauncher.update();
         }
     }
 

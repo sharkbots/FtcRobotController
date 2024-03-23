@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLoca
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
+import org.firstinspires.ftc.teamcode.tools.PlaneLauncher;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
 
@@ -161,6 +162,7 @@ public abstract class AutoBase extends LinearOpMode {
         Setup();
         Global.telemetry = telemetry;
         Robot robot = new Robot(hardwareMap, gamepad1, gamepad2, true);
+        PlaneLauncher planeLauncher = new PlaneLauncher(hardwareMap);
 
         TeamPropDetection teamPropDetection = new TeamPropDetection();
         teamPropDetection.Setup(hardwareMap, telemetry);
@@ -220,7 +222,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Deposit purple pixel on spike mark
         drive.followTrajectorySequence(finalTrajectory.get(0));
-        Robot.planeAngle.setPosition(Robot.planeAngleStore);
+        planeLauncher.load();
 
 
         // Raise lift more + angle the claw to outtake

@@ -39,7 +39,7 @@ public class Hanger {
         this.handlerY = handlerY;
     }
 
-    public void update(Button button) {
+    public void update() {
         //Global.telemetry.addLine("Skyhook position is: " + hangerEncoder.getCurrentPosition());
         //Global.telemetry.update();
 

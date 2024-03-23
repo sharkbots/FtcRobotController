@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.teamcode.aprilTags.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
+import org.firstinspires.ftc.teamcode.tools.PlaneLauncher;
 import org.firstinspires.ftc.teamcode.tools.SetDriveMotors;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
@@ -19,6 +20,7 @@ public class TeleopDrive extends LinearOpMode {
     Robot robot;
     AprilTagDetection aprilTagDetection;
 
+
     public void Setup(){
         Global.telemetry = telemetry;
         driveMotors = new SetDriveMotors(hardwareMap);
@@ -31,7 +33,8 @@ public class TeleopDrive extends LinearOpMode {
         Robot.clawPitch.setPosition(Robot.clawPitchIntake); // clawPitchIntake
         Robot.clawYaw.setPosition(Robot.clawYawIntake);
         Robot.clawGrip.setPosition(Robot.clawOpen);
-        Robot.planeAngle.setPosition(Robot.planeAngleStore);
+
+        Robot.planeLauncher.load();
         sleep(1000);
 
         while(!isStarted() && !isStopRequested()){
