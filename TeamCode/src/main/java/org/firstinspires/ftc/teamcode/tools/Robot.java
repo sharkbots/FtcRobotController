@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.tools;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,7 +9,9 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hanger;
+import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.Lift;
+import org.firstinspires.ftc.teamcode.PlaneLauncher;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.ActionBuilder;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.Actions;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.StateMachine;
@@ -37,18 +38,17 @@ public class Robot {
         handlerDPad_Up = new Button(this.gamepad2, Button.NAME.DPAD_UP);
         handlerDPad_Left = new Button(this.gamepad2, Button.NAME.DPAD_LEFT);
         handlerDPad_Right = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
+        handlerLeftStick_Up = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
+        handlerLeftStick_Down = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
+        handlerLeftStick_Left = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
+        handlerLeftStick_Right = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
 
 
         // Robot functionality objects
         lift = new Lift(hardwareMap, gamepad2);
         planeLauncher = new PlaneLauncher(hardwareMap, handlerX);
-        //sideStackAngle = new SideStackAngle(hardwareMap, gamepad2);
         skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up, handlerY);//hardwareMap.dcMotor.get("skyHookMotor");
-
-
-        // Motors
-        intakeMotor = new OverrideMotor(hardwareMap.dcMotor.get("intakeMotor"));
-        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        intake = new Intake(hardwareMap, handlerLeftTrigger);
 
 
 
@@ -125,11 +125,11 @@ public class Robot {
                 .stopMotor(lift.liftMotor)
                 .resetMotorEncoder(lift.liftMotor)
                 .servoRunToPosition(clawPitch, clawPitchIntake)
-                .startMotor(intakeMotor, 1, false));
+                .startMotor(intake.intakeMotor, 1, false));
 
         intakingToHoldingPixels = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawClose)
-                .stopMotor(intakeMotor)
+                .stopMotor(intake.intakeMotor)
                 .servoRunToPosition(clawPitch, Robot.clawPitchIntake)
                 .resetTimer(timer)
                 .waitUntil(timer, 150)
@@ -142,7 +142,7 @@ public class Robot {
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
                 .resetMotorEncoder(lift.liftMotor)
-                .startMotor(intakeMotor, 1, false));
+                .startMotor(intake.intakeMotor, 1, false));
 
         holdingPixelsToIdle = new Actions(new ActionBuilder()
                 .servoRunToPosition(clawGrip, clawOpen));
@@ -282,7 +282,7 @@ public class Robot {
     // Functionality objects
     public static Lift lift;
     public static PlaneLauncher planeLauncher;
-    public static SideStackAngle sideStackAngle;
+    public static Intake intake;
 
     // Actions
     public Actions empty;
@@ -296,7 +296,6 @@ public class Robot {
 
     // Motors
 
-    public static OverrideMotor intakeMotor;
     public static Hanger skyHook;
     // Servos
     public static Servo clawPitch, clawYaw, clawGrip;
@@ -311,8 +310,10 @@ public class Robot {
 
     public static double analog_ClawYaw_ResetPosition, analog_ClawPitch_ResetPosition;
 
-    public static Button handlerA, handlerB, handlerX, handlerY, handlerLeftBumper,
-            handlerRightBumper, handlerLeftTrigger, handlerRightTrigger, handlerDPad_Down, handlerDPad_Up, handlerDPad_Left, handlerDPad_Right;
+    public static Button handlerA, handlerB, handlerX, handlerY, handlerLeftBumper, handlerRightBumper,
+            handlerLeftTrigger, handlerRightTrigger,
+            handlerDPad_Down, handlerDPad_Up, handlerDPad_Left, handlerDPad_Right,
+            handlerLeftStick_Up, handlerLeftStick_Down, handlerLeftStick_Left, handlerLeftStick_Right;
 
     Gamepad gamepad1, gamepad2;
     ElapsedTime timer, teleopTimer;
@@ -332,6 +333,10 @@ public class Robot {
         handlerDPad_Up.updateButton(gamepad2);
         handlerDPad_Left.updateButton(gamepad2);
         handlerDPad_Right.updateButton(gamepad2);
+        handlerLeftStick_Up.updateButton(gamepad2);
+        handlerLeftStick_Down.updateButton(gamepad2);
+        handlerLeftStick_Left.updateButton(gamepad2);
+        handlerLeftStick_Right.updateButton(gamepad2);
     }
 
     public void updateSync() {
@@ -345,14 +350,6 @@ public class Robot {
             isEndgame = true;
         }
 
-
-        // Manages Reject mode on Roomba as an override of its current power and state
-        if(handlerLeftTrigger.Pressed()) {
-            intakeMotor.setOverridePower(-1);
-        } else if (handlerLeftTrigger.Released()) {
-            intakeMotor.cancelOverridePower();
-        }
-
         if(!(stateMachine.getCurrentState() == outTakingPixels) && isEndgame){
             skyHook.update();
         }
@@ -364,6 +361,8 @@ public class Robot {
             lift.update();
             planeLauncher.update();
         }
+
+        intake.update();
     }
 
     public StateMachine.State currentState(){

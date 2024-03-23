@@ -6,26 +6,26 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.tools.Button;
+import org.firstinspires.ftc.teamcode.tools.OverrideMotor;
 
 public class Intake {
-    private final DcMotor intakeMotor;
-    private boolean runIntake = false;
+    public final OverrideMotor intakeMotor;
+    private final  Button handlerLeftTrigger;
 
-    public Intake(HardwareMap hardwareMap) {
-        intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
-        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public Intake(HardwareMap hardwareMap, Button handlerLeftTrigger) {
+        // Motors
+        intakeMotor = new OverrideMotor(hardwareMap.dcMotor.get("intakeMotor"));
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        this.handlerLeftTrigger = handlerLeftTrigger;
     }
 
-    public void setIntakePower(Button button) {
-        if (button.Pressed()) {
-            runIntake = !runIntake;
-            if (runIntake){
-                double INTAKE_POWER = 1;
-                intakeMotor.setPower(INTAKE_POWER);
-            }
-            else{
-                intakeMotor.setPower(0);
-            }
+    public void update(){
+        // Manages Reject mode on Roomba as an override of its current power and state
+        if(handlerLeftTrigger.Pressed()) {
+            intakeMotor.setOverridePower(-1);
+        } else if (handlerLeftTrigger.Released()) {
+            intakeMotor.cancelOverridePower();
         }
     }
 }

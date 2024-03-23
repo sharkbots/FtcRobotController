@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tools;
+package org.firstinspires.ftc.teamcode;
 
 
 import android.media.Image;
@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.tools.Button;
 
 public class PlaneLauncher {
     private final DcMotor planeLauncher;

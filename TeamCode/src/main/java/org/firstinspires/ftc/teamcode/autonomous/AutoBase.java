@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLoca
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
-import org.firstinspires.ftc.teamcode.tools.PlaneLauncher;
+import org.firstinspires.ftc.teamcode.PlaneLauncher;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
 
