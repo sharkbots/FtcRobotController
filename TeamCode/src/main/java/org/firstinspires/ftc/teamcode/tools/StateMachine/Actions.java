@@ -3,41 +3,43 @@ package org.firstinspires.ftc.teamcode.tools.StateMachine;
 import java.util.ArrayList;
 
 public class Actions {
-    int currentActionIndex; // Index to keep track of the current action
-    //ArrayList<Action> actions; // List of actions to be performed during the transition
-    ArrayList<Action> actions;
+    private int currentActionIndex; // Index to keep track of the current action
+    private ArrayList<Action> actionList;  // List of actions to be performed during the transition
 
-    public Actions(ActionBuilder builder){
-        this.actions = builder.getList();
+    public Actions(Action... action){
+        actionList = new ArrayList<Action>();
         currentActionIndex = 0;
+        add(action);
     }
 
-    public void run(){
-        while (!isComplete()){
-            // do nothing
-        }
+    // Add a single action to the action list
+    Actions add (Action... action) {
+        for (Action a : action)
+            actionList.add(a);
+        return this;
     }
 
-    public void runAsync(){
-        class MyRunnable implements Runnable {
-            @Override
-            public void run() {
-                Actions.this.run();
+    // Add every action in a list of actions to overall actionList
+    Actions add (Actions actions) {
+        for (Action a : actions.actionList)
+            actionList.add(a);
+        return this;
+    }
+
+    boolean isComplete() {
+        assert (currentActionIndex >= 0);
+        while (true) {
+            // if index is last, reached end of list
+            if (currentActionIndex == actionList.size()-1) {
+                currentActionIndex = 0;
+                return true;
             }
-        }
-        Thread thread = new Thread(new MyRunnable());
-        thread.start();
-    }
-
-    public boolean isComplete() {
-        // Iterate through all actions to see if they are complete
-        for (; currentActionIndex < actions.size(); currentActionIndex++) {
-            if (!(actions.get(currentActionIndex).evaluate())) {
+            if (!actionList.get(currentActionIndex).evaluate()) {
+                // Failed an execute, report failure.
                 return false;
             }
+            currentActionIndex ++;
         }
-        currentActionIndex = 0; // Reset the action index
-        return true; // All actions are complete
     }
 
     public void update(){

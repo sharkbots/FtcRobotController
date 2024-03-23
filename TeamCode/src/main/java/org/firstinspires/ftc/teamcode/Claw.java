@@ -17,9 +17,11 @@ public class Claw {
         clawGrip = hardwareMap.servo.get("clawGrip");
         clawYawAnalogSensor = hardwareMap.get(AnalogInput.class, "rotationPositionInput");
         clawPitchAnalogSensor = hardwareMap.get(AnalogInput.class, "armPositionInput");
+
         clawGrip.scaleRange(0, 0.23);
         clawPitch.scaleRange(0.07, 0.28);
         clawYaw.scaleRange(0, 1);
+
         this.gamepad2 = gamepad2;
     }
 
@@ -68,6 +70,12 @@ public class Claw {
             clawPitch.setPosition(pitchPositionValues.get(pitchPosition));
         }
     }
+
+    public boolean waitForAnalogPitchSensorAtPosition () {
+        double currentPosition = clawPitchAnalogSensor.getVoltage() / 3.3 * 360;
+        return Math.abs(analog_ClawPitch_ResetPosition - currentPosition) <= 10;
+    }
+
 //YAW
     private static double clawYawIntake = 0.5;
     // Slanted is 60 degrees, allows us to drop pixels vertically for mosaics
@@ -107,15 +115,9 @@ public class Claw {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
+    public boolean waitForAnalogYawSensorAtPosition () {
+        double currentPosition = clawYawAnalogSensor.getVoltage() / 3.3 * 360;
+        return Math.abs(analog_ClawYaw_ResetPosition - currentPosition) <= 5;
+    }
 
 }

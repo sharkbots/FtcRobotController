@@ -17,7 +17,7 @@ public class ActionBuilder {
     // Return a list to be used by the state machine
     public ArrayList<Action> getList() { return list; }
 
-    public ActionBuilder resetMotorEncoder(DcMotor motor) {     // motor
+    public ActionBuilder resetMotorEncoder(DcMotor motor) {     // done --> lift
         ActionFunction function = () -> {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             return true;
@@ -26,7 +26,7 @@ public class ActionBuilder {
                 "stop and reset " + motor.getDeviceName();
         return add(name, function);
     }
-    public ActionBuilder setMotorPosition(DcMotor motor, int targetPosition, double power) {  // done
+    public ActionBuilder setMotorPosition(DcMotor motor, int targetPosition, double power) {  // done --> lift
         ActionFunction function = () -> {
             motor.setTargetPosition(targetPosition);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -51,7 +51,7 @@ public class ActionBuilder {
         return add(name, function);
     }
 
-    public ActionBuilder stopMotor(DcMotor motor) {     // motor
+    public ActionBuilder stopMotor(DcMotor motor) {     // done in lift. TODO in intake
         ActionFunction function = () -> {
             motor.setPower(0);
             return true;
@@ -71,7 +71,7 @@ public class ActionBuilder {
         return add(name, function);
     }
 
-    public ActionBuilder waitForMotorAbovePosition(DcMotor motor, int expectedPosition) {   //  lift
+    public ActionBuilder waitForMotorAbovePosition(DcMotor motor, int expectedPosition) {   //  done
         ActionFunction function = () -> {
             return motor.getCurrentPosition() >= expectedPosition*0.95;
         };
@@ -80,7 +80,7 @@ public class ActionBuilder {
         return add(name, function);
     }
 
-    public ActionBuilder waitForAnalogSensorAtPosition(AnalogInput analogSensor, double expectedPosition, int tolerance) { // lift --> servo
+    public ActionBuilder waitForAnalogSensorAtPosition(AnalogInput analogSensor, double expectedPosition, int tolerance) {  // done
         ActionFunction function = () -> {
             double currentPosition = analogSensor.getVoltage() / 3.3 * 360;
             return Math.abs(expectedPosition - currentPosition) <= tolerance;
@@ -90,7 +90,7 @@ public class ActionBuilder {
         return add(name, function);
     }
 
-    public ActionBuilder waitForMotorBelowPosition(DcMotor motor, int expectedPosition) {
+    public ActionBuilder waitForMotorBelowPosition(DcMotor motor, int expectedPosition) {  // done
         ActionFunction function = () -> {
             return motor.getCurrentPosition() <= expectedPosition*0.95;
         };
@@ -106,7 +106,7 @@ public class ActionBuilder {
         return add(name, function);
     }
 
-    public ActionBuilder resetTimer(ElapsedTime timer) {
+    public ActionBuilder resetTimer(ElapsedTime timer) {           // timer
         ActionFunction function = () -> { timer.reset(); return true;};
         String name = "reset timer " + timer.toString();
         return add(name, function);
@@ -126,7 +126,7 @@ public class ActionBuilder {
     }
 
 
-    private ActionBuilder add(String name, ActionFunction function) {
+    private ActionBuilder add(String name, ActionFunction function) {       // no longer needed
         list.add(new Action(name, function));
         return this;
     }

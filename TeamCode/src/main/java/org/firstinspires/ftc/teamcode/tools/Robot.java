@@ -1,3 +1,4 @@
+/*
 package org.firstinspires.ftc.teamcode.tools;
 
 import static android.os.SystemClock.sleep;
@@ -11,6 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Hanger;
 import org.firstinspires.ftc.teamcode.Lift;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.ActionBuilder;
@@ -42,6 +44,7 @@ public class Robot {
 
 
         lift = new Lift(hardwareMap, gamepad2);
+        claw = new Claw(hardwareMap, gamepad2);
 
         // Motors
         intakeMotor = new OverrideMotor(hardwareMap.dcMotor.get("intakeMotor"));
@@ -248,9 +251,11 @@ public class Robot {
     }
 
 
+    public static Lift lift;
+    public static Claw claw;
+
     // States
     StateMachine stateMachine;
-    public static Lift lift;
     public StateMachine.State intakingPixels;
     public StateMachine.State holdingPixels;
     public StateMachine.State holdingPixelsLow;
@@ -373,3 +378,4 @@ public class Robot {
     }
 
 }
+*/

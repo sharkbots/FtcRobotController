@@ -114,6 +114,18 @@ public class Lift {
         }
     }
 
+    public boolean waitLiftMotorAbovePosition(liftPositions expectedPosition) {
+        return liftMotor.getCurrentPosition() >= liftPositionValues.get(expectedPosition)*0.95;
+    }
+
+    public boolean waitLiftMotorBelowPosition(int expectedPosition) {
+        return liftMotor.getCurrentPosition() <= expectedPosition*0.95;
+    }
+
+    public void resetLiftMotorEncoder() {
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
     public void startMotorEncoder() {
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         liftMotor.setPower(-1);
@@ -121,6 +133,10 @@ public class Lift {
     public void startMotorNoEncoder() {
         liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor.setPower(-1);
+    }
+
+    public void stopLiftMotor() {
+        liftMotor.setPower(0);
     }
 
 }
