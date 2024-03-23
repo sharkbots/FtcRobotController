@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.tools;
 
+import static org.firstinspires.ftc.teamcode.tools.Global.telemetry;
+
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -38,17 +40,17 @@ public class Robot {
         handlerDPad_Up = new Button(this.gamepad2, Button.NAME.DPAD_UP);
         handlerDPad_Left = new Button(this.gamepad2, Button.NAME.DPAD_LEFT);
         handlerDPad_Right = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
-        handlerLeftStick_Up = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
-        handlerLeftStick_Down = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
-        handlerLeftStick_Left = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
-        handlerLeftStick_Right = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
+        handlerLeftStick_Up = new Button(this.gamepad2, Button.NAME.LEFT_STICK_UP);
+        handlerLeftStick_Down = new Button(this.gamepad2, Button.NAME.LEFT_STICK_DOWN);
+        handlerLeftStick_Left = new Button(this.gamepad2, Button.NAME.LEFT_STICK_LEFT);
+        handlerLeftStick_Right = new Button(this.gamepad2, Button.NAME.LEFT_STICK_RIGHT);
 
 
         // Robot functionality objects
         lift = new Lift(hardwareMap, gamepad2);
         planeLauncher = new PlaneLauncher(hardwareMap, handlerX);
         skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up, handlerY);//hardwareMap.dcMotor.get("skyHookMotor");
-        intake = new Intake(hardwareMap, handlerLeftTrigger);
+        intake = new Intake(hardwareMap, handlerLeftTrigger, handlerLeftStick_Up, handlerLeftStick_Down);
 
 
 
@@ -352,6 +354,7 @@ public class Robot {
 
         if(!(stateMachine.getCurrentState() == outTakingPixels) && isEndgame){
             skyHook.update();
+            planeLauncher.update();
         }
 
 
@@ -359,10 +362,10 @@ public class Robot {
 
         if(stateMachine.getCurrentState() == outTakingPixels){
             lift.update();
-            planeLauncher.update();
         }
 
-        intake.update();
+        intake.update(!(stateMachine.getCurrentState() == outTakingPixels));
+
     }
 
     public StateMachine.State currentState(){
