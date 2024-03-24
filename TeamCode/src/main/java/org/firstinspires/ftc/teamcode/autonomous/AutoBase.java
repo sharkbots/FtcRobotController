@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
@@ -175,16 +176,22 @@ public abstract class AutoBase extends LinearOpMode {
         // Let's have at list 33% chance to pick it right if nothing works
         TeamPropDetection.propLocation propLoc = TeamPropDetection.propLocation.CENTER;
 
-        Robot.lift.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Robot.lift.liftMotor.setPower(0.5);
-        while (Robot.lift.liftMotor.getCurrentPosition() < 15*0.95) {
+        Robot.lift.startLiftMotorWithEncoder(0.5);
+        //Robot.lift.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //Robot.lift.liftMotor.setPower(0.5);
+        while (Robot.lift.getCurrentLiftMotorPosition() < 15*0.95) {
             continue;
         }
-        Robot.lift.liftMotor.setPower(0);
+        Robot.lift.stopLiftMotor();
+        //Robot.lift.liftMotor.setPower(0);
 
-        Robot.clawGrip.setPosition(Robot.clawCloseOnePixel);
-        Robot.clawPitch.setPosition(Robot.clawPitchIntake);
-        Robot.clawYaw.setPosition(Robot.clawYawIntake);
+        Robot.claw.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL);
+        Robot.claw.setPitchPosition(Claw.pitchPositions.INTAKE);
+        Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
+
+        //Robot.clawGrip.setPosition(Robot.clawCloseOnePixel);
+        //Robot.clawPitch.setPosition(Robot.clawPitchIntake);
+        //Robot.clawYaw.setPosition(Robot.clawYawIntake);
 
         TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
         ArrayList<TrajectorySequence> finalTrajectory;
@@ -220,7 +227,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Deposit purple pixel on spike mark
         drive.followTrajectorySequence(finalTrajectory.get(0));
-        Robot.planeAngle.setPosition(Robot.planeAngleStore);
+        Robot.planeLauncher.store();
 
 
         // Raise lift more + angle the claw to outtake

@@ -6,6 +6,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.tools.Robot;
+import org.firstinspires.ftc.teamcode.tools.ServoActionManager;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,38 +25,46 @@ public class Claw {
         clawPitch.scaleRange(0.07, 0.28);
         clawYaw.scaleRange(0, 1);
 
+        clawPitchServoActionManger = new ServoActionManager(clawPitch, clawPitchAnalogSensor);
+        clawYawServoActionManager = new ServoActionManager(clawYaw, clawYawAnalogSensor);
+        clawGripServoActionManager = new ServoActionManager(clawGrip);
+
         this.gamepad2 = gamepad2;
     }
 
     Gamepad gamepad2;
     public static Servo clawPitch, clawYaw, clawGrip;
     public static AnalogInput clawYawAnalogSensor, clawPitchAnalogSensor;
+    public static ServoActionManager clawPitchServoActionManger, clawYawServoActionManager, clawGripServoActionManager;
 
-
-    //GRIP
-    private static double clawOpen = 1.0;
-    private static double clawClose = 0.15;
-    private static double clawCloseOnePixel = 0;
     public enum gripPositions {
         OPEN,
+        OPEN_AUTO,
         CLOSE,
         CLOSE_ONE_PIXEL,
     }
     private static final Map<Claw.gripPositions, Double> gripPositionValues = new HashMap<>();
     static {
+        //GRIP
+        double clawOpen = 1.0;
         gripPositionValues.put(gripPositions.OPEN, clawOpen);
+
+        double clawOpenAuto = 0.5;
+        gripPositionValues.put(gripPositions.OPEN_AUTO, clawOpenAuto);
+
+
+        double clawClose = 0.15;
         gripPositionValues.put(gripPositions.CLOSE, clawClose);
+
+        double clawCloseOnePixel = 0;
         gripPositionValues.put(gripPositions.CLOSE_ONE_PIXEL, clawCloseOnePixel);
     }
-    public void setGripPosition(Claw.gripPositions gripPosition) {
+    public void setGripPosition(gripPositions gripPosition) {
         if (gripPositionValues.containsKey(gripPosition)) {
-            clawGrip.setPosition(gripPositionValues.get(gripPosition));
+            clawGripServoActionManager.setServoPosition(gripPositionValues.get(gripPosition));
         }
     }
-    //PITCH
-    private static double clawPitchIntake = 0;
-    private static double clawPitchOutTake = 1;
-    private static double analog_ClawPitch_ResetPosition = 323;
+
     public enum pitchPositions{
         INTAKE,
         OUTTAKE,
@@ -61,32 +72,25 @@ public class Claw {
     }
     private static final Map<Claw.pitchPositions, Double> pitchPositionValues = new HashMap<>();
     static {
+        //PITCH
+        double clawPitchIntake = 0;
         pitchPositionValues.put(pitchPositions.INTAKE, clawPitchIntake);
+
+        double clawPitchOutTake = 1;
         pitchPositionValues.put(pitchPositions.OUTTAKE, clawPitchOutTake);
+
+        double analog_ClawPitch_ResetPosition = 323;
         pitchPositionValues.put(pitchPositions.RESET, analog_ClawPitch_ResetPosition);
     }
-    public void setPitchPosition(Claw.pitchPositions pitchPosition) {
+    public void setPitchPosition(pitchPositions pitchPosition) {
         if (pitchPositionValues.containsKey(pitchPosition)) {
-            clawPitch.setPosition(pitchPositionValues.get(pitchPosition));
+            clawPitchServoActionManger.setServoPosition(pitchPositionValues.get(pitchPosition));
         }
     }
 
-    public boolean waitForAnalogPitchSensorAtPosition () {
-        double currentPosition = clawPitchAnalogSensor.getVoltage() / 3.3 * 360;
-        return Math.abs(analog_ClawPitch_ResetPosition - currentPosition) <= 10;
+    public boolean waitForAnalogPitchSensorAtPosition (pitchPositions pitchPosition, double tolerance) {
+        return clawPitchServoActionManger.waitForAnalogServoSensorAtPosition(pitchPositionValues.get(pitchPosition), 3.3, tolerance);
     }
-
-//YAW
-    private static double clawYawIntake = 0.5;
-    // Slanted is 60 degrees, allows us to drop pixels vertically for mosaics
-    private static double clawYawLeftSlantedUp = 1;
-    private static double clawYawLeftHorizontal = clawYawLeftSlantedUp-0.21;
-    private static double clawYawLeftSlantedDown = clawYawLeftHorizontal-0.21;
-
-    private static double clawYawRightSlantedUp = 0;
-    private static double clawYawRightHorizontal = clawYawRightSlantedUp+0.21;
-    private static double clawYawRightSlantedDown = clawYawRightHorizontal+0.21;
-    private static double analog_ClawYaw_ResetPosition = 180;
 
     public enum yawPositions{
         INTAKE,
@@ -100,24 +104,100 @@ public class Claw {
     }
     private static final Map<Claw.yawPositions, Double> yawPositionValues = new HashMap<>();
     static {
+        //YAW
+        // Slanted is 60 degrees, allows us to drop pixels vertically for mosaics
+
+        double clawYawIntake = 0.5;
         yawPositionValues.put(yawPositions.INTAKE, clawYawIntake);
+
+        double clawYawLeftSlantedUp = 1;
         yawPositionValues.put(yawPositions.LEFT_SLANT_UP, clawYawLeftSlantedUp);
+
+        double clawYawLeftHorizontal = clawYawLeftSlantedUp-0.21;
         yawPositionValues.put(yawPositions.LEFT_HORIZONTAL, clawYawLeftHorizontal);
+
+        double clawYawLeftSlantedDown = clawYawLeftHorizontal-0.21;
         yawPositionValues.put(yawPositions.LEFT_SLANT_DOWN, clawYawLeftSlantedDown);
+
+        double clawYawRightSlantedUp = 0;
         yawPositionValues.put(yawPositions.RIGHT_SLANT_UP, clawYawRightSlantedUp);
+
+        double clawYawRightHorizontal = clawYawRightSlantedUp+0.21;
         yawPositionValues.put(yawPositions.RIGHT_HORIZONTAL, clawYawRightHorizontal);
+
+        double clawYawRightSlantedDown = clawYawRightHorizontal+0.21;
         yawPositionValues.put(yawPositions.RIGHT_SLANT_DOWN, clawYawRightSlantedDown);
+
+        double analog_ClawYaw_ResetPosition = 180;
         yawPositionValues.put(yawPositions.RESET, analog_ClawYaw_ResetPosition);
     }
-    public void setYawPosition(Claw.yawPositions yawPosition) {
+    public void setYawPosition(yawPositions yawPosition) {
         if (yawPositionValues.containsKey(yawPosition)) {
             clawYaw.setPosition(yawPositionValues.get(yawPosition));
         }
     }
 
-    public boolean waitForAnalogYawSensorAtPosition () {
-        double currentPosition = clawYawAnalogSensor.getVoltage() / 3.3 * 360;
-        return Math.abs(analog_ClawYaw_ResetPosition - currentPosition) <= 5;
+    public boolean waitForAnalogYawSensorAtPosition (yawPositions yawPosition, double tolerance) {
+        return clawYawServoActionManager.waitForAnalogServoSensorAtPosition(yawPositionValues.get(yawPosition), 3.3, tolerance);
+    }
+
+    public void update(){
+        //telemetry.addData("Requested position: ", Robot.clawYaw.getPosition());
+        if(Robot.handlerDPad_Left.Pressed()){
+            if(Robot.handlerRightTrigger.On()){
+                Robot.claw.setYawPosition(Claw.yawPositions.RIGHT_HORIZONTAL);
+                //Robot.clawYaw.setPosition(Robot.clawYawRightHorizontal);
+            }
+            else{
+                Robot.claw.setYawPosition(Claw.yawPositions.LEFT_HORIZONTAL);
+                //Robot.clawYaw.setPosition(Robot.clawYawLeftHorizontal);
+            }
+        }
+
+        if(Robot.handlerDPad_Down.Pressed()){
+            if(Robot.handlerRightTrigger.On()){
+                Robot.claw.setYawPosition(Claw.yawPositions.RIGHT_SLANT_UP);
+                //Robot.clawYaw.setPosition(Robot.clawYawRightSlantedUp);
+            }
+            else{
+                Robot.claw.setYawPosition(Claw.yawPositions.LEFT_SLANT_DOWN);
+                //Robot.clawYaw.setPosition(Robot.clawYawLeftSlantedDown);
+            }
+        }
+
+        if(Robot.handlerDPad_Up.Pressed()){
+            if(Robot.handlerRightTrigger.On()){
+                Robot.claw.setYawPosition(Claw.yawPositions.RIGHT_SLANT_DOWN);
+                //Robot.clawYaw.setPosition(Robot.clawYawRightSlantedDown);
+            }
+            else{
+                Robot.claw.setYawPosition(Claw.yawPositions.LEFT_SLANT_UP);
+                //Robot.clawYaw.setPosition(Robot.clawYawLeftSlantedUp);
+
+            }
+        }
+
+        if(Robot.handlerDPad_Right.Pressed()){
+            if(Robot.handlerRightTrigger.On()){
+                //Robot.clawYaw.setPosition(Robot.clawYawIntake);
+                Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
+            }
+            else{
+                Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
+                //Robot.clawYaw.setPosition(Robot.clawYawIntake);
+            }
+        }
+
+
+        if(Robot.handlerRightBumper.Pressed()){
+            Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+            //Robot.clawGrip.setPosition(Robot.clawOpen);
+        }
+        if(Robot.handlerLeftBumper.Pressed()){
+            Robot.claw.setGripPosition(Claw.gripPositions.CLOSE);
+            //Robot.clawGrip.setPosition(Robot.clawClose);
+        }
+
     }
 
 }

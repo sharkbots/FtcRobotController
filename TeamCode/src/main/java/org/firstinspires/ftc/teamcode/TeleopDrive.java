@@ -28,20 +28,26 @@ public class TeleopDrive extends LinearOpMode {
         aprilTagDetection = new AprilTagDetection();
         aprilTagDetection.Setup(hardwareMap, telemetry);
 
-        Robot.clawPitch.setPosition(Robot.clawPitchIntake); // clawPitchIntake
+        Robot.claw.setPitchPosition(Claw.pitchPositions.INTAKE);
+        Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
+        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+        Robot.planeLauncher.store();
+        Robot.intake.setIntakeFlipperPosition(Intake.flipperPositions.UP);
+        /*Robot.clawPitch.setPosition(Robot.clawPitchIntake); // clawPitchIntake
         Robot.clawYaw.setPosition(Robot.clawYawIntake);
         Robot.clawGrip.setPosition(Robot.clawOpen);
-        Robot.planeAngle.setPosition(Robot.planeAngleStore);
+        Robot.planeAngle.setPosition(Robot.planeAngleStore);*/
         sleep(1000);
 
         while(!isStarted() && !isStopRequested()){
             if(!isLiftReset){
-                Robot.lift.liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                Robot.lift.liftMotor.setPower(-1);
-                if(Robot.liftTouchDown.isPressed()){
-                    Robot.lift.liftMotor.setPower(0);
-                    Robot.lift.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    Robot.lift.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                Robot.lift.startLiftMotorWithEncoder(-1);
+                //Robot.lift.liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                //Robot.lift.liftMotor.setPower(-1);
+                if(Robot.lift.liftTouchDownPressed()){
+                    Robot.lift.resetLiftMotorEncoder();
+                    /*Robot.lift.liftMotor.setPower(0);
+                    Robot.lift.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);*/
                     isLiftReset = true;
                 }
         }
@@ -57,9 +63,11 @@ public class TeleopDrive extends LinearOpMode {
         while(opModeIsActive()){
 
             if(!isLiftReset) {
-                Robot.lift.liftMotor.setPower(-1);
-                if (Robot.liftTouchDown.isPressed()) {
-                    Robot.lift.liftMotor.setPower(0);
+                Robot.lift.startLiftMotorWithNoEncoder(-1);
+                //Robot.lift.liftMotor.setPower(-1);
+                if (Robot.lift.liftTouchDownPressed()) {
+                    Robot.lift.stopLiftMotor();
+                    //Robot.lift.liftMotor.setPower(0);
                     isLiftReset = true;
                 }
             }
@@ -89,54 +97,8 @@ public class TeleopDrive extends LinearOpMode {
 
             robot.update();
 
-            if(robot.currentState()==robot.outTakingPixels){
-
-                //telemetry.addData("Requested position: ", Robot.clawYaw.getPosition());
-
-                if(Robot.handlerDPad_Left.Pressed()){
-                    if(Robot.handlerRightTrigger.On()){
-                        Robot.clawYaw.setPosition(Robot.clawYawRightHorizontal);
-                    }
-                    else{
-                        Robot.clawYaw.setPosition(Robot.clawYawLeftHorizontal);
-                    }
-                }
-
-                if(Robot.handlerDPad_Down.Pressed()){
-                    if(Robot.handlerRightTrigger.On()){
-                        Robot.clawYaw.setPosition(Robot.clawYawRightSlantedUp);
-                    }
-                    else{
-                        Robot.clawYaw.setPosition(Robot.clawYawLeftSlantedDown);
-                    }
-                }
-
-                if(Robot.handlerDPad_Up.Pressed()){
-                    if(Robot.handlerRightTrigger.On()){
-                        Robot.clawYaw.setPosition(Robot.clawYawRightSlantedDown);
-                    }
-                    else{
-                        Robot.clawYaw.setPosition(Robot.clawYawLeftSlantedUp);
-
-                    }
-                }
-
-                if(Robot.handlerDPad_Right.Pressed()){
-                    if(Robot.handlerRightTrigger.On()){
-                        Robot.clawYaw.setPosition(Robot.clawYawIntake);
-                    }
-                    else{
-                        Robot.clawYaw.setPosition(Robot.clawYawIntake);
-                    }
-                }
-
-
-                if(Robot.handlerRightBumper.Pressed()){
-                    Robot.clawGrip.setPosition(Robot.clawOpen);
-                }
-                if(Robot.handlerLeftBumper.Pressed()){
-                    Robot.clawGrip.setPosition(Robot.clawClose);
-                }
+            if(robot.currentState()==robot.outTakingPixels) {
+                Robot.claw.update();
             }
 
         }

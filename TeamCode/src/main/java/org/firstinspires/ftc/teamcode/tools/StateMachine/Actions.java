@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.tools.StateMachine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Actions {
     private int currentActionIndex; // Index to keep track of the current action
@@ -13,33 +14,42 @@ public class Actions {
     }
 
     // Add a single action to the action list
-    Actions add (Action... action) {
-        for (Action a : action)
-            actionList.add(a);
+    public Actions add (Action... action) {
+        actionList.addAll(Arrays.asList(action));
         return this;
     }
 
     // Add every action in a list of actions to overall actionList
-    Actions add (Actions actions) {
-        for (Action a : actions.actionList)
-            actionList.add(a);
+    public Actions add (Actions actions) {
+        actionList.addAll(actions.actionList);
         return this;
     }
 
-    boolean isComplete() {
-        assert (currentActionIndex >= 0);
-        while (true) {
-            // if index is last, reached end of list
-            if (currentActionIndex == actionList.size()-1) {
-                currentActionIndex = 0;
-                return true;
+    public void run(){
+        while (!isComplete()){
+            // do nothing
+        }
+    }
+    public void runAsync(){
+        class MyRunnable implements Runnable {
+            @Override
+            public void run() {
+                Actions.this.run();
             }
-            if (!actionList.get(currentActionIndex).evaluate()) {
-                // Failed an execute, report failure.
+        }
+        Thread thread = new Thread(new MyRunnable());
+        thread.start();
+    }
+
+    public boolean isComplete() {
+        // Iterate through all actions to see if they are complete
+        for (; currentActionIndex < actionList.size(); currentActionIndex++) {
+            if (!(actionList.get(currentActionIndex).evaluate())) {
                 return false;
             }
-            currentActionIndex ++;
         }
+        currentActionIndex = 0; // Reset the action index
+        return true; // All actions are complete
     }
 
     public void update(){

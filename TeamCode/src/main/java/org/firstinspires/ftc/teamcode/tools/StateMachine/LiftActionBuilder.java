@@ -1,39 +1,31 @@
 package org.firstinspires.ftc.teamcode.tools.StateMachine;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-
 import org.firstinspires.ftc.teamcode.Lift;
 
 public class LiftActionBuilder {
-    LiftActionBuilder (Lift lift) {
+    public LiftActionBuilder (Lift lift) {
         this.lift = lift;
     }
 
-    Action setMinLiftPosition(Lift.liftPositions liftPosition) {
+    public Action setLiftMotorPositionWithPower(Lift.liftPositions liftPositions, double power) {  // done --> lift
         ActionFunction function = () -> {
-            lift.setLiftPosition(liftPosition);
+            lift.setLiftPosition(liftPositions, power);
             return true;
         };
-        return new Action("setMinLiftPosition", function);
+        return new Action("set lift motor to target position" , function);
     }
 
-    Action waitLiftMotorAbovePosition(Lift.liftPositions expectedPosition) {
-        ActionFunction function = () -> {
-            lift.waitLiftMotorAbovePosition(expectedPosition);
-            return true;
-        };
+    public Action waitForLiftMotorAbovePosition(Lift.liftPositions expectedPosition) {
+        ActionFunction function = () -> lift.waitLiftMotorAbovePosition(expectedPosition);
         return new Action("waitForLiftMotorAbovePosition", function);
     }
 
-    Action waitLiftMotorBelowPosition(int expectedPosition) {
-        ActionFunction function = () -> {
-            lift.waitLiftMotorBelowPosition(expectedPosition);
-            return true;
-        };
+    public Action waitForLiftMotorBelowPosition(int expectedPosition) {
+        ActionFunction function = () -> lift.waitLiftMotorBelowPosition(expectedPosition);
         return new Action("waitLiftMotorBelowPosition", function);
     }
 
-    Action resetLiftMotorEncoder() {
+    public Action resetLiftMotorEncoder() {
         ActionFunction function = () -> {
             lift.resetLiftMotorEncoder();
             return true;
@@ -41,23 +33,23 @@ public class LiftActionBuilder {
         return new Action("resetLiftMotorEncoder", function);
     }
 
-    Action startMotorEncoder() {
+    public Action startMotorWithEncoder(double power) {
         ActionFunction function = () -> {
-            lift.startMotorEncoder();
+            lift.startLiftMotorWithEncoder(power);
             return true;
         };
         return new Action("startMotorEncoder", function);
     }
 
-    Action startMotorNoEncoder() {
+    public Action startMotorNoEncoder(double power) {
         ActionFunction function = () -> {
-            lift.startMotorNoEncoder();
+            lift.startLiftMotorWithNoEncoder(power);
             return true;
         };
         return new Action("startMotorNoEncoder", function);
     }
 
-    Action stopLiftMotor() {
+    public Action stopLiftMotor() {
         ActionFunction function = () -> {
             lift.stopLiftMotor();
             return true;
@@ -65,5 +57,10 @@ public class LiftActionBuilder {
         return new Action("stopLiftMotor", function);
     }
 
-    private Lift lift;
+    public Action waitUntilLiftTouchDownPressed(){
+        ActionFunction function = lift::liftTouchDownPressed;
+        return new Action("waitUntilLiftTouchDownPressed", function);
+    }
+
+    private final Lift lift;
 }

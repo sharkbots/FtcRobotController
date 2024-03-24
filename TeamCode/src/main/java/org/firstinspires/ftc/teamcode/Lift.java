@@ -4,47 +4,54 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.tools.Global;
+import org.firstinspires.ftc.teamcode.tools.MotorActionManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Lift {
-
-    public static final int liftEncoderHolding = 800; // Set your minimum encoder value here
-    public static final int liftEncoderHoldingTeleop = 50; // Set your minimum encoder value here
-    public static final int liftEncoderHoldingLow = 150; // Set your minimum encoder value here
-    public static final int liftEncoderMin = 1400; // Set your minimum encoder value here
-    private static final int liftEncoderMax = 3600;
-    private static final int liftEncoderMinYellowLow = liftEncoderMin-100;
-    private static final int liftEncoderMinYellowHigh = liftEncoderMin+300;
     private static final Map<liftPositions, Integer> liftPositionValues = new HashMap<>();
+    public MotorActionManager liftMotorActionManager;
     public DcMotorEx liftMotor;
+    public TouchSensor liftTouchDown;
     Gamepad gamepad2;
 
     private final double handlerLiftDeadzone = 0.05;
 
-    private int lastSetPosition = 0;
-
     public enum liftPositions {
-        ENCODER_HOLDING,
-        ENCODER_HOLDING_TELEOP,
-        ENCODER_HOLDING_LOW,
-        ENCODER_MIN,
-        ENCODER_MAX,
-        ENCODER_MIN_YELLOW_LOW,
-        ENCODER_MIN_YELLOW_HIGH
-    }
+        HOLDING,
+        HOLDING_TELEOP,
 
+        MIN,
+        MAX,
+        AUTO_MIN_YELLOW,
+        AUTO_MIN_YELLOW_LOW,
+        AUTO_MIN_YELLOW_HIGH
+    }
     static {
-        liftPositionValues.put(liftPositions.ENCODER_HOLDING, liftEncoderHolding);
-        liftPositionValues.put(liftPositions.ENCODER_HOLDING_TELEOP, liftEncoderHoldingTeleop);
-        liftPositionValues.put(liftPositions.ENCODER_HOLDING_LOW, liftEncoderHoldingLow);
-        liftPositionValues.put(liftPositions.ENCODER_MIN, liftEncoderMin);
-        liftPositionValues.put(liftPositions.ENCODER_MAX, liftEncoderMax);
-        liftPositionValues.put(liftPositions.ENCODER_MIN_YELLOW_LOW, liftEncoderMinYellowLow);
-        liftPositionValues.put(liftPositions.ENCODER_MIN_YELLOW_HIGH, liftEncoderMinYellowHigh);
+        int liftEncoderHolding = 800;
+        liftPositionValues.put(liftPositions.HOLDING, liftEncoderHolding);
+
+        int liftEncoderHoldingTeleop = 50;
+        liftPositionValues.put(liftPositions.HOLDING_TELEOP, liftEncoderHoldingTeleop);
+
+        int liftEncoderHoldingLow = 150;
+        liftPositionValues.put(liftPositions.AUTO_MIN_YELLOW_LOW, liftEncoderHoldingLow);
+
+        int liftEncoderMin = 1400;
+        liftPositionValues.put(liftPositions.MIN, liftEncoderMin);
+
+        int liftEncoderMax = 3600;
+        liftPositionValues.put(liftPositions.MAX, liftEncoderMax);
+
+        int liftEncoderMinYellowLow = liftEncoderMin-100;
+        liftPositionValues.put(liftPositions.AUTO_MIN_YELLOW, liftEncoderMinYellowLow);
+
+        int liftEncoderMinYellowHigh = liftEncoderMin+300;
+        liftPositionValues.put(liftPositions.AUTO_MIN_YELLOW_HIGH, liftEncoderMinYellowHigh);
     }
 
     public Lift(HardwareMap hardwareMap, Gamepad gamepad2){
@@ -52,40 +59,35 @@ public class Lift {
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        liftTouchDown = hardwareMap.touchSensor.get("liftTouchDown");
+
+
+        liftMotorActionManager = new MotorActionManager(liftMotor);
         this.gamepad2 = gamepad2;
     }
 
-    public void update() {
+    public Lift(HardwareMap hardwareMap){
+        liftMotor = (DcMotorEx) hardwareMap.dcMotor.get("liftMotor");
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Bit of a hack (so that when it comes from state machine target pos is not 0)
-        lastSetPosition = Global.ensureWithin(liftMotor.getTargetPosition(), liftEncoderMin, liftEncoderMax);
+        liftTouchDown = hardwareMap.touchSensor.get("liftTouchDown");
 
-        // If the handler does not want to move motor, then hold the last position set by the handler
-        // Else, move the motor normally
-        if ((Math.abs(gamepad2.right_stick_y)<handlerLiftDeadzone) ||
-                (-gamepad2.right_stick_y>0 && lastSetPosition==liftEncoderMax) ||
-                (-gamepad2.right_stick_y<0 && lastSetPosition==liftEncoderMin)
 
-        ){
-            holdPosition(lastSetPosition);
-        }
-        else{
-            setLiftPowerBasedOnGamepad(gamepad2);
-            lastSetPosition = liftMotor.getCurrentPosition();
-
-            // Hack continued :-)
-            liftMotor.setTargetPosition(Global.ensureWithin(lastSetPosition, liftEncoderMin, liftEncoderMax));
-        }
+        liftMotorActionManager = new MotorActionManager(liftMotor);
+        this.gamepad2 = null;
     }
 
     public void setLiftPowerBasedOnGamepad(Gamepad gamepad) {
         double power = -gamepad.right_stick_y;
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        if ((liftMotor.getCurrentPosition() > liftEncoderMax*1.05) && power > 0){
+        if ((liftMotor.getCurrentPosition() > liftPositionValues.get(liftPositions.MAX)*1.05) && power > 0){
             power = 0;
         }
-        if ((liftMotor.getCurrentPosition() < liftEncoderMin*0.95) && power < 0){
+        if ((liftMotor.getCurrentPosition() < liftPositionValues.get(liftPositions.MIN)*0.95) && power < 0){
             power = 0;
         }
 
@@ -99,44 +101,69 @@ public class Lift {
 
     }
 
-    public void holdPosition(int position) {
-        liftMotor.setTargetPosition(position);
-        //liftMotor.setTargetPositionTolerance(100);
-        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        liftMotor.setPower(0.7);
+    public int getCurrentLiftMotorPosition(){
+        return liftMotorActionManager.getCurrentMotorPosition();
     }
 
-    public void setLiftPosition(liftPositions liftPosition) {
+    public void holdPosition(int position) {
+        liftMotorActionManager.holdPosition(position, 0.7);
+    }
+
+    public void setLiftPosition(liftPositions liftPosition, double power) {
         if (liftPositionValues.containsKey(liftPosition)) {
-            liftMotor.setTargetPosition(liftPositionValues.get(liftPosition));
-            liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            liftMotor.setPower(1);
+            liftMotorActionManager.holdPosition(liftPositionValues.get(liftPosition), power);
         }
     }
 
     public boolean waitLiftMotorAbovePosition(liftPositions expectedPosition) {
-        return liftMotor.getCurrentPosition() >= liftPositionValues.get(expectedPosition)*0.95;
+        return liftMotorActionManager.waitMotorAbovePosition(liftPositionValues.get(expectedPosition));
     }
 
     public boolean waitLiftMotorBelowPosition(int expectedPosition) {
-        return liftMotor.getCurrentPosition() <= expectedPosition*0.95;
+        return liftMotorActionManager.waitMotorBelowPosition(expectedPosition);
     }
 
     public void resetLiftMotorEncoder() {
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotorActionManager.resetMotorEncoder();
     }
 
-    public void startMotorEncoder() {
-        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        liftMotor.setPower(-1);
+    public void startLiftMotorWithEncoder(double power) {
+        liftMotorActionManager.startMotorEncoder(power);
     }
-    public void startMotorNoEncoder() {
-        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor.setPower(-1);
+    public void startLiftMotorWithNoEncoder(double power) {
+        liftMotorActionManager.startMotorNoEncoder(power);
     }
 
     public void stopLiftMotor() {
-        liftMotor.setPower(0);
+        liftMotorActionManager.stopMotor();
+    }
+
+    public boolean liftTouchDownPressed(){
+        return liftTouchDown.isPressed();
+    }
+    private int lastSetPosition = 0;
+
+    public void update() {
+
+        // Bit of a hack (so that when it comes from state machine target pos is not 0)
+        lastSetPosition = Global.ensureWithin(liftMotor.getTargetPosition(), liftPositionValues.get(liftPositions.MIN), liftPositionValues.get(liftPositions.MAX));
+
+        // If the handler does not want to move motor, then hold the last position set by the handler
+        // Else, move the motor normally
+        if ((Math.abs(gamepad2.right_stick_y)<handlerLiftDeadzone) ||
+                (-gamepad2.right_stick_y>0 && lastSetPosition ==liftPositionValues.get(liftPositions.MAX)) ||
+                (-gamepad2.right_stick_y<0 && lastSetPosition ==liftPositionValues.get(liftPositions.MIN))
+
+        ){
+            holdPosition(lastSetPosition);
+        }
+        else{
+            setLiftPowerBasedOnGamepad(gamepad2);
+            lastSetPosition = liftMotor.getCurrentPosition();
+
+            // Hack continued :-)
+            liftMotor.setTargetPosition(Global.ensureWithin(lastSetPosition, liftPositionValues.get(liftPositions.MIN), liftPositionValues.get(liftPositions.MAX)));
+        }
     }
 
 }
