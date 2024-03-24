@@ -1,93 +1,50 @@
 package org.firstinspires.ftc.teamcode;
 
-
-import android.media.Image;
-
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.tools.Button;
+import org.firstinspires.ftc.teamcode.tools.ServoActionManager;
 
 public class PlaneLauncher {
-    private final DcMotor planeLauncher;
-    private final Servo planeAngle;
+    private final Servo planeLauncher;
     private final Button handlerX;
-    private boolean isPlaneLaunchTriggered, isPlaneTimerReset;
-    private final double planeAngleStore, planeAngleLaunch;
+    private final double holdPlane, releasePlane;
+    private final ServoActionManager planeLauncherServoActionManager;
 
-    private final ElapsedTime timerForPlane;
 
-    public PlaneLauncher(HardwareMap hardwareMap, Button handlerX){
+    public PlaneLauncher(HardwareMap hardwareMap, Button handlerX) {
         // Launcher
-        planeLauncher = hardwareMap.dcMotor.get("planeLauncher");
-        planeLauncher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        planeLauncher = hardwareMap.servo.get("planeLauncher");
+        holdPlane = 1.0;
+        releasePlane = 0.0;
 
-        // Angle
-        planeAngle = hardwareMap.servo.get("planeAngle");
-        planeAngle.scaleRange(0.56, 0.77);
-        planeAngleStore = 1;
-        planeAngleLaunch = 0;
-
-        // Timer for launching
-        timerForPlane = new ElapsedTime();
-        isPlaneTimerReset = false;
-        isPlaneLaunchTriggered = false;
+        planeLauncherServoActionManager = new ServoActionManager(planeLauncher);
 
         this.handlerX = handlerX;
     }
 
-    public PlaneLauncher(HardwareMap hardwareMap){
+    public PlaneLauncher(HardwareMap hardwareMap) {
         // Launcher
-        planeLauncher = hardwareMap.dcMotor.get("planeLauncher");
-        planeLauncher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        planeLauncher = hardwareMap.servo.get("planeLauncher");
+        holdPlane = 1.0;
+        releasePlane = 0.0;
 
-        // Angle
-        planeAngle = hardwareMap.servo.get("planeAngle");
-        planeAngle.scaleRange(0.56, 0.77);
-        planeAngleStore = 1;
-        planeAngleLaunch = 0;
+        planeLauncherServoActionManager = new ServoActionManager(planeLauncher);
 
-        timerForPlane = null;
-        handlerX = null;
+        this.handlerX = null;
     }
 
-    public void store(){
-        planeAngle.setPosition(planeAngleStore);
+    public void releasePlane(){
+        planeLauncherServoActionManager.setServoPosition(releasePlane);
     }
-    public void update(){
-        if(handlerX.On()) {
-            isPlaneLaunchTriggered = true;
-            if(!isPlaneTimerReset) {
-                timerForPlane.reset();
-                isPlaneTimerReset = true;
-            }
+    public void storePlane(){
+        planeLauncherServoActionManager.setServoPosition(holdPlane);
+    }
 
-            planeAngle.setPosition(planeAngleLaunch);
-
-            if(timerForPlane.milliseconds() >= 500) {
-                planeLauncher.setPower(1);
-                timerForPlane.reset();
-                isPlaneTimerReset = true;
-            }
-        }
-        else{
-            if(isPlaneLaunchTriggered &&  timerForPlane.milliseconds() >= 500) {
-                planeLauncher.setPower(1);
-                isPlaneLaunchTriggered = false;
-                timerForPlane.reset();
-                isPlaneTimerReset = true;
-            }
-            else {
-                if(timerForPlane.milliseconds() >= 500) {
-                    isPlaneTimerReset = false;
-                    planeAngle.setPosition(planeAngleStore);
-                    planeLauncher.setPower(0);
-                    isPlaneLaunchTriggered = false;
-                }
-            }
+    public void update() {
+        if (handlerX.Pressed()){
+            releasePlane();
         }
     }
 }
