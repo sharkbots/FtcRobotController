@@ -38,6 +38,8 @@ public class PixelsDetection {
 
         colorSensor1.enableLed(true);
         colorSensor2.enableLed(true);
+        colorSensor1.setGain(5);
+        colorSensor2.setGain(5);
     }
 
 
