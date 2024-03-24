@@ -16,8 +16,8 @@ public class PlaneLauncher {
     public PlaneLauncher(HardwareMap hardwareMap, Button handlerX) {
         // Launcher
         planeLauncher = hardwareMap.servo.get("planeLauncher");
-        holdPlane = 1.0;
-        releasePlane = 0.0;
+        holdPlane = 0.77;
+        releasePlane = 0.2;
 
         planeLauncherServoActionManager = new ServoActionManager(planeLauncher);
 
@@ -27,8 +27,8 @@ public class PlaneLauncher {
     public PlaneLauncher(HardwareMap hardwareMap) {
         // Launcher
         planeLauncher = hardwareMap.servo.get("planeLauncher");
-        holdPlane = 1.0;
-        releasePlane = 0.0;
+        holdPlane = 0.77;
+        releasePlane = 0.2;
 
         planeLauncherServoActionManager = new ServoActionManager(planeLauncher);
 
