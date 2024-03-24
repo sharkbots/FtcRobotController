@@ -54,7 +54,7 @@ public class PlaneLauncher {
         handlerX = null;
     }
 
-    public void load(){
+    public void store(){
         planeAngle.setPosition(planeAngleStore);
     }
     public void update(){

@@ -1,35 +1,35 @@
 package org.firstinspires.ftc.teamcode;
 
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.StateMachine;
 import org.firstinspires.ftc.teamcode.tools.Button;
+import org.firstinspires.ftc.teamcode.tools.MotorActionManager;
 import org.firstinspires.ftc.teamcode.tools.OverrideMotor;
-import org.firstinspires.ftc.teamcode.tools.Robot;
+import org.firstinspires.ftc.teamcode.tools.ServoActionManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Intake {
     public final OverrideMotor intakeMotor;
     public final Servo intakeFlipper;
     private final Button handlerLeftTrigger, handlerLeftStick_Up, handlerLeftStick_Down;
-    private final double intakeFlipperUp, intakeFlipperPixel5, intakeFlipperPixel4, intakeFlipperPixel3;
-    private FLIPPER_CASES flipperCase;
+    private static final double intakeFlipperUp = 1.0, intakeFlipperPixel5 = 0.62, intakeFlipperPixel4 = 0.6075, intakeFlipperPixel3 = 0.595;
+    private flipperPositions flipperCase;
+    public MotorActionManager intakeMotorActionManager;
+    public ServoActionManager intakeFlipperActionManger;
 
     public Intake(HardwareMap hardwareMap, Button handlerLeftTrigger, Button handlerLeftStick_Up, Button handlerLeftStick_Down) {
         // Motors
-        intakeMotor = new OverrideMotor(hardwareMap.dcMotor.get("intakeMotor"));
+        intakeMotor = new OverrideMotor((DcMotorEx)hardwareMap.dcMotor.get("intakeMotor"));
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeFlipper = hardwareMap.servo.get("intakeFlipper");
 
-        intakeFlipperUp = 1.0;
-        intakeFlipperPixel5 = 0.62;
-        intakeFlipperPixel4 = 0.6075;
-        intakeFlipperPixel3 = 0.595;
+        intakeMotorActionManager = new MotorActionManager(intakeMotor);
+        intakeFlipperActionManger = new ServoActionManager(intakeFlipper);
 
         intakeFlipper.scaleRange(0, 1.0);
 
@@ -37,12 +37,34 @@ public class Intake {
         this.handlerLeftStick_Up = handlerLeftStick_Up;
         this.handlerLeftStick_Down = handlerLeftStick_Down;
 
-        flipperCase = FLIPPER_CASES.UP;
+        flipperCase = flipperPositions.UP;
     }
 
-    private enum FLIPPER_CASES{
-        UP, PIXEL_5, PIXEL_4, PIXEL_3
+
+    public void startIntakeMotorWithNoEncoder(double power) {
+        intakeMotorActionManager.startMotorNoEncoder(power);
     }
+
+    public void stopIntakeMotor() {
+        intakeMotorActionManager.stopMotor();
+    }
+
+    public enum flipperPositions{
+        UP, PIXEL5, PIXEL4, PIXEL3
+    }
+    private static final Map<Intake.flipperPositions, Double> flipperPositionValues = new HashMap<>();
+    static {
+        //FLIPPER POSITIONS
+        flipperPositionValues.put(Intake.flipperPositions.UP, intakeFlipperUp);
+        flipperPositionValues.put(Intake.flipperPositions.PIXEL5, intakeFlipperPixel5);
+        flipperPositionValues.put(Intake.flipperPositions.PIXEL4, intakeFlipperPixel4);
+        flipperPositionValues.put(Intake.flipperPositions.PIXEL3, intakeFlipperPixel3);
+
+    }
+    public void setIntakeFlipperPosition(flipperPositions flipperPosition){
+        intakeFlipperActionManger.setServoPosition(flipperPositionValues.get(flipperPosition));
+    }
+
 
     public void update(Boolean notInOutTake){
         // Manages Reject mode on Roomba as an override of its current power and state
@@ -56,44 +78,44 @@ public class Intake {
                 case UP:
                     if(handlerLeftStick_Down.Pressed()){
                         intakeFlipper.setPosition(intakeFlipperPixel5);
-                        flipperCase = FLIPPER_CASES.PIXEL_5;
+                        flipperCase = flipperPositions.PIXEL5;
                     }
                     break;
 
-                case PIXEL_5:
+                case PIXEL5:
                     if(handlerLeftStick_Down.Pressed()){
                         intakeFlipper.setPosition(intakeFlipperPixel4);
-                        flipperCase = FLIPPER_CASES.PIXEL_4;
+                        flipperCase = flipperPositions.PIXEL4;
                     }
                     if(handlerLeftStick_Up.Pressed()){
                         intakeFlipper.setPosition(intakeFlipperUp);
-                        flipperCase = FLIPPER_CASES.UP;
+                        flipperCase = flipperPositions.UP;
                     }
                     break;
 
-                case PIXEL_4:
+                case PIXEL4:
                     if(handlerLeftStick_Down.Pressed()){
                         intakeFlipper.setPosition(intakeFlipperPixel3);
-                        flipperCase = FLIPPER_CASES.PIXEL_3;
+                        flipperCase = flipperPositions.PIXEL3;
                     }
                     if(handlerLeftStick_Up.Pressed()){
                         intakeFlipper.setPosition(intakeFlipperPixel5);
-                        flipperCase = FLIPPER_CASES.PIXEL_5;
+                        flipperCase = flipperPositions.PIXEL5;
                     }
                     break;
 
-                case PIXEL_3:
+                case PIXEL3:
                     if(handlerLeftStick_Up.Pressed()){
                         intakeFlipper.setPosition(intakeFlipperPixel4);
-                        flipperCase = FLIPPER_CASES.PIXEL_4;
+                        flipperCase = flipperPositions.PIXEL4;
+                    }
+                    if(handlerLeftStick_Down.Pressed()){
+                        intakeFlipper.setPosition(intakeFlipperUp);
+                        flipperCase = flipperPositions.UP;
                     }
                     break;
             }
         }
-    }
-
-    public void reset(){
-        intakeFlipper.setPosition(1.0);
     }
 
 }

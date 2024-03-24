@@ -2,13 +2,19 @@ package org.firstinspires.ftc.teamcode.tools;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-public class OverrideMotor implements DcMotor {
-    private DcMotor dcMotor;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
+public class OverrideMotor implements DcMotorEx {
+    private final DcMotorEx dcMotor;
     double overridePower = 0;
 
-    public OverrideMotor(DcMotor motor) {
+    public OverrideMotor(DcMotorEx motor) {
         this.dcMotor = motor;
     }
 
@@ -140,5 +146,100 @@ public class OverrideMotor implements DcMotor {
     @Override
     public void close() {
         dcMotor.close();
+    }
+
+    @Override
+    public void setMotorEnable() {
+        dcMotor.setMotorEnable();
+    }
+
+    @Override
+    public void setMotorDisable() {
+        dcMotor.setMotorDisable();
+    }
+
+    @Override
+    public boolean isMotorEnabled() {
+        return dcMotor.isMotorEnabled();
+    }
+
+    @Override
+    public void setVelocity(double v) {
+        dcMotor.setVelocity(v);
+    }
+
+    @Override
+    public void setVelocity(double v, AngleUnit angleUnit) {
+
+    }
+
+    @Override
+    public double getVelocity() {
+        return dcMotor.getVelocity();
+    }
+
+    @Override
+    public double getVelocity(AngleUnit angleUnit) {
+        return dcMotor.getVelocity(angleUnit);
+    }
+
+    @Override
+    public void setPIDCoefficients(RunMode runMode, PIDCoefficients pidCoefficients) {
+        dcMotor.setPIDCoefficients(runMode, pidCoefficients);
+    }
+
+    @Override
+    public void setPIDFCoefficients(RunMode runMode, PIDFCoefficients pidfCoefficients) throws UnsupportedOperationException {
+        dcMotor.setPIDFCoefficients(runMode, pidfCoefficients);
+    }
+
+    @Override
+    public void setVelocityPIDFCoefficients(double v, double v1, double v2, double v3) {
+        dcMotor.setVelocityPIDFCoefficients(v, v1, v2, v3);
+    }
+
+    @Override
+    public void setPositionPIDFCoefficients(double v) {
+        dcMotor.setPositionPIDFCoefficients(v);
+    }
+
+    @Override
+    public PIDCoefficients getPIDCoefficients(RunMode runMode) {
+        return dcMotor.getPIDCoefficients(runMode);
+    }
+
+    @Override
+    public PIDFCoefficients getPIDFCoefficients(RunMode runMode) {
+        return dcMotor.getPIDFCoefficients(runMode);
+    }
+
+    @Override
+    public void setTargetPositionTolerance(int i) {
+        dcMotor.setTargetPositionTolerance(i);
+    }
+
+    @Override
+    public int getTargetPositionTolerance() {
+        return dcMotor.getTargetPositionTolerance();
+    }
+
+    @Override
+    public double getCurrent(CurrentUnit currentUnit) {
+        return dcMotor.getCurrent(currentUnit);
+    }
+
+    @Override
+    public double getCurrentAlert(CurrentUnit currentUnit) {
+        return dcMotor.getCurrentAlert(currentUnit);
+    }
+
+    @Override
+    public void setCurrentAlert(double v, CurrentUnit currentUnit) {
+        dcMotor.setCurrentAlert(v, currentUnit);
+    }
+
+    @Override
+    public boolean isOverCurrent() {
+        return dcMotor.isOverCurrent();
     }
 }

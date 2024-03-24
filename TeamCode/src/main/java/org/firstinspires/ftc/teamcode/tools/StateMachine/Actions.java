@@ -1,15 +1,28 @@
 package org.firstinspires.ftc.teamcode.tools.StateMachine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Actions {
-    int currentActionIndex; // Index to keep track of the current action
-    //ArrayList<Action> actions; // List of actions to be performed during the transition
-    ArrayList<Action> actions;
+    private int currentActionIndex; // Index to keep track of the current action
+    private ArrayList<Action> actionList;  // List of actions to be performed during the transition
 
-    public Actions(ActionBuilder builder){
-        this.actions = builder.getList();
+    public Actions(Action... action){
+        actionList = new ArrayList<Action>();
         currentActionIndex = 0;
+        add(action);
+    }
+
+    // Add a single action to the action list
+    public Actions add (Action... action) {
+        actionList.addAll(Arrays.asList(action));
+        return this;
+    }
+
+    // Add every action in a list of actions to overall actionList
+    public Actions add (Actions actions) {
+        actionList.addAll(actions.actionList);
+        return this;
     }
 
     public void run(){
@@ -17,7 +30,6 @@ public class Actions {
             // do nothing
         }
     }
-
     public void runAsync(){
         class MyRunnable implements Runnable {
             @Override
@@ -31,8 +43,8 @@ public class Actions {
 
     public boolean isComplete() {
         // Iterate through all actions to see if they are complete
-        for (; currentActionIndex < actions.size(); currentActionIndex++) {
-            if (!(actions.get(currentActionIndex).evaluate())) {
+        for (; currentActionIndex < actionList.size(); currentActionIndex++) {
+            if (!(actionList.get(currentActionIndex).evaluate())) {
                 return false;
             }
         }
