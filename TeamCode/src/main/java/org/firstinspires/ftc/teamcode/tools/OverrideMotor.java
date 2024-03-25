@@ -49,6 +49,7 @@ public class OverrideMotor implements DcMotorEx {
     }
 
     @Override
+    @Deprecated
     public void setPowerFloat() {
         dcMotor.setPowerFloat();
     }
@@ -184,6 +185,7 @@ public class OverrideMotor implements DcMotorEx {
     }
 
     @Override
+    @Deprecated
     public void setPIDCoefficients(RunMode runMode, PIDCoefficients pidCoefficients) {
         dcMotor.setPIDCoefficients(runMode, pidCoefficients);
     }
@@ -204,6 +206,7 @@ public class OverrideMotor implements DcMotorEx {
     }
 
     @Override
+    @Deprecated
     public PIDCoefficients getPIDCoefficients(RunMode runMode) {
         return dcMotor.getPIDCoefficients(runMode);
     }
