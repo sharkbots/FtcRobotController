@@ -4,7 +4,9 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
@@ -21,145 +23,99 @@ public abstract class AutoBase extends LinearOpMode {
     protected StandardTrackingWheelLocalizer myLocalizer;
 
     public class Coordinates{
-        Boolean BlueAlliance;
-        Boolean CloseSide;
+        Boolean isBlueAlliance;
+        Boolean isNearSide;
+
+        //Blue near side
+        Pose2d startPose = new Pose2d(12, 62, Math.toRadians(90.0));
+        Pose2d leftTeamProp = new Pose2d(20, 38, Math.toRadians(90.0));
+        Pose2d centerTeamProp = new Pose2d(12, 32, Math.toRadians(90.00));
+        Pose2d rightTeamProp = new Pose2d(9, 32, Math.toRadians(0.00));
+
+        // vectors to set up for backdrop
+        Vector2d setupForBackdrop = new Vector2d(30, 50);
+
+        // near side
+        Pose2d backdropIntermediateLeft = new Pose2d(47, 43, Math.toRadians(180.00));
+        Pose2d backdropIntermediateCenter = new Pose2d(47, 37, Math.toRadians(180.00));
+        Pose2d backdropIntermediateRight = new Pose2d(47, 33, Math.toRadians(180.00));
+
+        //Blue backdrop
+        Pose2d backdropStrafeForCenter = new Pose2d(51, 45, Math.toRadians(180.00));
+        Pose2d backdropLeft = new Pose2d(51, 43, Math.toRadians(180.00));
+        Pose2d backdropCenter = new Pose2d(51, 37, Math.toRadians(180.00));
+        Pose2d backdropRight = new Pose2d(51, 33, Math.toRadians(180.00));
 
         // Blue alliance parking
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
-        Pose2d parkFinalRight = new Pose2d(50, 11.5, Math.toRadians(180.00));
-        /*Pose2d leftParkIntermediateRedRight = new Pose2d(42, -11.5, Math.toRadians(180.00));
-        Pose2d leftParkFinalRedRight = new Pose2d(50, -11.5, Math.toRadians(180.00));*/
-
-
-        // DBZ Right park on Red team
-        Pose2d rightParkIntermediateRedRight = new Pose2d(42, -60, Math.toRadians(180.00));
-        Pose2d rightParkFinalRedRight = new Pose2d(50, -60, Math.toRadians(180.00));
-
-
-
-
-        //Blue backdrop
-        Pose2d backdropLeft = new Pose2d(50, 44, Math.toRadians(180.00));
-        Pose2d backdropCenter = new Pose2d(50, 36, Math.toRadians(180.00));
-        Pose2d backdropRight = new Pose2d(50, 30, Math.toRadians(180.00));
-
-        // close side
-        Pose2d backdropIntermediateLeft = new Pose2d(30, 42, Math.toRadians(180.00));
-        Pose2d backdropIntermediateCenter = new Pose2d(35, 36, Math.toRadians(180.00));
-        Pose2d backdropIntermediateRight = new Pose2d(30, 30, Math.toRadians(180.00));
-
-        // vectors to set up for backdrop
-        Vector2d setUpForBackdropA = new Vector2d(11, 32);
-        Vector2d setUpForBackdropB = new Vector2d(11, 50);
-        Vector2d setUpForBackdropC = new Vector2d(35, 50);
+        Vector2d parkBetweenBackdrops = new Vector2d(50, 11.5);
+        Vector2d parkInCorner = new Vector2d(47, 62);
 
         //blue far side
-        Vector2d prepareFarDrop = new Vector2d(-37, 63);
-        Vector2d parkFinalLeft = new Vector2d(50, 60);
-        Vector2d backdropIntermediateFar = new Vector2d(14, 63);
-        Vector2d intermediateDropFar = new Vector2d(50, 63);
+        Vector2d prepareFarDrop = new Vector2d(-37, 59);
 
-        /*// red backdrop
-        Pose2d rightBackdropLeft = new Pose2d(50, -29, Math.toRadians(180.00));
-        Pose2d rightBackdropCenter = new Pose2d(50, -36, Math.toRadians(180.00));
-        Pose2d rightBackdropRight = new Pose2d(50, -44, Math.toRadians(180.00));
+        Vector2d backdropIntermediateFar = new Vector2d(18, 59);
+        Vector2d intermediateDropFar = new Vector2d(35, 59);
 
 
-        // Close side approach to backdrop
-        Pose2d rightBackdropIntermediateLeft = new Pose2d(30, -30, Math.toRadians(180.00));
-        Pose2d rightBackdropIntermediateCenter = new Pose2d(35, -36, Math.toRadians(180.00));
-        Pose2d rightBackdropIntermediateRight = new Pose2d(30, -42, Math.toRadians(180.00));*/
 
-
-        // Purple spike mark locations
-        //Blue close side
-        Pose2d preStartPose = new Pose2d(9.5, 63, Math.toRadians(90)); //robot needs to strafe 2 inches to the actual start pose
-        Pose2d startPose = new Pose2d(11, 63, Math.toRadians(90));
-        Pose2d rightTeamProp = new Pose2d(10.5, 32, Math.toRadians(0.00));
-        //Pose2d rightTeamProp = new Pose2d(9.5, 28, Math.toRadians(180.00));
-        Pose2d centerTeamProp = new Pose2d(12, 34.5, Math.toRadians(90.00));
-        Pose2d leftTeamProp = new Pose2d(9.5, 28, Math.toRadians(180.00));
-        //Pose2d leftTeamProp = new Pose2d(10.5, 32, Math.toRadians(0.00));
-
-        /*//Blue far side
-        Pose2d preStartPoseBlueRight = new Pose2d(-9.5, 63, Math.toRadians(90));
-        Pose2d startPoseBlueRight = new Pose2d(-14, 61, Math.toRadians(90));
-        Pose2d leftTeamPropBlueRight = new Pose2d(-11, 28, Math.toRadians(160));
-        Pose2d centerTeamPropBlueRight = new Pose2d(-12, 35, Math.toRadians(90.00));
-        Pose2d rightTeamPropBlueRight = new Pose2d(-11.5, 39, Math.toRadians(0));
-
-        //Red far side
-        Pose2d preStartPoseRedLeft = new Pose2d(-9.5, -63, Math.toRadians(270));
-        Pose2d startPoseRedLeft = new Pose2d(-13, -63, Math.toRadians(270));
-        Pose2d rightTeamPropRedLeft = new Pose2d(-10, -32, Math.toRadians(180.00));
-        Pose2d centerTeamPropRedLeft = new Pose2d(-12, -34.5, Math.toRadians(270));
-        Pose2d leftTeamPropRedLeft = new Pose2d(-10.5, -30, Math.toRadians(0));
-
-        //Red close side
-        Pose2d preStartPoseRedRight = new Pose2d(9.5, -63, Math.toRadians(270));
-        Pose2d startPoseRedRight = new Pose2d(15.5, -60, Math.toRadians(270));
-        Pose2d rightTeamPropRedRight = new Pose2d(9.5, -28, Math.toRadians(180.00));
-        Pose2d centerTeamPropRedRight = new Pose2d(12, -35, Math.toRadians(270));
-        Pose2d leftTeamPropRedRight = new Pose2d(10, -31, Math.toRadians(350));*/
-
-
-        public Coordinates(Boolean BlueAlliance, Boolean CloseSide) {
-            this.BlueAlliance = BlueAlliance;
-            this.CloseSide = CloseSide;
+        public Coordinates(Boolean isBlueAlliance, Boolean isNearSide) {
+            this.isBlueAlliance = isBlueAlliance;
+            this.isNearSide = isNearSide;
             AutoDataStorage.redSide = false;
 
-            // Default is blue alliance close side
+            // Default is blue alliance near side
 
             // Blue alliance far side
-            if(BlueAlliance && !CloseSide){
-                preStartPose = flipCloseToFarSide(preStartPose);
-                startPose = flipCloseToFarSide(startPose);
-                rightTeamProp = flipCloseToFarSide(rightTeamProp);
-                centerTeamProp = flipCloseToFarSide(centerTeamProp);
-                leftTeamProp = flipCloseToFarSide(leftTeamProp);
+            if(isBlueAlliance && !isNearSide){
+                startPose = flipToFarSide(startPose);
+                Pose2d tempLeftTeamProp = leftTeamProp;
+                leftTeamProp = flipToFarSide(rightTeamProp);
+                centerTeamProp = flipToFarSide(centerTeamProp);
+                rightTeamProp = flipToFarSide(tempLeftTeamProp);
+
             }
 
             // Red alliance
-            if (!BlueAlliance){
+            if (!isBlueAlliance){
                 // Red backdrop
-                setUpForBackdropA = flipVectorAcrossX(setUpForBackdropA);
-                setUpForBackdropB = flipVectorAcrossX(setUpForBackdropB);
-                setUpForBackdropC = flipVectorAcrossX(setUpForBackdropC);
+                setupForBackdrop = flipVectorAcrossX(setupForBackdrop);
 
-                backdropIntermediateLeft = flipBackDrop(backdropIntermediateLeft);
-                backdropIntermediateCenter = flipBackDrop(backdropIntermediateCenter);
-                backdropIntermediateRight = flipBackDrop(backdropIntermediateRight);
-                backdropLeft = flipBackDrop(backdropLeft);
-                backdropCenter = flipBackDrop(backdropCenter);
-                backdropRight = flipBackDrop(backdropRight);
-                
+                Pose2d tempLeftPose = backdropIntermediateLeft;
+                backdropIntermediateLeft = flipAcrossX(backdropIntermediateRight);
+                backdropIntermediateCenter = flipAcrossX(backdropIntermediateCenter);
+                backdropIntermediateRight = flipAcrossX(tempLeftPose);
+
+                tempLeftPose = backdropLeft;
+                backdropLeft = flipAcrossX(backdropRight);
+                backdropCenter = flipAcrossX(backdropCenter);
+                backdropStrafeForCenter = flipAcrossX(backdropStrafeForCenter);
+                backdropRight = flipAcrossX(tempLeftPose);
+
                 parkIntermediate = flipAcrossX(parkIntermediate);
-                parkFinalRight = flipAcrossX(parkFinalRight);
-                parkFinalLeft = flipVectorAcrossX(parkFinalLeft);
+                parkInCorner = flipVectorAcrossX(parkInCorner);
+                parkBetweenBackdrops = flipVectorAcrossX(parkBetweenBackdrops);
                 backdropIntermediateFar = flipVectorAcrossX(backdropIntermediateFar);
 
                 AutoDataStorage.redSide = true;
 
-                // Close side
-                if (CloseSide){
-                    preStartPose = flipAcrossX(preStartPose);
+                // Near side
+                if (isNearSide){
                     startPose = flipAcrossX(startPose);
-                    Pose2d tempRightTeamProp = rightTeamProp;
-                    rightTeamProp = flipAcrossXKeepHeading(leftTeamProp); //blue left spike mark is symmetrical to red right spike mark
+                    Pose2d tempLeftTeamProp = leftTeamProp;
+                    leftTeamProp = flipAcrossX(rightTeamProp);//blue left spike mark is symmetrical to red right spike mark
                     centerTeamProp = flipAcrossX(centerTeamProp);
-                    leftTeamProp = flipAcrossXKeepHeading(tempRightTeamProp); //ibid
+                    rightTeamProp = flipAcrossX(tempLeftTeamProp);
                 }
 
                 // Far side
-                if (!CloseSide){
-                    preStartPose = flipAcrossCenter(preStartPose);
+                if (!isNearSide){
                     startPose = flipAcrossCenter(startPose);
-                    Pose2d tempRightTeamProp = rightTeamProp;
-                    rightTeamProp = flipTeamPropAcrossCenter(leftTeamProp);
-                    centerTeamProp = flipTeamPropAcrossCenter(centerTeamProp);
-                    leftTeamProp = flipTeamPropAcrossCenter(tempRightTeamProp);
+                    leftTeamProp = flipAcrossCenter(leftTeamProp);
+                    centerTeamProp = flipAcrossCenter(centerTeamProp);
+                    rightTeamProp = flipAcrossCenter(rightTeamProp);
 
-                    prepareFarDrop = flipAcrossXKeepHeadingVector(prepareFarDrop);
+                    prepareFarDrop = flipVectorAcrossX(prepareFarDrop);
                 }
             }
         }
@@ -167,40 +123,37 @@ public abstract class AutoBase extends LinearOpMode {
 
         // Blue alliance to red alliance
         public Pose2d flipAcrossX(Pose2d pose){
-            return new Pose2d(pose.getX(), -pose.getY(), (-pose.getHeading())%360);
+            return new Pose2d(pose.getX(), -pose.getY(), (-pose.getHeading())%Math.toRadians(360));
         }
 
         public Pose2d flipAcrossXKeepHeading(Pose2d pose){ //needed for team prop and prepare far drop
             return new Pose2d(pose.getX(), -pose.getY(), pose.getHeading());
         }
-        public Vector2d flipAcrossXKeepHeadingVector(Vector2d vector2d){ //needed for team prop and prepare far drop
-            return new Vector2d(vector2d.getX(), -vector2d.getY());
-        }
+
         public Vector2d flipVectorAcrossX(Vector2d vector2d){
             return new Vector2d(vector2d.getX(), -vector2d.getY());
         }
 
-        // Close side to far side
-        public Pose2d flipCloseToFarSide(Pose2d pose){
-            return new Pose2d(pose.getX()-48, pose.getY(), pose.getHeading());
+        // Near side to far side
+        public Pose2d flipToFarSide(Pose2d pose){
+            return new Pose2d(-(pose.getX()+24), pose.getY(), (Math.toRadians(180)-pose.getHeading())%Math.toRadians(360));
         }
 
         public Pose2d flipAcrossCenter(Pose2d pose) {
-            return new Pose2d(pose.getX()-48, -pose.getY(),(-pose.getHeading())%360);
+            return flipAcrossX(flipToFarSide(pose));
+            //return new Pose2d(pose.getX()-48, -pose.getY(),(-pose.getHeading())%Math.toRadians(360));
         }
 
         public Pose2d flipTeamPropAcrossCenter(Pose2d pose){
             return new Pose2d(pose.getX()-48, -pose.getY(), pose.getHeading());
         }
 
-        public Pose2d flipBackDrop(Pose2d pose){
-            return new Pose2d(pose.getX(), pose.getY()-72, (-pose.getHeading())%360);
-        }
+//        public Pose2d flipBackDrop(Pose2d pose){
+//            return new Pose2d(pose.getX(), pose.getY()-72, (-pose.getHeading())%Math.toRadians(360));
+//        }
 
     }
     Coordinates c; //= new Coordinates(true, true); // change values later
-    static final double SLOWERVELOCITY = 15;
-    static final double SLOWERANGULARVELOCITY = 2.5;
 
     abstract void Setup();
 
@@ -223,16 +176,22 @@ public abstract class AutoBase extends LinearOpMode {
         // Let's have at list 33% chance to pick it right if nothing works
         TeamPropDetection.propLocation propLoc = TeamPropDetection.propLocation.CENTER;
 
-        Robot.lift.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Robot.lift.liftMotor.setPower(0.5);
-        while (Robot.lift.liftMotor.getCurrentPosition() < 15*0.95) {
+        Robot.lift.startLiftMotorWithEncoder(0.5);
+        //Robot.lift.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //Robot.lift.liftMotor.setPower(0.5);
+        while (Robot.lift.getCurrentLiftMotorPosition() < 15*0.95) {
             continue;
         }
-        Robot.lift.liftMotor.setPower(0);
+        Robot.lift.stopLiftMotor();
+        //Robot.lift.liftMotor.setPower(0);
 
-        Robot.clawGrip.setPosition(Robot.clawCloseOnePixel);
-        Robot.clawPitch.setPosition(Robot.clawPitchIntake);
-        Robot.clawYaw.setPosition(Robot.clawYawIntake);
+        Robot.claw.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL);
+        Robot.claw.setPitchPosition(Claw.pitchPositions.INTAKE);
+        Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
+
+        //Robot.clawGrip.setPosition(Robot.clawCloseOnePixel);
+        //Robot.clawPitch.setPosition(Robot.clawPitchIntake);
+        //Robot.clawYaw.setPosition(Robot.clawYawIntake);
 
         TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
         ArrayList<TrajectorySequence> finalTrajectory;
@@ -247,8 +206,8 @@ public abstract class AutoBase extends LinearOpMode {
             }
         }
 
-        myLocalizer.setPoseEstimate(c.preStartPose);
-        drive.setPoseEstimate(c.preStartPose); // !!!!!
+        myLocalizer.setPoseEstimate(c.startPose);
+        drive.setPoseEstimate(c.startPose); // !!!!!
 
         if (propLoc == TeamPropDetection.propLocation.LEFT) {
             finalTrajectory = trajectoryBuilder.trajectorySequenceLeft;
@@ -260,43 +219,57 @@ public abstract class AutoBase extends LinearOpMode {
             finalTrajectory = trajectoryBuilder.trajectorySequenceRight;
         }
 
-        //robot.closeClaw = true;
+        //robot.updateSync();
 
-
-
-        //robot.outtakePixelsLow = true;
-
-
-
-
-        robot.updateSync();
-        // Test propLoc here
 
         //Raise lift so the pixel doesn't drag on the ground
-        robot.autoOutTakeYellowLow.performAll();
+        robot.autoOutTakeYellowLow.run();
 
         // Deposit purple pixel on spike mark
         drive.followTrajectorySequence(finalTrajectory.get(0));
+        Robot.planeLauncher.storePlane();
 
+
+        // Raise lift more + angle the claw to outtake
+        if(c.isNearSide) {
+            robot.autoOutTakeYellow.runAsync();
+        }
+        else {
+            ElapsedTime timer = new ElapsedTime();
+            while(timer.seconds() < 9) {
+                continue;
+            }
+        }
         // Position the robot in front of the backdrop
         drive.followTrajectorySequence(finalTrajectory.get(1));
 
-        // Raise lift more + angle the claw to outtake
-        robot.autoOutTakeYellow.performAll();
+        if(!c.isNearSide) {
+
+            if(propLoc == TeamPropDetection.propLocation.CENTER)
+                robot.autoOutTakeYellowHigh.runAsync();
+            else {
+                robot.autoOutTakeYellow.runAsync();
+
+            }
+
+        }
 
         // Go to the backdrop
         drive.followTrajectorySequence(finalTrajectory.get(2));
 
         // Drop yellow pixel
-        robot.autoOpenClaw.performAll();
+        robot.autoOpenClaw.run();
 
         // Park
+        robot.exitingOutTakeToIdle.runAsync();
         drive.followTrajectorySequence(finalTrajectory.get(3));
-        waitForStart();
 
-        //runAutonomous(robot, drive, propLoc);
+
         AutoDataStorage.currentPose = drive.getPoseEstimate();
         AutoDataStorage.comingFromAutonomous = true;
+
+        waitForStart();
+
     }
 
 

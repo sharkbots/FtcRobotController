@@ -9,7 +9,8 @@ public class Button {
 
     public enum NAME {
         A, B, X, Y, DPAD_DOWN, DPAD_UP, DPAD_LEFT, DPAD_RIGHT,
-        LEFT_BUMPER, RIGHT_BUMPER, LEFT_TRIGGER, RIGHT_TRIGGER
+        LEFT_BUMPER, RIGHT_BUMPER, LEFT_TRIGGER, RIGHT_TRIGGER,
+        LEFT_STICK_UP, LEFT_STICK_DOWN, LEFT_STICK_LEFT, LEFT_STICK_RIGHT
     }
 
     public Button(Gamepad gamepad, NAME buttonName) {
@@ -59,6 +60,18 @@ public class Button {
                 break;
             case RIGHT_TRIGGER:
                 buttonState = gamepad.right_trigger >= 0.5;
+                break;
+            case LEFT_STICK_UP:
+                buttonState = gamepad.left_stick_y <= -0.5;
+                break;
+            case LEFT_STICK_DOWN:
+                buttonState = gamepad.left_stick_y >= 0.5;
+                break;
+            case LEFT_STICK_LEFT:
+                buttonState = gamepad.left_stick_x <= -0.5;
+                break;
+            case LEFT_STICK_RIGHT:
+                buttonState = gamepad.left_stick_x >= 0.5;
                 break;
         }
     }

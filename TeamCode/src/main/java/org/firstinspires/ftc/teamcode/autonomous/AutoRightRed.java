@@ -14,7 +14,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
         import org.firstinspires.ftc.teamcode.tools.Robot;
 
 
-@Autonomous(name="Autonomous Right Red")
+@Autonomous(name="Near Red", group="Auto")
 public class AutoRightRed extends AutoBase {
     void Setup() {
         c = new Coordinates(false, true);

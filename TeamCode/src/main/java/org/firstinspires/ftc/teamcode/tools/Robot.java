@@ -1,20 +1,20 @@
 package org.firstinspires.ftc.teamcode.tools;
 
-import static android.os.SystemClock.sleep;
-
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Hanger;
+import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.Lift;
-import org.firstinspires.ftc.teamcode.tools.StateMachine.ActionBuilder;
+import org.firstinspires.ftc.teamcode.PlaneLauncher;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.Actions;
+import org.firstinspires.ftc.teamcode.tools.StateMachine.ClawActionBuilder;
+import org.firstinspires.ftc.teamcode.tools.StateMachine.IntakeActionBuilder;
+import org.firstinspires.ftc.teamcode.tools.StateMachine.LiftActionBuilder;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.StateMachine;
+import org.firstinspires.ftc.teamcode.tools.StateMachine.TimerActionBuilder;
 
 import java.util.function.BooleanSupplier;
 
@@ -38,50 +38,26 @@ public class Robot {
         handlerDPad_Up = new Button(this.gamepad2, Button.NAME.DPAD_UP);
         handlerDPad_Left = new Button(this.gamepad2, Button.NAME.DPAD_LEFT);
         handlerDPad_Right = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
+        handlerLeftStick_Up = new Button(this.gamepad2, Button.NAME.LEFT_STICK_UP);
+        handlerLeftStick_Down = new Button(this.gamepad2, Button.NAME.LEFT_STICK_DOWN);
+        handlerLeftStick_Left = new Button(this.gamepad2, Button.NAME.LEFT_STICK_LEFT);
+        handlerLeftStick_Right = new Button(this.gamepad2, Button.NAME.LEFT_STICK_RIGHT);
 
 
         lift = new Lift(hardwareMap, gamepad2);
+        claw = new Claw(hardwareMap, gamepad2);
+        planeLauncher = new PlaneLauncher(hardwareMap, handlerX);
+        skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up, handlerY);//hardwareMap.dcMotor.get("skyHookMotor");
+        intake = new Intake(hardwareMap, handlerLeftTrigger, handlerLeftStick_Up, handlerLeftStick_Down);
 
-        // Motors
-        intakeMotor = new OverrideMotor(hardwareMap.dcMotor.get("intakeMotor"));
-        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        // Timer
+        teleopTimer = new ElapsedTime();
+        timer = new Timer(new ElapsedTime());
 
-        skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up);//hardwareMap.dcMotor.get("skyHookMotor");
-
-
-        planeLauncher = hardwareMap.dcMotor.get("planeLauncher");
-        planeLauncher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        // Servos
-        clawPitch = hardwareMap.servo.get("clawPitch");
-        clawYaw = hardwareMap.servo.get("clawYaw");
-        clawGrip = hardwareMap.servo.get("clawGrip");
-
-       // clawGrip.scaleRange(0.02, 0.22);  //old values
-        clawGrip.scaleRange(0.05, 0.35);
-        //clawPitch.scaleRange(0.755, 0.950);
-        clawPitch.scaleRange(0.755, 0.973);
-        clawYaw.scaleRange(0.0725, 1);
-
-        // Touch Sensors
-        liftTouchDown = hardwareMap.touchSensor.get("liftTouchDown");
-
-        clawOpen = 1;
-        clawClose = 0.30;
-        clawCloseOnePixel = 0;
-        clawPitchGoDown = 1;
-        clawPitchIntake = 0.894;
-        clawPitchOutTake = 0;
-
-        clawYawIntake = 0.5;
-        // Slanted is 60 degrees, allows us to drop pixels vertically for mosaics
-        clawYawLeftSlantedUp = 1;
-        clawYawLeftHorizontal = clawYawLeftSlantedUp-0.21;
-        clawYawLeftSlantedDown = clawYawLeftHorizontal-0.21;
-
-        clawYawRightSlantedUp = 0;
-        clawYawRightHorizontal = clawYawRightSlantedUp+0.21;
-        clawYawRightSlantedDown = clawYawRightHorizontal+0.21;
+        clawActionBuilder = new ClawActionBuilder(claw);
+        liftActionBuilder = new LiftActionBuilder(lift);
+        timerActionBuilder = new TimerActionBuilder(timer);
+        intakeActionBuilder = new IntakeActionBuilder(intake);
 
 
         stateMachine = new StateMachine();
@@ -106,100 +82,178 @@ public class Robot {
         stateMachine.setInitialState(idle);
 
         // Actions
-        empty = new Actions(new ActionBuilder());
+        empty = new Actions();
         //teleop
-        idleToIntakingPixels = new Actions(new ActionBuilder()
-                .servoRunToPosition(clawGrip, clawOpen)
+        idleToIntakingPixels = new Actions()
+                .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN))
+                .add(timerActionBuilder.resetTimer())
+                .add(timerActionBuilder.waitUntil(150))
+                .add(liftActionBuilder.startMotorWithEncoder(-1))
+                .add(liftActionBuilder.waitUntilLiftTouchDownPressed())
+                .add(liftActionBuilder.stopLiftMotor())
+                .add(liftActionBuilder.resetLiftMotorEncoder())
+                .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.INTAKE))
+                .add(intakeActionBuilder.startIntakeMotorWithNoEncoder(1));
+
+                /*.servoRunToPosition(clawGrip, clawOpen)
                 .resetTimer(timer)
                 .waitUntil(timer, 150)
-                .startMotor(lift.liftMotor, -1)
+                .startMotor(lift.liftMotor, -1, true)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
                 .resetMotorEncoder(lift.liftMotor)
                 .servoRunToPosition(clawPitch, clawPitchIntake)
-                .startMotor(intakeMotor, 0.15));
+                .startMotor(intakeMotor, 1, false));*/
 
-        intakingToHoldingPixels = new Actions(new ActionBuilder()
-                .servoRunToPosition(clawGrip, clawClose)
+        intakingToHoldingPixels = new Actions()
+                .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE))
+                .add(intakeActionBuilder.stopIntakeMotor())
+                .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.INTAKE))
+                .add(timerActionBuilder.resetTimer())
+                .add(timerActionBuilder.waitUntil(150))
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.HOLDING_TELEOP, 1));
+
+
+                /*.servoRunToPosition(clawGrip, clawClose)
                 .stopMotor(intakeMotor)
-                .servoRunToPosition(clawPitch, clawPitchGoDown)
+                .servoRunToPosition(clawPitch, Robot.clawPitchIntake)
                 .resetTimer(timer)
                 .waitUntil(timer, 150)
-                .startMotor(lift.liftMotor, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingTeleop)
-                .stopMotor(lift.liftMotor));
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderHoldingTeleop, 1));*/
 
-        holdingPixelsToIntakingPixels = new Actions(new ActionBuilder()
-                .servoRunToPosition(clawPitch, clawPitchIntake)
+        holdingPixelsToIntakingPixels = new Actions()
+                .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.INTAKE))
+                .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN))
+                .add(liftActionBuilder.startMotorWithEncoder(-1))
+                .add(liftActionBuilder.waitUntilLiftTouchDownPressed())
+                .add(liftActionBuilder.stopLiftMotor())
+                .add(liftActionBuilder.resetLiftMotorEncoder())
+                .add(intakeActionBuilder.startIntakeMotorWithNoEncoder(1));
+
+                /*.servoRunToPosition(clawPitch, clawPitchIntake)
                 .servoRunToPosition(clawGrip, clawOpen)
-                .startMotor(lift.liftMotor, -1)
+                .startMotor(lift.liftMotor, -1, true)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
                 .resetMotorEncoder(lift.liftMotor)
-                .startMotor(intakeMotor, 0.15));
+                .startMotor(intakeMotor, 1, false));*/
 
-        holdingPixelsToIdle = new Actions(new ActionBuilder()
-                .servoRunToPosition(clawGrip, clawOpen));
+        holdingPixelsToIdle = new Actions()
+                .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN));
+                /*.servoRunToPosition(clawGrip, clawOpen));*/
 
-        idleToHoldingPixels = new Actions(new ActionBuilder()
-                .servoRunToPosition(clawGrip, clawClose)
+        idleToHoldingPixels = new Actions()
+                .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE))
+                .add(timerActionBuilder.resetTimer())
+                .add(timerActionBuilder.waitUntil(200))
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.HOLDING_TELEOP, 1));
+
+                /*.servoRunToPosition(clawGrip, clawClose)
                 .resetTimer(timer)
                 .waitUntil(timer, 200)
-                .startMotor(lift.liftMotor, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingTeleop)
-                .stopMotor(lift.liftMotor));
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderHoldingTeleop, 1));*/
 
-        holdingPixelsToOutTakingPixels = new Actions(new ActionBuilder()
-                .startMotor(lift.liftMotor, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
-                .stopMotor(lift.liftMotor)
-                .servoRunToPosition(clawPitch, clawPitchOutTake));
+        holdingPixelsToOutTakingPixels = new Actions()
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.MIN, 1))
+                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.liftPositions.MIN))
+                .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.OUTTAKE));
 
-        exitingOutTakeToIdle = new Actions(new ActionBuilder()
-                // Guarantees lift was not manually put below claw movement limit
-                .startMotor(lift.liftMotor, 1)
+                /*.setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
-                .servoRunToPosition(clawYaw, clawYawIntake)
-                .servoRunToPosition(clawPitch, clawPitchGoDown)
-                .startMotor(lift.liftMotor, -1)
+                .servoRunToPosition(clawPitch, clawPitchOutTake));*/
+
+        exitingOutTakeToIdle = new Actions()
+                .add(clawActionBuilder.setYawPosition(Claw.yawPositions.INTAKE))
+                .add(clawActionBuilder.waitForAnalogYawSensorAtPosition(Claw.yawPositions.RESET,5))
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.MIN, 1))
+                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.liftPositions.MIN))
+                .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.INTAKE))
+                // To get lift going down as fast as possible, bring it down with motor power instead of servo
+                // servo will act as maintaining a linear speed and it's slower than just motor power with help of gravity
+                .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.INTAKE))
+                .add(clawActionBuilder.waitForAnalogPitchSensorAtPosition(Claw.pitchPositions.RESET, 10))
+                .add(liftActionBuilder.startMotorNoEncoder(-1))
+                .add(liftActionBuilder.waitUntilLiftTouchDownPressed())
+                .add(liftActionBuilder.stopLiftMotor())
+                .add(liftActionBuilder.resetLiftMotorEncoder());
+
+                /*.servoRunToPosition(clawYaw, clawYawIntake)
+                .waitForAnalogSensorAtPosition(clawYawAnalogSensor, analog_ClawYaw_ResetPosition, 5)
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin)
+                .servoRunToPosition(clawPitch, clawPitchIntake)
+                // To get lift going down as fast as possible, bring it down with motor power instead of servo
+                // servo will act as maintaining a linear speed and it's slower than just motor power with help of gravity
+                .servoRunToPosition(clawPitch, clawPitchIntake)
+                .waitForAnalogSensorAtPosition(clawPitchAnalogSensor, analog_ClawPitch_ResetPosition, 10)
+                .startMotor(lift.liftMotor, -1, false)
                 .waitForTouchSensorPressed(liftTouchDown)
                 .stopMotor(lift.liftMotor)
-                .resetMotorEncoder(lift.liftMotor));
+                .resetMotorEncoder(lift.liftMotor));*/
+
+
         //auto
+        autoHoldOnePixel = new Actions()
+                .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL))
+                .add(timerActionBuilder.waitUntil(500))
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.HOLDING, 1));
 
-        autoHoldOnePixel = new Actions(new ActionBuilder()
-                .servoRunToPosition(clawGrip, clawCloseOnePixel)
+                /*.servoRunToPosition(clawGrip, clawCloseOnePixel)
                 .waitUntil(timer, 500)
-                .startMotor(lift.liftMotor, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHolding)
-                .stopMotor(lift.liftMotor));
+                .setMotorPosition(lift.liftMotor, lift.liftEncoderHolding, 1));*/
 
-        autoOutTakeYellow = new Actions(new ActionBuilder()
-                .startMotor(lift.liftMotor, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHolding+400)
-                .stopMotor(lift.liftMotor)
-                .servoRunToPosition(clawPitch, clawPitchOutTake));
 
-        autoOutTakeYellowLow = new Actions(new ActionBuilder()
-                .startMotor(lift.liftMotor, 1)
-                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingLow)
-                .stopMotor(lift.liftMotor)
-                /*.servoRunToPosition(clawPitch, clawPitchOutTake)*/);
+        autoOutTakeYellow = new Actions()
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.AUTO_MIN_YELLOW, 1))
+                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.liftPositions.AUTO_MIN_YELLOW))
+                .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.OUTTAKE));
 
-        autoOpenClaw = new Actions(new ActionBuilder()
+                /*.setMotorPosition(lift.liftMotor, lift.liftEncoderMin-100, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin-100)
+                .servoRunToPosition(clawPitch, clawPitchOutTake));*/
+
+        autoOutTakeYellowHigh = new Actions()
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.AUTO_MIN_YELLOW_HIGH, 1))
+                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.liftPositions.AUTO_MIN_YELLOW_HIGH))
+                .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.OUTTAKE));
+
+                /*.setMotorPosition(lift.liftMotor, lift.liftEncoderMin+300, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderMin+300)
+                .servoRunToPosition(clawPitch, clawPitchOutTake));*/
+
+        autoOutTakeYellowLow = new Actions()
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.AUTO_MIN_YELLOW_LOW, 1))
+                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.liftPositions.AUTO_MIN_YELLOW_LOW));
+
+                /*.setMotorPosition(lift.liftMotor, lift.liftEncoderHoldingLow, 1)
+                .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingLow));*/
+
+        autoOpenClaw = new Actions()
+                .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN_AUTO))
+                .add(timerActionBuilder.resetTimer())
+                .add(timerActionBuilder.waitUntil(300))
+                .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN))
+                .add(timerActionBuilder.resetTimer())
+                .add(timerActionBuilder.waitUntil(300))
+                .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.INTAKE))
+                .add(timerActionBuilder.resetTimer())
+                .add(timerActionBuilder.waitUntil(150));
+
+                /*.servoRunToPosition(clawGrip, clawOpen/2)
+                .resetTimer(timer)
+                .waitUntil(timer, 300)
                 .servoRunToPosition(clawGrip, clawOpen)
                 .resetTimer(timer)
-                .waitUntil(timer, 300));
+                .waitUntil(timer, 300)
+                .servoRunToPosition(clawPitch, clawPitchIntake)
+                .resetTimer(timer)
+                .waitUntil(timer, 150));*/
 
-        // Timer
-        timer = new ElapsedTime();
 
-        if (isAutonomousMode) {
-            createAutoStateTransitions();
-        }
-        else {
+        if (!isAutonomousMode) { // no state machine to create in autonomous
             createTeleopStateTransitions();
         }
+
     }
 
 
@@ -210,16 +264,16 @@ public class Robot {
         // button triggers
         BooleanSupplier handlerButtonAPressed = handlerA::Pressed;
         BooleanSupplier handlerButtonBPressed = handlerB::Pressed;
-        BooleanSupplier handlerButtonXPressed = handlerX::Pressed;
-        BooleanSupplier handlerButtonYPressed = handlerY::Pressed;
-        BooleanSupplier handlerButtonLeftBumperPressed = handlerLeftBumper::Pressed;
-        BooleanSupplier handlerButtonRightBumperPressed = handlerRightBumper::Pressed;
+        // BooleanSupplier handlerButtonXPressed = handlerX::Pressed;
+        // BooleanSupplier handlerButtonYPressed = handlerY::Pressed;
+        // BooleanSupplier handlerButtonLeftBumperPressed = handlerLeftBumper::Pressed;
+        // BooleanSupplier handlerButtonRightBumperPressed = handlerRightBumper::Pressed;
         BooleanSupplier handlerButtonLeftTriggerPressed = handlerLeftTrigger::Pressed;
-        BooleanSupplier handlerButtonRightTriggerPressed = handlerRightTrigger::Pressed;
-        BooleanSupplier handlerDPad_DownPressed = handlerDPad_Down::Pressed;
-        BooleanSupplier handlerDPad_UpPressed = handlerDPad_Up::Pressed;
-        BooleanSupplier handlerDPad_LeftPressed = handlerDPad_Left::Pressed;
-        BooleanSupplier handlerDPad_RightPressed = handlerDPad_Right::Pressed;
+        // BooleanSupplier handlerButtonRightTriggerPressed = handlerRightTrigger::Pressed;
+        // BooleanSupplier handlerDPad_DownPressed = handlerDPad_Down::Pressed;
+        // BooleanSupplier handlerDPad_UpPressed = handlerDPad_Up::Pressed;
+        // BooleanSupplier handlerDPad_LeftPressed = handlerDPad_Left::Pressed;
+        // BooleanSupplier handlerDPad_RightPressed = handlerDPad_Right::Pressed;
 
         BooleanSupplier alwaysTrue = ()-> true;
 
@@ -254,10 +308,20 @@ public class Robot {
                 exitingOutTakeToIdle);
     }
 
+    // Functionalities
+    public static Lift lift;
+    public static Claw claw;
+    public static PlaneLauncher planeLauncher;
+    public static Intake intake;
+
+    // Action Builders
+    public static ClawActionBuilder clawActionBuilder;
+    public static LiftActionBuilder liftActionBuilder;
+    public static TimerActionBuilder timerActionBuilder;
+    public static IntakeActionBuilder intakeActionBuilder;
 
     // States
     StateMachine stateMachine;
-    public static Lift lift;
     public StateMachine.State intakingPixels;
     public StateMachine.State holdingPixels;
     public StateMachine.State holdingPixelsLow;
@@ -274,30 +338,23 @@ public class Robot {
             holdingPixelsToIdle, idleToHoldingPixels, holdingPixelsToOutTakingPixels, exitingOutTakeToIdle;
 
     //Autonomous Actions
-    public Actions autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowLow, autoOpenClaw;
+    public Actions autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autoOpenClaw;
 
-    // Motors
 
     public static OverrideMotor intakeMotor;
     public static Hanger skyHook;
-    public static DcMotor planeLauncher;
-    // Servos
-    public static Servo clawPitch, clawYaw, clawGrip;
-    // TouchSensors
-    public static TouchSensor liftTouchDown;
 
-    public static double clawPitchGoDown, clawPitchIntake, clawPitchOutTake;
-    public static double clawOpen, clawClose, clawCloseOnePixel, clawYawIntake,
-            clawYawLeftSlantedUp, clawYawLeftHorizontal, clawYawLeftSlantedDown, clawYawRightSlantedUp, clawYawRightHorizontal, clawYawRightSlantedDown;
-    int liftOutTake;
+    public static Button handlerA, handlerB, handlerX, handlerY,
+            handlerLeftBumper, handlerRightBumper, handlerLeftTrigger, handlerRightTrigger,
+            handlerDPad_Down, handlerDPad_Up, handlerDPad_Left, handlerDPad_Right,
+            handlerLeftStick_Up, handlerLeftStick_Down, handlerLeftStick_Left, handlerLeftStick_Right;;
 
-    public static Button handlerA, handlerB, handlerX, handlerY, handlerLeftBumper,
-            handlerRightBumper, handlerLeftTrigger, handlerRightTrigger, handlerDPad_Down, handlerDPad_Up, handlerDPad_Left, handlerDPad_Right;
 
     Gamepad gamepad1, gamepad2;
-    ActionBuilder actionBuilder;
-    ElapsedTime timer = new ElapsedTime();
+    ElapsedTime teleopTimer;
+    public Timer timer;
 
+    boolean isEndgame = false;
     private void updateButtons(){
         handlerA.updateButton(gamepad2);
         handlerB.updateButton(gamepad2);
@@ -311,6 +368,10 @@ public class Robot {
         handlerDPad_Up.updateButton(gamepad2);
         handlerDPad_Left.updateButton(gamepad2);
         handlerDPad_Right.updateButton(gamepad2);
+        handlerLeftStick_Up.updateButton(gamepad2);
+        handlerLeftStick_Down.updateButton(gamepad2);
+        handlerLeftStick_Left.updateButton(gamepad2);
+        handlerLeftStick_Right.updateButton(gamepad2);
     }
 
     public void updateSync() {
@@ -320,21 +381,13 @@ public class Robot {
     public void update(){
         updateButtons();
 
-        // Manages Reject mode on Roomba as an override of its current power and state
-        if(handlerLeftTrigger.Pressed()) {
-            intakeMotor.setOverridePower(-0.4);
-        } else if (handlerLeftTrigger.Released()) {
-            intakeMotor.cancelOverridePower();
+        if (teleopTimer.seconds() >= 120 || handlerLeftBumper.Pressed()){
+            isEndgame = true;
         }
-        if(handlerX.On()) {
-            planeLauncher.setPower(1);
-            sleep(200);
-        }
-        else{
-            planeLauncher.setPower(0);
-        }
-        if(!(stateMachine.getCurrentState() == outTakingPixels)){
-            skyHook.update(handlerDPad_Down);
+
+        if(!(stateMachine.getCurrentState() == outTakingPixels) && isEndgame){
+            skyHook.update();
+            planeLauncher.update();
         }
 
 
@@ -343,6 +396,9 @@ public class Robot {
         if(stateMachine.getCurrentState() == outTakingPixels){
             lift.update();
         }
+
+        intake.update(!(stateMachine.getCurrentState() == outTakingPixels));
+
     }
 
     public StateMachine.State currentState(){
