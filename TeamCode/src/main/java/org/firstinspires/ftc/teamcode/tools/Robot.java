@@ -111,7 +111,7 @@ public class Robot {
                 .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.INTAKE))
                 .add(timerActionBuilder.resetTimer())
                 .add(timerActionBuilder.waitUntil(150))
-                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.HOLDING_TELEOP, 1));
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.HOLDING_TELEOP, 1));
 
 
                 /*.servoRunToPosition(clawGrip, clawClose)
@@ -146,7 +146,7 @@ public class Robot {
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE))
                 .add(timerActionBuilder.resetTimer())
                 .add(timerActionBuilder.waitUntil(200))
-                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.HOLDING_TELEOP, 1));
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.HOLDING_TELEOP, 1));
 
                 /*.servoRunToPosition(clawGrip, clawClose)
                 .resetTimer(timer)
@@ -154,8 +154,8 @@ public class Robot {
                 .setMotorPosition(lift.liftMotor, lift.liftEncoderHoldingTeleop, 1));*/
 
         holdingPixelsToOutTakingPixels = new Actions()
-                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.MIN, 1))
-                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.liftPositions.MIN))
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.MIN, 1))
+                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.Position.MIN))
                 .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.OUTTAKE));
 
                 /*.setMotorPosition(lift.liftMotor, lift.liftEncoderMin, 1)
@@ -165,8 +165,8 @@ public class Robot {
         exitingOutTakeToIdle = new Actions()
                 .add(clawActionBuilder.setYawPosition(Claw.yawPositions.INTAKE))
                 .add(clawActionBuilder.waitForAnalogYawSensorAtPosition(Claw.yawPositions.RESET,5))
-                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.MIN, 1))
-                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.liftPositions.MIN))
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.MIN, 1))
+                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.Position.MIN))
                 .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.INTAKE))
                 // To get lift going down as fast as possible, bring it down with motor power instead of servo
                 // servo will act as maintaining a linear speed and it's slower than just motor power with help of gravity
@@ -196,7 +196,7 @@ public class Robot {
         autoHoldOnePixel = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL))
                 .add(timerActionBuilder.waitUntil(500))
-                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.HOLDING, 1));
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.HOLDING, 1));
 
                 /*.servoRunToPosition(clawGrip, clawCloseOnePixel)
                 .waitUntil(timer, 500)
@@ -204,8 +204,8 @@ public class Robot {
 
 
         autoOutTakeYellow = new Actions()
-                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.AUTO_MIN_YELLOW, 1))
-                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.liftPositions.AUTO_MIN_YELLOW))
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.AUTO_MIN_YELLOW, 1))
+                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.Position.AUTO_MIN_YELLOW))
                 .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.OUTTAKE));
 
                 /*.setMotorPosition(lift.liftMotor, lift.liftEncoderMin-100, 1)
@@ -213,8 +213,8 @@ public class Robot {
                 .servoRunToPosition(clawPitch, clawPitchOutTake));*/
 
         autoOutTakeYellowHigh = new Actions()
-                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.AUTO_MIN_YELLOW_HIGH, 1))
-                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.liftPositions.AUTO_MIN_YELLOW_HIGH))
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.AUTO_MIN_YELLOW_HIGH, 1))
+                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.Position.AUTO_MIN_YELLOW_HIGH))
                 .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.OUTTAKE));
 
                 /*.setMotorPosition(lift.liftMotor, lift.liftEncoderMin+300, 1)
@@ -222,8 +222,8 @@ public class Robot {
                 .servoRunToPosition(clawPitch, clawPitchOutTake));*/
 
         autoOutTakeYellowLow = new Actions()
-                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.liftPositions.AUTO_MIN_YELLOW_LOW, 1))
-                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.liftPositions.AUTO_MIN_YELLOW_LOW));
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.AUTO_MIN_YELLOW_LOW, 1))
+                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.Position.AUTO_MIN_YELLOW_LOW));
 
                 /*.setMotorPosition(lift.liftMotor, lift.liftEncoderHoldingLow, 1)
                 .waitForMotorAbovePosition(lift.liftMotor, lift.liftEncoderHoldingLow));*/
@@ -347,7 +347,7 @@ public class Robot {
     public static Button handlerA, handlerB, handlerX, handlerY,
             handlerLeftBumper, handlerRightBumper, handlerLeftTrigger, handlerRightTrigger,
             handlerDPad_Down, handlerDPad_Up, handlerDPad_Left, handlerDPad_Right,
-            handlerLeftStick_Up, handlerLeftStick_Down, handlerLeftStick_Left, handlerLeftStick_Right;;
+            handlerLeftStick_Up, handlerLeftStick_Down, handlerLeftStick_Left, handlerLeftStick_Right;
 
 
     Gamepad gamepad1, gamepad2;

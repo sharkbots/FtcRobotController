@@ -7,15 +7,15 @@ public class LiftActionBuilder {
         this.lift = lift;
     }
 
-    public Action setLiftMotorPositionWithPower(Lift.liftPositions liftPositions, double power) {  // done --> lift
+    public Action setLiftMotorPositionWithPower(Lift.Position position, double power) {  // done --> lift
         ActionFunction function = () -> {
-            lift.setLiftPosition(liftPositions, power);
+            lift.setLiftPosition(position, power);
             return true;
         };
         return new Action("set lift motor to target position" , function);
     }
 
-    public Action waitForLiftMotorAbovePosition(Lift.liftPositions expectedPosition) {
+    public Action waitForLiftMotorAbovePosition(Lift.Position expectedPosition) {
         ActionFunction function = () -> lift.waitLiftMotorAbovePosition(expectedPosition);
         return new Action("waitForLiftMotorAbovePosition", function);
     }
