@@ -3,9 +3,8 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
@@ -16,13 +15,14 @@ import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 //@Autonomous(name="Autonomous Base")
 public abstract class AutoBase extends LinearOpMode {
 
     protected StandardTrackingWheelLocalizer myLocalizer;
 
-    public class Coordinates{
+    public static class Coordinates{
         Boolean isBlueAlliance;
         Boolean isNearSide;
 
@@ -55,8 +55,6 @@ public abstract class AutoBase extends LinearOpMode {
         Vector2d prepareFarDrop = new Vector2d(-37, 59);
 
         Vector2d backdropIntermediateFar = new Vector2d(18, 59);
-        Vector2d intermediateDropFar = new Vector2d(35, 59);
-
 
 
         public Coordinates(Boolean isBlueAlliance, Boolean isNearSide) {
@@ -126,10 +124,6 @@ public abstract class AutoBase extends LinearOpMode {
             return new Pose2d(pose.getX(), -pose.getY(), (-pose.getHeading())%Math.toRadians(360));
         }
 
-        public Pose2d flipAcrossXKeepHeading(Pose2d pose){ //needed for team prop and prepare far drop
-            return new Pose2d(pose.getX(), -pose.getY(), pose.getHeading());
-        }
-
         public Vector2d flipVectorAcrossX(Vector2d vector2d){
             return new Vector2d(vector2d.getX(), -vector2d.getY());
         }
@@ -141,16 +135,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         public Pose2d flipAcrossCenter(Pose2d pose) {
             return flipAcrossX(flipToFarSide(pose));
-            //return new Pose2d(pose.getX()-48, -pose.getY(),(-pose.getHeading())%Math.toRadians(360));
         }
-
-        public Pose2d flipTeamPropAcrossCenter(Pose2d pose){
-            return new Pose2d(pose.getX()-48, -pose.getY(), pose.getHeading());
-        }
-
-//        public Pose2d flipBackDrop(Pose2d pose){
-//            return new Pose2d(pose.getX(), pose.getY()-72, (-pose.getHeading())%Math.toRadians(360));
-//        }
 
     }
     Coordinates c; //= new Coordinates(true, true); // change values later
@@ -179,8 +164,10 @@ public abstract class AutoBase extends LinearOpMode {
         Robot.lift.startLiftMotorWithEncoder(0.5);
         //Robot.lift.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //Robot.lift.liftMotor.setPower(0.5);
+
+        //noinspection StatementWithEmptyBody
         while (Robot.lift.getCurrentLiftMotorPosition() < 15*0.95) {
-            continue;
+            // Waiting for lift motor position to reach target
         }
         Robot.lift.stopLiftMotor();
         //Robot.lift.liftMotor.setPower(0);
@@ -235,9 +222,9 @@ public abstract class AutoBase extends LinearOpMode {
             robot.autoOutTakeYellow.runAsync();
         }
         else {
-            ElapsedTime timer = new ElapsedTime();
-            while(timer.seconds() < 9) {
-                continue;
+            Deadline waitFarSide = new Deadline(9, TimeUnit.SECONDS);
+            //noinspection StatementWithEmptyBody
+            while(!waitFarSide.hasExpired()) {
             }
         }
         // Position the robot in front of the backdrop

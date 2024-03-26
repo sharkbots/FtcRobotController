@@ -4,16 +4,12 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.tools.Button;
-import org.firstinspires.ftc.teamcode.tools.Global;
 
 public class Hanger {
     private final DcMotor hangerMotor;
     private final DcMotor hangerEncoder;
-    private final int countsPerRev = 1531; //not sure of this value
-    private final double HANGER_REVOLUTIONS = 0.4; //need to test to see how many revolutions
     private final Button handlerDPadDown, handlerDPadUp, handlerY;
 
     private final int maxSkyHookPosition = 3600;
@@ -40,20 +36,18 @@ public class Hanger {
     }
 
     public void update() {
-        //Global.telemetry.addLine("Skyhook position is: " + hangerEncoder.getCurrentPosition());
-        //Global.telemetry.update();
 
-        if(handlerDPadUp.On()){
-            autoMoveHanger = 0;
-            hangerPower = 1;
-        }
-        else if(handlerDPadDown.On()){ // button is pressed
-            autoMoveHanger = 0;
-            hangerPower = -1;
-        }
-        else if (autoMoveHanger == 0){ // We stop the motor only in manual mode
-            hangerPower = 0;
-        }
+//        if(handlerDPadUp.On()){
+//            autoMoveHanger = 0;
+//            hangerPower = 1;
+//        }
+//        else if(handlerDPadDown.On()){ // button is pressed
+//            autoMoveHanger = 0;
+//            hangerPower = -1;
+//        }
+//        else if (autoMoveHanger == 0){ // We stop the motor only in manual mode
+//            hangerPower = 0;
+//        }
 
         if(handlerY.Pressed()){
             if (autoMoveHanger == 0){

@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Hanger;
 import org.firstinspires.ftc.teamcode.Intake;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.teamcode.tools.StateMachine.LiftActionBuilder;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.StateMachine;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.TimerActionBuilder;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 public class Robot {
@@ -51,7 +53,7 @@ public class Robot {
         intake = new Intake(hardwareMap, handlerLeftTrigger, handlerLeftStick_Up, handlerLeftStick_Down);
 
         // Timer
-        teleopTimer = new ElapsedTime();
+        teleopDeadline = new Deadline(90, TimeUnit.SECONDS);
         timer = new Timer(new ElapsedTime());
 
         clawActionBuilder = new ClawActionBuilder(claw);
@@ -195,6 +197,7 @@ public class Robot {
         //auto
         autoHoldOnePixel = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL))
+                .add(timerActionBuilder.resetTimer())
                 .add(timerActionBuilder.waitUntil(500))
                 .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.HOLDING, 1));
 
@@ -351,7 +354,7 @@ public class Robot {
 
 
     Gamepad gamepad1, gamepad2;
-    ElapsedTime teleopTimer;
+    Deadline teleopDeadline;
     public Timer timer;
 
     boolean isEndgame = false;
@@ -381,15 +384,14 @@ public class Robot {
     public void update(){
         updateButtons();
 
-        if (teleopTimer.seconds() >= 120 || handlerLeftBumper.Pressed()){
+        if (teleopDeadline.hasExpired() || handlerLeftBumper.Pressed()){
             isEndgame = true;
         }
 
-        if(!(stateMachine.getCurrentState() == outTakingPixels) && isEndgame){
+        if(isEndgame /* && !(stateMachine.getCurrentState() == outTakingPixels)*/){
             skyHook.update();
             planeLauncher.update();
         }
-
 
         stateMachine.updateState();
 
