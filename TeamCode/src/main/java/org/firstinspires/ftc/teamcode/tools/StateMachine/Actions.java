@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.tools.StateMachine;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -54,5 +56,17 @@ public class Actions {
 
     public void update(){
         isComplete();
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Action action: actionList) {
+            // Assuming each Action has a meaningful toString() implementation
+            sb.append(action.toString());
+            sb.append(", "); // Separate actions with commas
+            }
+        return sb.toString();
     }
 }

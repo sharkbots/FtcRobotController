@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.tools.StateMachine;
 
+import androidx.annotation.NonNull;
+
 import org.firstinspires.ftc.teamcode.tools.Global;
 
 // This is what an action is: a function with no input parameters which returns
@@ -24,5 +26,11 @@ public class Action {
                 Global.telemetry.addLine(msg);
             }
             return performAction.evaluate();
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return msg;
         }
     }

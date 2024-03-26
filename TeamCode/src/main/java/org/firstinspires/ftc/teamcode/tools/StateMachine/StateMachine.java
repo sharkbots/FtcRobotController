@@ -117,5 +117,20 @@ public class StateMachine {
     public State getCurrentState(){
         return currentState;
     }
+
+    public void printGraphvizDot() {
+        System.out.println("digraph StateMachine {");
+        for (State state : states) {
+            for (State.Transition transition : state.transitions) {
+                // Assuming Actions.toString() returns a comma-separated list of action names
+                String actionsString = transition.actions.toString();
+                System.out.println("    \"" + state.name + "\" -> \"" + transition.getDestinationState().name +
+                        "\" [label=\"" + actionsString + "\"];");
+            }
+        }
+        System.out.println("}");
+    }
 }
+
+
 

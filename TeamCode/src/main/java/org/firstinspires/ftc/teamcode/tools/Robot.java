@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 public class Robot {
-    public Robot(HardwareMap hardwareMap, Gamepad gamepad1, Gamepad gamepad2, Boolean isAutonomousMode) {
+    public Robot(HardwareMap hardwareMap, Gamepad gamepad1, Gamepad gamepad2) {
 
         // Gamepads
         this.gamepad1 = gamepad1;
@@ -62,6 +62,14 @@ public class Robot {
         intakeActionBuilder = new IntakeActionBuilder(intake);
 
 
+        createStateMachine();
+        createActions();
+        createTeleopStateTransitions();
+
+
+    }
+
+    private void createStateMachine() {
         stateMachine = new StateMachine();
 
         // States
@@ -74,16 +82,15 @@ public class Robot {
         // Adding states to stateMachine
         stateMachine.addState(intakingPixels);
         stateMachine.addState(holdingPixels);
-        stateMachine.addState(holdingPixelsLow);
         stateMachine.addState(idle);
         stateMachine.addState(outTakingPixels);
         stateMachine.addState(exitingOutTake);
 
-
         // Set initial state
         stateMachine.setInitialState(idle);
+    }
 
-        // Actions
+    private void createActions() {
         empty = new Actions();
         //teleop
         idleToIntakingPixels = new Actions()
@@ -142,7 +149,7 @@ public class Robot {
 
         holdingPixelsToIdle = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN));
-                /*.servoRunToPosition(clawGrip, clawOpen));*/
+        /*.servoRunToPosition(clawGrip, clawOpen));*/
 
         idleToHoldingPixels = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE))
@@ -251,16 +258,7 @@ public class Robot {
                 .servoRunToPosition(clawPitch, clawPitchIntake)
                 .resetTimer(timer)
                 .waitUntil(timer, 150));*/
-
-
-        if (!isAutonomousMode) { // no state machine to create in autonomous
-            createTeleopStateTransitions();
-        }
-
     }
-
-
-
 
 
     private void createTeleopStateTransitions() {
@@ -327,7 +325,6 @@ public class Robot {
     StateMachine stateMachine;
     public StateMachine.State intakingPixels;
     public StateMachine.State holdingPixels;
-    public StateMachine.State holdingPixelsLow;
     public StateMachine.State idle;
     public StateMachine.State outTakingPixels;
     public StateMachine.State exitingOutTake;
@@ -406,5 +403,7 @@ public class Robot {
     public StateMachine.State currentState(){
         return stateMachine.getCurrentState();
     }
+
+    public void printGraphvizDot() {stateMachine.printGraphvizDot();}
 
 }

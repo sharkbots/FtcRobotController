@@ -27,7 +27,7 @@ public class TeleopDrive extends LinearOpMode {
 
         pixelsDetection = new PixelsDetection(hardwareMap);
 
-        robot = new Robot(hardwareMap, gamepad1, gamepad2, false);
+        robot = new Robot(hardwareMap, gamepad1, gamepad2);
 
         aprilTagDetection = new AprilTagDetection();
         aprilTagDetection.Setup(hardwareMap, telemetry);

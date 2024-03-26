@@ -146,7 +146,7 @@ public abstract class AutoBase extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Setup();
         Global.telemetry = telemetry;
-        Robot robot = new Robot(hardwareMap, gamepad1, gamepad2, true);
+        Robot robot = new Robot(hardwareMap, gamepad1, gamepad2);
 
         TeamPropDetection teamPropDetection = new TeamPropDetection();
         teamPropDetection.Setup(hardwareMap, telemetry);
