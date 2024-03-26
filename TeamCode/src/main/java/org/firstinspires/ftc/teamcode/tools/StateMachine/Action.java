@@ -2,6 +2,12 @@ package org.firstinspires.ftc.teamcode.tools.StateMachine;
 
 import org.firstinspires.ftc.teamcode.tools.Global;
 
+// This is what an action is: a function with no input parameters which returns
+// true/false when evaluate.
+interface ActionFunction {
+    Boolean evaluate();
+}
+
 public class Action {
         private final ActionFunction performAction; // A function that performs the action and returns true if the action is complete
         private final String msg;
