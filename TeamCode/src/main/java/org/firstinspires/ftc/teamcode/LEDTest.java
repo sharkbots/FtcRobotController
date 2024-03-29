@@ -55,11 +55,8 @@ public class LEDTest extends LinearOpMode {
         while(opModeIsActive()){
 
             pixelsDetection.update();
-            if(deadline.hasExpired()) {
-                displayPixel1 = !displayPixel1;
-                deadline.reset();
-            }
             ledRibbons.setPattern(pixelsDetection.pixel1.pattern, pixelsDetection.pixel2.pattern);
+            ledRibbons.update();
         }
 
     }
