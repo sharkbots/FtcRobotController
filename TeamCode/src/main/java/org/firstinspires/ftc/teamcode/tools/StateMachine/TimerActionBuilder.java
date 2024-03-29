@@ -9,10 +9,10 @@ public class TimerActionBuilder {
 
     public TimerActionBuilder (Timer timer) { this.timer = timer; }
 
-    public Action resetTimer() {
+    /*public Action resetTimer() {
         ActionFunction function = () -> { timer.resetTimer(); return true;};
         return new Action("reset timer ", function);
-    }
+    }*/
 
     public Action waitUntil(double targetTime) {
         ActionFunction function = () -> timer.waitUntil(targetTime);
