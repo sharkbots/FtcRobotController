@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.tools;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.LED;
 
 public class PixelsDetection {
 
@@ -75,6 +74,10 @@ public class PixelsDetection {
         Global.telemetry.addLine();
 
         return detectedColor;
+    }
+
+    public boolean hasTwoPixels() {
+        return (pixel1 != PIXEL_COLOR.UNDEFINED) && (pixel2 != PIXEL_COLOR.UNDEFINED);
     }
 
     private void setLEDStatus() {

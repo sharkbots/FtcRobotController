@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Claw;
+import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
@@ -161,6 +162,8 @@ public abstract class AutoBase extends LinearOpMode {
         // Let's have at list 33% chance to pick it right if nothing works
         TeamPropDetection.propLocation propLoc = TeamPropDetection.propLocation.CENTER;
 
+        /*
+
         Robot.lift.startLiftMotorWithEncoder(0.5);
         //Robot.lift.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //Robot.lift.liftMotor.setPower(0.5);
@@ -175,10 +178,13 @@ public abstract class AutoBase extends LinearOpMode {
         Robot.claw.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL);
         Robot.claw.setPitchPosition(Claw.pitchPositions.INTAKE);
         Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
+        Robot.planeLauncher.storePlane();
 
         //Robot.clawGrip.setPosition(Robot.clawCloseOnePixel);
         //Robot.clawPitch.setPosition(Robot.clawPitchIntake);
         //Robot.clawYaw.setPosition(Robot.clawYawIntake);
+
+        */
 
         TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
         ArrayList<TrajectorySequence> finalTrajectory;
@@ -208,14 +214,60 @@ public abstract class AutoBase extends LinearOpMode {
 
         //robot.updateSync();
 
+        // first cycle (yellow preload + white from stack)
+        Robot.intake.setIntakeFlipperPosition(Intake.flipperPositions.PIXEL5);
+        robot.startIntakingPixels.run();
+        while(!Robot.pixelsDetection.hasTwoPixels()){
+            Robot.pixelsDetection.update();
+        }
+        robot.holdPixels.run();
+        robot.outTake.run();
+        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+        Deadline waitFarSide = new Deadline(1, TimeUnit.SECONDS);
+        //noinspection StatementWithEmptyBody
+        while(!waitFarSide.hasExpired()) {
+        }
+        robot.resetOutTake.run();
 
+        // second cycle (2 whites from stack)
+        Robot.intake.setIntakeFlipperPosition(Intake.flipperPositions.PIXEL4);
+        robot.startIntakingPixels.run();
+        Robot.intake.setIntakeFlipperPosition(Intake.flipperPositions.PIXEL3);
+        while(!Robot.pixelsDetection.hasTwoPixels()){
+            Robot.pixelsDetection.update();
+        }
+        robot.holdPixels.run();
+        robot.outTake.run();
+        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+        waitFarSide.reset();
+        //noinspection StatementWithEmptyBody
+        while(!waitFarSide.hasExpired()) {
+        }
+        robot.resetOutTake.run();
+
+
+        // third cycle (2 whites from stack)
+        Robot.intake.setIntakeFlipperPosition(Intake.flipperPositions.UP);
+        robot.startIntakingPixels.run();
+        while(!Robot.pixelsDetection.hasTwoPixels()){
+            Robot.pixelsDetection.update();
+        }
+        robot.holdPixels.run();
+        robot.outTake.run();
+        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+        waitFarSide.reset();
+        //noinspection StatementWithEmptyBody
+        while(!waitFarSide.hasExpired()) {
+        }
+        robot.resetOutTake.run();
+
+
+/*
         //Raise lift so the pixel doesn't drag on the ground
         robot.autoOutTakeYellowLow.run();
 
         // Deposit purple pixel on spike mark
         drive.followTrajectorySequence(finalTrajectory.get(0));
-        Robot.planeLauncher.storePlane();
-
 
         // Raise lift more + angle the claw to outtake
         if(c.isNearSide) {
@@ -245,7 +297,7 @@ public abstract class AutoBase extends LinearOpMode {
         drive.followTrajectorySequence(finalTrajectory.get(2));
 
         // Drop yellow pixel
-        robot.autoOpenClaw.run();
+        robot.autonomousOpenClaw.run();
 
         // Park
         robot.exitingOutTakeToIdle.runAsync();
@@ -255,6 +307,8 @@ public abstract class AutoBase extends LinearOpMode {
         AutoDataStorage.currentPose = drive.getPoseEstimate();
         AutoDataStorage.comingFromAutonomous = true;
 
+
+ */
         waitForStart();
 
     }

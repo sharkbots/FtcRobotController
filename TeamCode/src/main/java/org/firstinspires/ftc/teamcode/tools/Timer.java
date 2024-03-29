@@ -10,11 +10,22 @@ public class Timer {
     public void resetTimer(){
         timer.reset();
     }
+    private boolean timerNotReset = true;
 
     public double getMilliseconds(){
         return timer.milliseconds();
     }
     public boolean waitUntil(double targetTime){
-        return timer.milliseconds() >= targetTime;
+        if(timerNotReset){
+            timer.reset();
+            timerNotReset = false;
+        }
+        if(timer.milliseconds() >= targetTime){
+            timerNotReset = true;
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
