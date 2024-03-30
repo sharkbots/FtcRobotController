@@ -22,6 +22,11 @@ public class StateMachine {
         {
             transitions.add(new Transition(nextState, trigger, actions));
         }
+        // Method to add a transition to this state
+        public void addTransitionTo(State nextState, BooleanSupplier trigger, Action action)
+        {
+            transitions.add(new Transition(nextState, trigger, new Actions(action)));
+        }
 
         // Inner Transition class representing a possible change from the current state to another
         public class Transition {

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.teamcode.aprilTags.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
-import org.firstinspires.ftc.teamcode.tools.PixelsDetection;
 import org.firstinspires.ftc.teamcode.tools.SetDriveMotors;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
@@ -18,13 +17,10 @@ public class TeleopDrive extends LinearOpMode {
 
     Robot robot;
     AprilTagDetection aprilTagDetection;
-    PixelsDetection pixelsDetection;
 
     public void Setup(){
         Global.telemetry = telemetry;
         driveMotors = new SetDriveMotors(hardwareMap);
-
-        pixelsDetection = new PixelsDetection(hardwareMap);
 
         robot = new Robot(hardwareMap, gamepad1, gamepad2);
 
@@ -62,6 +58,7 @@ public class TeleopDrive extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Setup();
+        Global.telemetry.speak("SHARKBOTS SHARKBOTS SHARKBOTS");
         waitForStart();
         while(opModeIsActive()){
 
@@ -94,12 +91,10 @@ public class TeleopDrive extends LinearOpMode {
                 distanceToWall = aprilTagDetection.GetDistanceAwayFromTheBackdrop();
             }
 
-
             driveMotors.driveCommands(horizontal, vertical, turn, goFast, distanceToWall, switchDriveMode, alignToCardinalPoint, resetHeading);
             driveMotors.update();
 
             robot.update();
-            pixelsDetection.update();
 
             if(robot.currentState()==robot.outTakingPixels) {
                 Robot.claw.update();
