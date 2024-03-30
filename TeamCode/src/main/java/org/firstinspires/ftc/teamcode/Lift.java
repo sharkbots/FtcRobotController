@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.tools.Global;
 import org.firstinspires.ftc.teamcode.tools.MotorActionManager;
 
 public class Lift {
