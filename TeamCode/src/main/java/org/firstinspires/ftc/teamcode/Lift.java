@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.tools.Global;
 import org.firstinspires.ftc.teamcode.tools.MotorActionManager;
@@ -110,8 +111,7 @@ public class Lift {
     public void update() {
 
         // Bit of a hack (so that when it comes from state machine target pos is not 0)
-        int lastSetPosition = Global.ensureWithin(liftMotor.getTargetPosition(), Position.MIN.value, Position.MAX.value);
-
+        int lastSetPosition = Range.clip(liftMotor.getTargetPosition(), Position.MIN.value, Position.MAX.value);
         // If the handler does not want to move motor, then hold the last position set by the handler
         // Else, move the motor normally
         if ((Math.abs(gamepad2.right_stick_y)<handlerLiftDeadzone) ||
@@ -124,7 +124,7 @@ public class Lift {
             lastSetPosition = liftMotor.getCurrentPosition();
 
             // Hack continued :-)
-            liftMotor.setTargetPosition(Global.ensureWithin(lastSetPosition, Position.MIN.value, Position.MAX.value));
+            liftMotor.setTargetPosition(Range.clip(lastSetPosition, Position.MIN.value, Position.MAX.value));
         }
     }
 
