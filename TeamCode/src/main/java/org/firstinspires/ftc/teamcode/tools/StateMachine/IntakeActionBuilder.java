@@ -38,7 +38,7 @@ public class IntakeActionBuilder {
             intake.pixels.update();
             return intake.pixels.hasTwoPixels();
         };
-        return new DeadlineAction.DeadlineActionImpl("waitUntilHasTwoPixels", function, timeout, unit);
+        return new DeadlineAction("waitUntilHasTwoPixels", function, timeout, unit);
     }
 
     private final Intake intake;
