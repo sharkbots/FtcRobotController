@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.tools.StateMachine.ClawActionBuilder;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.IntakeActionBuilder;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.LiftActionBuilder;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.StateMachine;
-import org.firstinspires.ftc.teamcode.tools.StateMachine.TimerActionBuilder;
+import org.firstinspires.ftc.teamcode.tools.StateMachine.DeadlineAction;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
@@ -52,7 +52,7 @@ public class Robot {
         planeLauncher = new PlaneLauncher(hardwareMap, handlerX);
         skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up, handlerY);//hardwareMap.dcMotor.get("skyHookMotor");
         intake = new Intake(hardwareMap, handlerLeftTrigger, handlerLeftStick_Up, handlerLeftStick_Down);
-        pixelsDetection = new PixelsDetection(hardwareMap);
+
         ledRibbons = new LEDRibbons(hardwareMap);
 
         DcMotor blinkinPower = hardwareMap.get(DcMotor.class, "blinkinpower");
@@ -60,18 +60,15 @@ public class Robot {
 
         // Timer
         teleopDeadline = new Deadline(90, TimeUnit.SECONDS);
-        timer = new Timer(new ElapsedTime());
 
         clawActionBuilder = new ClawActionBuilder(claw);
         liftActionBuilder = new LiftActionBuilder(lift);
-        timerActionBuilder = new TimerActionBuilder(timer);
         intakeActionBuilder = new IntakeActionBuilder(intake);
 
 
         createStateMachine();
         createActions();
         createTeleopStateTransitions();
-
 
     }
 
@@ -99,10 +96,13 @@ public class Robot {
 
     private void createActions() {
         empty = new Actions();
-        //teleop
+
+        ////////////////
+        //// TELEOP ////
+        ////////////////
         startIntakingPixels = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN))
-                .add(timerActionBuilder.waitUntil(150))
+                .add(DeadlineAction.waitFor(150, TimeUnit.MILLISECONDS))
                 .add(liftActionBuilder.startMotorWithEncoder(-1))
                 .add(liftActionBuilder.waitUntilLiftTouchDownPressed())
                 .add(liftActionBuilder.stopLiftMotor())
@@ -111,14 +111,14 @@ public class Robot {
                 .add(intakeActionBuilder.startIntakeMotorWithNoEncoder(1));
 
         holdPixels = new Actions()
-                .add(timerActionBuilder.waitUntil(150))
+                .add(DeadlineAction.waitFor(150, TimeUnit.MILLISECONDS))
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE))
-                .add(timerActionBuilder.waitUntil(500))
+                .add(DeadlineAction.waitFor(500, TimeUnit.MILLISECONDS))
                 .add(intakeActionBuilder.startIntakeMotorWithNoEncoder(-1))
                 .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.INTAKE))
-                .add(timerActionBuilder.waitUntil(150))
+                .add(DeadlineAction.waitFor(150, TimeUnit.MILLISECONDS))
                 .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.HOLDING_TELEOP, 1))
-                .add(timerActionBuilder.waitUntil(100))
+                .add(DeadlineAction.waitFor(100, TimeUnit.MILLISECONDS))
                 .add(intakeActionBuilder.stopIntakeMotor());
 
         holdingPixelsToIntakingPixels = new Actions()
@@ -135,7 +135,7 @@ public class Robot {
 
         idleToHoldingPixels = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE))
-                .add(timerActionBuilder.waitUntil(200))
+                .add(DeadlineAction.waitFor(200, TimeUnit.MILLISECONDS))
                 .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.HOLDING_TELEOP, 1));
 
         outTake = new Actions()
@@ -157,10 +157,16 @@ public class Robot {
                 .add(liftActionBuilder.stopLiftMotor())
                 .add(liftActionBuilder.resetLiftMotorEncoder());
 
-        //auto
+        ////////////////
+        // AUTONOMOUS //
+        ////////////////
+        tryIntakeTwoPixels = new Actions()
+                .add(startIntakingPixels)
+                .add(intakeActionBuilder.waitForTwoPixelsOrTimeout(3, TimeUnit.SECONDS));
+
         autoHoldOnePixel = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL))
-                .add(timerActionBuilder.waitUntil(500))
+                .add(DeadlineAction.waitFor(500, TimeUnit.MILLISECONDS))
                 .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.HOLDING, 1));
 
         autoOutTakeYellow = new Actions()
@@ -179,7 +185,7 @@ public class Robot {
 
         autonomousOpenClawYellow = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN_HALFWAY))
-                .add(timerActionBuilder.waitUntil(300))
+                .add(DeadlineAction.waitFor(300, TimeUnit.MILLISECONDS))
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN));
     }
 
@@ -198,7 +204,7 @@ public class Robot {
         // BooleanSupplier handlerDPad_UpPressed = handlerDPad_Up::Pressed;
         // BooleanSupplier handlerDPad_LeftPressed = handlerDPad_Left::Pressed;
         // BooleanSupplier handlerDPad_RightPressed = handlerDPad_Right::Pressed;
-        BooleanSupplier twoPixelsInPossession = pixelsDetection::hasTwoPixels;
+        BooleanSupplier twoPixelsInPossession = intake.pixels::hasTwoPixels;
 
         BooleanSupplier alwaysTrue = ()-> true;
 
@@ -240,13 +246,11 @@ public class Robot {
     public static Claw claw;
     public static PlaneLauncher planeLauncher;
     public static Intake intake;
-    public static PixelsDetection pixelsDetection;
     public static LEDRibbons ledRibbons;
 
     // Action Builders
     public static ClawActionBuilder clawActionBuilder;
     public static LiftActionBuilder liftActionBuilder;
-    public static TimerActionBuilder timerActionBuilder;
     public static IntakeActionBuilder intakeActionBuilder;
 
     // States
@@ -266,7 +270,7 @@ public class Robot {
             holdingPixelsToIdle, idleToHoldingPixels, outTake, resetOutTake;
 
     //Autonomous Actions
-    public Actions autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autonomousOpenClawYellow;
+    public Actions tryIntakeTwoPixels, autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autonomousOpenClawYellow;
 
 
     public static OverrideMotor intakeMotor;
@@ -280,7 +284,6 @@ public class Robot {
 
     Gamepad gamepad1, gamepad2;
     Deadline teleopDeadline;
-    public Timer timer;
 
     boolean isEndgame = false;
     private void updateButtons(){
@@ -308,25 +311,19 @@ public class Robot {
 
     public void update(){
         updateButtons();
-        pixelsDetection.update();
-        ledRibbons.setPattern(pixelsDetection.pixel1.pattern, pixelsDetection.pixel2.pattern);
+        isEndgame = teleopDeadline.hasExpired() || handlerLeftBumper.Pressed();
 
-        if (teleopDeadline.hasExpired() || handlerLeftBumper.Pressed()){
-            isEndgame = true;
-        }
-
-        if(isEndgame /* && !(stateMachine.getCurrentState() == outTakingPixels)*/){
+        if(isEndgame){
             skyHook.update();
             planeLauncher.update();
         }
 
         stateMachine.updateState();
-
         if(stateMachine.getCurrentState() == outTakingPixels){
             lift.update();
         }
-
         intake.update(!(stateMachine.getCurrentState() == outTakingPixels));
+        ledRibbons.setPattern(intake.pixels.pixel1.pattern, intake.pixels.pixel2.pattern);
 
     }
 

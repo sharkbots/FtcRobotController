@@ -213,14 +213,18 @@ public abstract class AutoBase extends LinearOpMode {
         }
 
         //robot.updateSync();
+        // Purple on spike mark
+
 
         // first cycle (yellow preload + white from stack)
-        Robot.intake.setIntakeFlipperPosition(Intake.flipperPositions.PIXEL5);
-        robot.startIntakingPixels.run();
-        while(!Robot.pixelsDetection.hasTwoPixels()){
-            Robot.pixelsDetection.update();
-        }
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+        do {
+            robot.tryIntakeTwoPixels.run();
+        } while(Robot.intake.pixels.hasTwoPixels());
+
         robot.holdPixels.run();
+        // go to backdrop
+
         robot.outTake.run();
         Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
         Deadline waitFarSide = new Deadline(1, TimeUnit.SECONDS);
@@ -229,12 +233,13 @@ public abstract class AutoBase extends LinearOpMode {
         }
         robot.resetOutTake.run();
 
+
         // second cycle (2 whites from stack)
-        Robot.intake.setIntakeFlipperPosition(Intake.flipperPositions.PIXEL4);
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL4);
         robot.startIntakingPixels.run();
-        Robot.intake.setIntakeFlipperPosition(Intake.flipperPositions.PIXEL3);
-        while(!Robot.pixelsDetection.hasTwoPixels()){
-            Robot.pixelsDetection.update();
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
+        while(!robot.intake.pixels.hasTwoPixels()){
+            robot.intake.pixels.update();
         }
         robot.holdPixels.run();
         robot.outTake.run();
@@ -246,11 +251,12 @@ public abstract class AutoBase extends LinearOpMode {
         robot.resetOutTake.run();
 
 
+
         // third cycle (2 whites from stack)
-        Robot.intake.setIntakeFlipperPosition(Intake.flipperPositions.UP);
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
         robot.startIntakingPixels.run();
-        while(!Robot.pixelsDetection.hasTwoPixels()){
-            Robot.pixelsDetection.update();
+        while(!robot.intake.pixels.hasTwoPixels()){
+            robot.intake.pixels.update();
         }
         robot.holdPixels.run();
         robot.outTake.run();

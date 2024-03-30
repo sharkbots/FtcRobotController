@@ -9,7 +9,6 @@ import org.firstinspires.ftc.teamcode.tools.Global;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name = "TeleOpDrive", group = "Testing")
 public class TeleopDrive extends LinearOpMode {
@@ -36,7 +35,7 @@ public class TeleopDrive extends LinearOpMode {
         Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
         Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
         Robot.planeLauncher.storePlane();
-        Robot.intake.setIntakeFlipperPosition(Intake.flipperPositions.UP);
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
         /*Robot.clawPitch.setPosition(Robot.clawPitchIntake); // clawPitchIntake
         Robot.clawYaw.setPosition(Robot.clawYawIntake);
         Robot.clawGrip.setPosition(Robot.clawOpen);
