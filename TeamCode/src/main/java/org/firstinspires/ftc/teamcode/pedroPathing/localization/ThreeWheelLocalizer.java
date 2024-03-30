@@ -8,6 +8,8 @@ import com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.roadRunner.util.Encoder;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,14 +37,16 @@ import java.util.List;
  */
 @Config
 public class ThreeWheelLocalizer extends ThreeTrackingWheelLocalizer {
-    public static double TICKS_PER_REV = 8192;
-    public static double WHEEL_RADIUS = 1.37795; // in
+    public static double TICKS_PER_REV = 2000;
+    public static double WHEEL_RADIUS = 0.945; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
+    // we value precision
 
-    public static double X_MULTIPLIER = 0.5008239963;
-    public static double Y_MULTIPLIER = 0.5018874659;
+    public static double X_MULTIPLIER = 0.9991;
+    public static double Y_MULTIPLIER = 1.0223;
 
-    public static double leftX = -18.5/25.4 - 0.1, leftY = 164.4/25.4, rightX = -18.4/25.4 - 0.1, rightY = -159.6/25.4, strafeX = -107.9/25.4+0.25, strafeY = -1.1/25.4-0.23;
+    public static double LATERAL_DISTANCE = 11.6254;
+    public static double leftX = 2.95, leftY = LATERAL_DISTANCE/2, rightX = 2.95, rightY = -LATERAL_DISTANCE/2, strafeX = -6.5, strafeY = 3.0/8;
 
     private RoadRunnerEncoder leftEncoder, rightEncoder, strafeEncoder;
 
@@ -59,14 +63,13 @@ public class ThreeWheelLocalizer extends ThreeTrackingWheelLocalizer {
         lastEncVels = lastTrackingEncVels;
 
         // TODO: redo the configs here
-        leftEncoder = new RoadRunnerEncoder(hardwareMap.get(DcMotorEx.class, "leftRear"));
-        rightEncoder = new RoadRunnerEncoder(hardwareMap.get(DcMotorEx.class, "rightFront"));
-        strafeEncoder = new RoadRunnerEncoder(hardwareMap.get(DcMotorEx.class, "strafeEncoder"));
+        leftEncoder = new RoadRunnerEncoder(hardwareMap.get(DcMotorEx.class, "backLeftMotor"));
+        rightEncoder = new RoadRunnerEncoder(hardwareMap.get(DcMotorEx.class, "intakeMotor"));
+        strafeEncoder = new RoadRunnerEncoder(hardwareMap.get(DcMotorEx.class, "frontLeftMotor"));
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
-        leftEncoder.setDirection(RoadRunnerEncoder.Direction.REVERSE);
+        strafeEncoder.setDirection(RoadRunnerEncoder.Direction.REVERSE);
         rightEncoder.setDirection(RoadRunnerEncoder.Direction.REVERSE);
-        strafeEncoder.setDirection(RoadRunnerEncoder.Direction.FORWARD);
     }
 
     public void resetHeading(double heading) {
