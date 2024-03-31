@@ -28,10 +28,15 @@ public class DeadlineAction extends Action {
                     deadline.reset();
                     isTimeoutStarted = true;
                 }
-                if(deadline.hasExpired() || performActionButNoLongerThanTimeout.evaluate()) {
+                if(performActionButNoLongerThanTimeout.evaluate()) {
                     isTimeoutStarted = false; // reset deadline for next round
                     return true; // we timed out or action finished
                 }
+                if(deadline.hasExpired()) {
+                    isTimeoutStarted = false; // reset deadline for next round
+                    return true; // we timed out or action finished
+                }
+
                 return false;
             };
         }
