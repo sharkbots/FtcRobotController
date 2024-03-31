@@ -65,7 +65,7 @@ public class PedroTest extends LinearOpMode {
         //Blue backdrop
         Pose2d backdropStrafeForCenter = new Pose2d(51, 45, Math.toRadians(180.00));
         Pose2d backdropLeft = new Pose2d(51, 41, Math.toRadians(180.00));
-        Pose2d backdropCenter = new Pose2d(51, 34, Math.toRadians(180.00));
+        Pose2d backdropCenter = new Pose2d(51, 31.5, Math.toRadians(180.00));
         Pose2d backdropRight = new Pose2d(51, 31, Math.toRadians(180.00));
 
         // Blue alliance parking
@@ -88,8 +88,8 @@ public class PedroTest extends LinearOpMode {
         Pose2d purpleToStackLeftControlPoint = new Pose2d(-36, 36);
 
         // To Backdrop
-        Pose2d centerTruss = new Pose2d(-14, 36);
-        Pose2d centerTrussToBackDropControlPoint = new Pose2d(30, 36);
+        Pose2d centerTruss = new Pose2d(-14, 34);
+        Pose2d centerTrussToBackDropControlPoint = new Pose2d(30, 34);
 
 
         public Coordinates(Boolean isBlueAlliance, Boolean isNearSide) {
@@ -176,11 +176,15 @@ public class PedroTest extends LinearOpMode {
     PedroTest.Coordinates c = new Coordinates(true, false);
     Robot robot;
 
+
     public void setup() {
         Global.telemetry = telemetry;
         robot = new Robot(hardwareMap, gamepad1, gamepad2);
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
-        Robot.claw.setGripPosition(Claw.gripPositions.CLOSE);
+        Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
+        Robot.claw.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL);
+
+
 
         follower = new Follower(hardwareMap);
 
@@ -215,7 +219,7 @@ public class PedroTest extends LinearOpMode {
     private PathChain goToBackdropThroughCenterTruss(Pose2d backdropPosition) {
         return follower.pathBuilder()
                 .addPath(new BezierLine(new Point(c.stackLeft), new Point(c.centerTruss)))
-                .addParametricCallback(0.8, robot.outTake.getAsyncRunnable())
+                .addParametricCallback(0.8, robot.outTakeSetClawYawRightSlantedUp.getAsyncRunnable())
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .addPath(new BezierCurve(new Point(c.centerTruss), new Point(c.centerTrussToBackDropControlPoint), new Point(backdropPosition)))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -224,11 +228,11 @@ public class PedroTest extends LinearOpMode {
 
     private PathChain goToStackSetupThroughCenterTruss(Pose2d backdropPosition) {
         return follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(backdropPosition), new Point(c.centerTrussToBackDropControlPoint), new Point(c.centerTruss)))
-                .addParametricCallback(0.1, robot.resetOutTake.getAsyncRunnable())
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .addPath(new BezierLine(new Point(c.centerTruss), new Point(c.stackLeftSetup)))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .addPath(new BezierCurve(new Point(backdropPosition), new Point(c.centerTrussToBackDropControlPoint), new Point(c.stackLeftSetup)))
+                //.addParametricCallback(0.1, robot.resetOutTake.getAsyncRunnable())
+//                .setConstantHeadingInterpolation(Math.toRadians(180))
+//                .addPath(new BezierLine(new Point(c.centerTruss), new Point(c.stackLeftSetup)))
+//                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
     }
 
@@ -251,8 +255,6 @@ public class PedroTest extends LinearOpMode {
                 .addPath(new BezierLine(new Point(setup), new Point(stack)))
                 .addParametricCallback(0.2, robot.tryIntakeTwoPixels.getAsyncRunnable())
                 .setPathEndVelocityConstraint(5)
-                //.addPath(new BezierLine(new Point(stack), new Point(c.centerTrussToBackDropControlPoint)))
-                //.setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
     }
 
@@ -269,22 +271,36 @@ public class PedroTest extends LinearOpMode {
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
 
         follower.run(intakeFromStack(STACK_POSITIONS.LEFT));
+        while(!robot.intake.pixels.hasTwoPixels()){
+            follower.update();
+        }
+//        Deadline deadline = new Deadline(2, TimeUnit.SECONDS);
+//        while(!deadline.hasExpired()){
+//            follower.update();
+//        }
 
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
 
+
         robot.holdPixels.run();
+
 //
 //
 //        follower.update();
 //        follower.telemetryDebug(telemetryA);
 //        follower.update();
 
-        follower.run(goToBackdropCenterThroughCenterTruss, true);
-
+        follower.run(goToBackdropCenterThroughCenterTruss);
+        follower.breakFollowing();
         robot.openClaw.run();
+        Deadline deadline = new Deadline(300, TimeUnit.MILLISECONDS);
+        while(!deadline.hasExpired()){
+            follower.update();
+        }
 
+        robot.resetOutTake.run();
 
-        follower.run(goToStackSetupThroughCenterTrussFromLeftBackdrop, true);
+        follower.run(goToStackSetupThroughCenterTrussFromLeftBackdrop);
 
 
 

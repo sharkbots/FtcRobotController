@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Hanger;
@@ -172,6 +173,18 @@ public class Robot {
 
         openClaw = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN));
+
+        outTakeSetClawYawLeftHorizontal = new Actions()
+                .add(outTake)
+                .add(clawActionBuilder.setYawPosition(Claw.yawPositions.LEFT_HORIZONTAL));
+
+        outTakeSetClawYawRightHorizontal = new Actions()
+                .add(outTake)
+                .add(clawActionBuilder.setYawPosition(Claw.yawPositions.RIGHT_HORIZONTAL));
+
+        outTakeSetClawYawRightSlantedUp = new Actions()
+                .add(outTake)
+                .add(clawActionBuilder.setYawPosition(Claw.yawPositions.RIGHT_SLANT_UP));
     }
 
 
@@ -243,7 +256,8 @@ public class Robot {
             holdingPixelsToIdle, idleToHoldingPixels, outTake, resetOutTake;
 
     //Autonomous Actions
-    public Actions tryIntakeTwoPixels, intakeOn, autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autonomousOpenClawYellow, openClaw;
+    public Actions tryIntakeTwoPixels, intakeOn, autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autonomousOpenClawYellow,
+            openClaw, outTakeSetClawYawLeftHorizontal, outTakeSetClawYawRightHorizontal, outTakeSetClawYawRightSlantedUp;
 
 
     public static OverrideMotor intakeMotor;
