@@ -846,18 +846,22 @@ public class Follower {
      *
      * This runs the path chain and does not move on until it is done.
      * This makes the code sequential and removes the need for a loop to run a path chain.
+     * This is useful to call it in a LinearOpMode an it will wait until the end of the path
+     * before going to the next instruction
      */
     public void run(PathChain path){
         this.followPath(path);
-        while(!this.atParametricEnd()){
+        do{
             this.update();
         }
+        while(!this.atParametricEnd());
     }
 
     /**
      * FTC 14903 SharkBots:
      *
      * This runs the path chain asynchronously in a new thread
+     * This starts the followPath and continues code execution in parallel
      */
     public void runAsync(PathChain path){
         class MyRunnable implements Runnable {

@@ -7,11 +7,9 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
-import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
@@ -21,7 +19,6 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 
-import java.util.concurrent.TimeUnit;
 
 /**
  * This is the Circle autonomous OpMode. It runs the robot in a PathChain that's actually not quite
@@ -36,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Config
 @Autonomous (name = "{Pedro Testing}", group = "Autonomous Pathing Tuning")
-public class PedroTest extends OpMode {
+public class PedroTest extends LinearOpMode {
     private Telemetry telemetryA;
 
     public static double RADIUS = 10;
@@ -45,8 +42,6 @@ public class PedroTest extends OpMode {
 
     private PathChain empty, purpleDrop, purpleToLeftSideStackSetup, goToBackdropCenterThroughCenterTruss, goToStackSetupThroughCenterTrussFromCenterBackdrop,goToStackSetupThroughCenterTrussFromLeftBackdrop, goToStackSetupThroughCenterTrussFromRightBackdrop, goToBackdropLeftThroughCenterTruss, goToBackdropRightThroughCenterTruss, backdropToLeftSideStack, park;
     private Deadline timer;
-
-
 
     public static class Coordinates{
         Boolean isBlueAlliance;
@@ -189,7 +184,7 @@ public class PedroTest extends OpMode {
 
         purpleDrop = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(c.startPose), new Point(c.centerTeamProp)))
-                    .setConstantHeadingInterpolation(Math.toRadians(90))
+                .setConstantHeadingInterpolation(Math.toRadians(90))
                 .build();
 
         purpleToLeftSideStackSetup = follower.pathBuilder()
@@ -212,10 +207,10 @@ public class PedroTest extends OpMode {
     private PathChain goToBackdropThroughCenterTruss(Pose2d backdropPosition) {
         return follower.pathBuilder()
                 .addPath(new BezierLine(new Point(c.stackLeft), new Point(c.centerTruss)))
-                    //.addParametricCallback(0.8, robot.outTake.getAsyncRunnable())
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                //.addParametricCallback(0.8, robot.outTake.getAsyncRunnable())
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .addPath(new BezierCurve(new Point(c.centerTruss), new Point(c.centerTrussToBackDropControlPoint), new Point(backdropPosition)))
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
     }
 
@@ -245,46 +240,35 @@ public class PedroTest extends OpMode {
         }
         return follower.pathBuilder()
                 .addPath(new BezierLine(new Point(setup), new Point(stack)))
-                    //.addParametricCallback(0.8, robot.outTake.getAsyncRunnable())
+                //.addParametricCallback(0.8, robot.outTake.getAsyncRunnable())
                 .build();
     }
 
-    int step = 0;
     @Override
-    public void init() {
+    public void runOpMode() throws InterruptedException {
         setup();
-        follower.followPath(purpleDrop);
-        step = 0;
 
-    }
-
-    @Override
-    public void loop() {
-
-        follower.update();
-        switch(step) {
-            case 0:
-                if(follower.atParametricEnd()) {
-                    follower.followPath(purpleToLeftSideStackSetup);
-                    step=1;
-                }
-            case 1:
-                if(follower.atParametricEnd()) {
-                    follower.followPath(intakeFromStack(STACK_POSITIONS.LEFT));
-                    step=2;
-                }
-            case 2:
-                if(follower.atParametricEnd()) {
-                    follower.followPath(goToBackdropCenterThroughCenterTruss);
-                    step=3;
-                }
-        }
-
+        waitForStart();
+        follower.run(purpleDrop);
+        follower.run(purpleToLeftSideStackSetup);
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+        follower.run(intakeFromStack(STACK_POSITIONS.LEFT));
+        //robot.holdPixels.runAsync();
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
 
         follower.update();
         follower.telemetryDebug(telemetryA);
         follower.update();
 
+        follower.run(goToBackdropCenterThroughCenterTruss);
+
+        follower.update();
+        follower.telemetryDebug(telemetryA);
+        follower.update();
+
+        while(!isStopRequested()){
+
+        }
 
         //robot.openClaw.run();
         //robot.resetOutTake.run();
