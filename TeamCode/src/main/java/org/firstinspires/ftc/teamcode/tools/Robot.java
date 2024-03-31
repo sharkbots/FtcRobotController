@@ -141,7 +141,7 @@ public class Robot {
         ////////////////
         tryIntakeTwoPixels = new Actions()
                 .add(startIntakingPixels)
-                .add(intakeActionBuilder.waitForTwoPixelsOrTimeout(3, TimeUnit.SECONDS));
+                .add(intakeActionBuilder.waitForTwoPixelsOrTimeout(5, TimeUnit.SECONDS));
 
         intakeOn = new Actions()
                 .add(startIntakingPixels);

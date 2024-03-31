@@ -223,6 +223,7 @@ public class PedroTest extends LinearOpMode {
     private PathChain goToStackSetupThroughCenterTruss(Pose2d backdropPosition) {
         return follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(backdropPosition), new Point(c.centerTrussToBackDropControlPoint), new Point(c.centerTruss)))
+                .addParametricCallback(0.1, robot.resetOutTake.getAsyncRunnable())
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .addPath(new BezierLine(new Point(c.centerTruss), new Point(c.stackLeftSetup)))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -263,7 +264,8 @@ public class PedroTest extends LinearOpMode {
 
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
 
-        follower.run(intakeFromStack(STACK_POSITIONS.LEFT));
+        follower.run(intakeFromStack(STACK_POSITIONS.LEFT), true);
+
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
 
         robot.holdPixels.run();
@@ -273,11 +275,14 @@ public class PedroTest extends LinearOpMode {
 //        follower.telemetryDebug(telemetryA);
 //        follower.update();
 
-        follower.run(goToBackdropCenterThroughCenterTruss);
+        follower.run(goToBackdropCenterThroughCenterTruss, true);
 
-        follower.update();
-        follower.telemetryDebug(telemetryA);
-        follower.update();
+        robot.openClaw.run();
+
+
+        follower.run(goToStackSetupThroughCenterTrussFromLeftBackdrop, true);
+
+
 
         while(!isStopRequested()){
 

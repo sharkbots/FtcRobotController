@@ -849,8 +849,10 @@ public class Follower {
      * This is useful to call it in a LinearOpMode an it will wait until the end of the path
      * before going to the next instruction
      */
-    public void run(PathChain path){
-        this.followPath(path);
+    public void run(PathChain path) { run(path, false);}
+
+    public void run(PathChain path, boolean holdEnd){
+        this.followPath(path, holdEnd);
         do{
             this.update();
         }
@@ -863,11 +865,13 @@ public class Follower {
      * This runs the path chain asynchronously in a new thread
      * This starts the followPath and continues code execution in parallel
      */
-    public void runAsync(PathChain path){
+    public void runAsync(PathChain path) { runAsync(path, false);}
+
+    public void runAsync(PathChain path, boolean holdEnd){
         class MyRunnable implements Runnable {
             @Override
             public void run() {
-                Follower.this.run(path);
+                Follower.this.run(path, holdEnd);
             }
         }
         Thread thread = new Thread(new MyRunnable());
