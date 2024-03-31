@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
@@ -35,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Config
 @Autonomous (name = "{Pedro Testing}", group = "Autonomous Pathing Tuning")
-public class PedroTest extends LinearOpMode {
+public class PedroTest extends OpMode {
     private Telemetry telemetryA;
 
     public static double RADIUS = 10;
@@ -44,6 +45,8 @@ public class PedroTest extends LinearOpMode {
 
     private PathChain empty, purpleDrop, purpleToLeftSideStackSetup, goToBackdropCenterThroughCenterTruss, goToStackSetupThroughCenterTrussFromCenterBackdrop,goToStackSetupThroughCenterTrussFromLeftBackdrop, goToStackSetupThroughCenterTrussFromRightBackdrop, goToBackdropLeftThroughCenterTruss, goToBackdropRightThroughCenterTruss, backdropToLeftSideStack, park;
     private Deadline timer;
+
+
 
     public static class Coordinates{
         Boolean isBlueAlliance;
@@ -246,31 +249,42 @@ public class PedroTest extends LinearOpMode {
                 .build();
     }
 
+    int step = 0;
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void init() {
         setup();
+        follower.followPath(purpleDrop);
+        step = 0;
 
-        waitForStart();
-        follower.run(purpleDrop);
-        follower.run(purpleToLeftSideStackSetup);
-        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
-        follower.run(intakeFromStack(STACK_POSITIONS.LEFT));
-        //robot.holdPixels.runAsync();
-        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+    }
 
-        follower.update();
-        follower.telemetryDebug(telemetryA);
-        follower.update();
-
-        follower.run(goToBackdropCenterThroughCenterTruss);
+    @Override
+    public void loop() {
 
         follower.update();
-        follower.telemetryDebug(telemetryA);
-        follower.update();
-
-        while(true){
-
+        switch(step) {
+            case 0:
+                if(follower.atParametricEnd()) {
+                    follower.followPath(purpleToLeftSideStackSetup);
+                    step=1;
+                }
+            case 1:
+                if(follower.atParametricEnd()) {
+                    follower.followPath(intakeFromStack(STACK_POSITIONS.LEFT));
+                    step=2;
+                }
+            case 2:
+                if(follower.atParametricEnd()) {
+                    follower.followPath(goToBackdropCenterThroughCenterTruss);
+                    step=3;
+                }
         }
+
+
+        follower.update();
+        follower.telemetryDebug(telemetryA);
+        follower.update();
+
 
         //robot.openClaw.run();
         //robot.resetOutTake.run();
