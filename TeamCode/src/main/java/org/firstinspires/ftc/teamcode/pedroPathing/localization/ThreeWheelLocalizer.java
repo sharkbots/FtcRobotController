@@ -42,9 +42,9 @@ public class ThreeWheelLocalizer extends ThreeTrackingWheelLocalizer {
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
     // we value precision
 
-    public static double X_MULTIPLIER = 0.9938; //0.9991
-    public static double Y_MULTIPLIER = 0.9944; //1.0223
-    public static double LATERAL_DISTANCE = 11.6527; //11.6254
+    public static double X_MULTIPLIER = 1.00222;
+    public static double Y_MULTIPLIER = 0.9944;
+    public static double LATERAL_DISTANCE = 11.6527;
     public static double leftX = 2.95, leftY = LATERAL_DISTANCE/2, rightX = 2.95, rightY = -LATERAL_DISTANCE/2, strafeX = -6.5, strafeY = 3.0/8;
 
     private RoadRunnerEncoder leftEncoder, rightEncoder, strafeEncoder;

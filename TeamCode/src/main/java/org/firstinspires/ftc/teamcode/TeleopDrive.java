@@ -62,7 +62,7 @@ public class TeleopDrive extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Setup();
-        Global.telemetry.speak("SHARKBOTS SHARKBOTS SHARKBOTS");
+        //Global.telemetry.speak("SHARKBOTS SHARKBOTS SHARKBOTS");
         waitForStart();
         while(opModeIsActive()){
 
@@ -76,7 +76,7 @@ public class TeleopDrive extends LinearOpMode {
                 }
             }
 
-            telemetry.addLine("Pose2d: x: " + driveMotors.pluh().getX() + " y: " + driveMotors.pluh().getY());
+            //telemetry.addLine("Pose2d: x: " + driveMotors.pluh().getX() + " y: " + driveMotors.pluh().getY());
 
             Global.telemetry.update();
             double horizontal = gamepad1.left_stick_x;

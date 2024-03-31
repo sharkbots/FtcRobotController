@@ -17,7 +17,10 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
+import org.firstinspires.ftc.teamcode.tools.Global;
 import org.firstinspires.ftc.teamcode.tools.Robot;
+
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -60,9 +63,9 @@ public class PedroTest extends LinearOpMode {
 
         //Blue backdrop
         Pose2d backdropStrafeForCenter = new Pose2d(51, 45, Math.toRadians(180.00));
-        Pose2d backdropLeft = new Pose2d(51, 43, Math.toRadians(180.00));
-        Pose2d backdropCenter = new Pose2d(51, 36, Math.toRadians(180.00));
-        Pose2d backdropRight = new Pose2d(51, 33, Math.toRadians(180.00));
+        Pose2d backdropLeft = new Pose2d(51, 41, Math.toRadians(180.00));
+        Pose2d backdropCenter = new Pose2d(51, 34, Math.toRadians(180.00));
+        Pose2d backdropRight = new Pose2d(51, 31, Math.toRadians(180.00));
 
         // Blue alliance parking
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
@@ -173,6 +176,7 @@ public class PedroTest extends LinearOpMode {
     Robot robot;
 
     public void setup() {
+        Global.telemetry = telemetry;
         robot = new Robot(hardwareMap, gamepad1, gamepad2);
         Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
 
@@ -202,12 +206,14 @@ public class PedroTest extends LinearOpMode {
 
         telemetryA.addLine("Good to start, go for it.");
         telemetryA.update();
+        Global.telemetry.speak("THE ROBOT IS ALIVE");
+
     }
 
     private PathChain goToBackdropThroughCenterTruss(Pose2d backdropPosition) {
         return follower.pathBuilder()
                 .addPath(new BezierLine(new Point(c.stackLeft), new Point(c.centerTruss)))
-                //.addParametricCallback(0.8, robot.outTake.getAsyncRunnable())
+                .addParametricCallback(0.8, robot.outTake.getAsyncRunnable())
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .addPath(new BezierCurve(new Point(c.centerTruss), new Point(c.centerTrussToBackDropControlPoint), new Point(backdropPosition)))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -240,7 +246,8 @@ public class PedroTest extends LinearOpMode {
         }
         return follower.pathBuilder()
                 .addPath(new BezierLine(new Point(setup), new Point(stack)))
-                //.addParametricCallback(0.8, robot.outTake.getAsyncRunnable())
+                .addParametricCallback(0.2, robot.tryIntakeTwoPixels.getAsyncRunnable())
+                .setPathEndVelocityConstraint(5)
                 .build();
     }
 
@@ -249,16 +256,22 @@ public class PedroTest extends LinearOpMode {
         setup();
 
         waitForStart();
+        //Deadline dead = new Deadline(1, TimeUnit.SECONDS);
         follower.run(purpleDrop);
-        follower.run(purpleToLeftSideStackSetup);
-        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
-        follower.run(intakeFromStack(STACK_POSITIONS.LEFT));
-        //robot.holdPixels.runAsync();
-        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
 
-        follower.update();
-        follower.telemetryDebug(telemetryA);
-        follower.update();
+        follower.run(purpleToLeftSideStackSetup);
+
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+
+        follower.run(intakeFromStack(STACK_POSITIONS.LEFT));
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+
+        robot.holdPixels.run();
+//
+//
+//        follower.update();
+//        follower.telemetryDebug(telemetryA);
+//        follower.update();
 
         follower.run(goToBackdropCenterThroughCenterTruss);
 
