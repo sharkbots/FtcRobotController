@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
+import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
@@ -73,7 +74,7 @@ public class PedroTest extends LinearOpMode {
         Vector2d parkInCorner = new Vector2d(47, 62);
 
         // Side stacks
-        Pose2d stackCenter = new Pose2d(-58, 24, Math.toRadians(180));
+        Pose2d stackCenter = new Pose2d(-57, 24, Math.toRadians(180));
         Pose2d stackCenterSetup = new Pose2d(stackCenter.getX()+10, stackCenter.getY(), stackCenter.getHeading());
 
         Pose2d stackLeft = new Pose2d(stackCenter.getX(), stackCenter.getY()+12, stackCenter.getHeading());
@@ -178,7 +179,8 @@ public class PedroTest extends LinearOpMode {
     public void setup() {
         Global.telemetry = telemetry;
         robot = new Robot(hardwareMap, gamepad1, gamepad2);
-        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+        Robot.claw.setGripPosition(Claw.gripPositions.CLOSE);
 
         follower = new Follower(hardwareMap);
 
@@ -248,8 +250,9 @@ public class PedroTest extends LinearOpMode {
         return follower.pathBuilder()
                 .addPath(new BezierLine(new Point(setup), new Point(stack)))
                 .addParametricCallback(0.2, robot.tryIntakeTwoPixels.getAsyncRunnable())
-                .addPath(new BezierLine(new Point(stack), new Point(c.centerTrussToBackDropControlPoint)))
                 .setPathEndVelocityConstraint(5)
+                //.addPath(new BezierLine(new Point(stack), new Point(c.centerTrussToBackDropControlPoint)))
+                //.setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
     }
 
@@ -265,7 +268,7 @@ public class PedroTest extends LinearOpMode {
 
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
 
-        follower.run(intakeFromStack(STACK_POSITIONS.LEFT), true);
+        follower.run(intakeFromStack(STACK_POSITIONS.LEFT));
 
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
 
