@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.teamcode.aprilTags.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
-import org.firstinspires.ftc.teamcode.tools.PixelsDetection;
 import org.firstinspires.ftc.teamcode.tools.SetDriveMotors;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
@@ -25,6 +24,7 @@ public class TeleopDrive extends LinearOpMode {
         startPose = new Pose2d(-36, 62, 90);
         Global.telemetry = telemetry;
         driveMotors = new SetDriveMotors(hardwareMap);
+
         robot = new Robot(hardwareMap, gamepad1, gamepad2);
 
         driveMotors.setPoseEstimate(startPose);
@@ -62,6 +62,7 @@ public class TeleopDrive extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Setup();
+        Global.telemetry.speak("SHARKBOTS SHARKBOTS SHARKBOTS");
         waitForStart();
         while(opModeIsActive()){
 

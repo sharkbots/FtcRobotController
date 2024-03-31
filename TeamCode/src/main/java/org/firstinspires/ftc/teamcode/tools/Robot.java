@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.tools;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Claw;
@@ -25,33 +24,13 @@ public class Robot {
     public Robot(HardwareMap hardwareMap, Gamepad gamepad1, Gamepad gamepad2) {
 
         // Gamepads
-        this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
+        buttons = new Buttons(gamepad1, gamepad2);
 
-        // Button assignment
-        handlerA = new Button(this.gamepad2, Button.NAME.A);
-        handlerB = new Button(this.gamepad2, Button.NAME.B);
-        handlerX = new Button(this.gamepad2, Button.NAME.X);
-        handlerY = new Button(this.gamepad2, Button.NAME.Y);
-        handlerLeftBumper = new Button(this.gamepad2, Button.NAME.LEFT_BUMPER);
-        handlerRightBumper = new Button(this.gamepad2, Button.NAME.RIGHT_BUMPER);
-        handlerLeftTrigger = new Button(this.gamepad2, Button.NAME.LEFT_TRIGGER);
-        handlerRightTrigger = new Button(this.gamepad2, Button.NAME.RIGHT_TRIGGER);
-        handlerDPad_Down = new Button(this.gamepad2, Button.NAME.DPAD_DOWN);
-        handlerDPad_Up = new Button(this.gamepad2, Button.NAME.DPAD_UP);
-        handlerDPad_Left = new Button(this.gamepad2, Button.NAME.DPAD_LEFT);
-        handlerDPad_Right = new Button(this.gamepad2, Button.NAME.DPAD_RIGHT);
-        handlerLeftStick_Up = new Button(this.gamepad2, Button.NAME.LEFT_STICK_UP);
-        handlerLeftStick_Down = new Button(this.gamepad2, Button.NAME.LEFT_STICK_DOWN);
-        handlerLeftStick_Left = new Button(this.gamepad2, Button.NAME.LEFT_STICK_LEFT);
-        handlerLeftStick_Right = new Button(this.gamepad2, Button.NAME.LEFT_STICK_RIGHT);
-
-
-        lift = new Lift(hardwareMap, gamepad2);
-        claw = new Claw(hardwareMap, gamepad2);
-        planeLauncher = new PlaneLauncher(hardwareMap, handlerX);
-        skyHook = new Hanger(hardwareMap, handlerDPad_Down, handlerDPad_Up, handlerY);//hardwareMap.dcMotor.get("skyHookMotor");
-        intake = new Intake(hardwareMap, handlerLeftTrigger, handlerLeftStick_Up, handlerLeftStick_Down);
+        lift = new Lift(hardwareMap, buttons);
+        claw = new Claw(hardwareMap, buttons);
+        planeLauncher = new PlaneLauncher(hardwareMap, buttons.handlerX);
+        skyHook = new Hanger(hardwareMap, buttons.handlerDPad_Down, buttons.handlerDPad_Up, buttons.handlerY);//hardwareMap.dcMotor.get("skyHookMotor");
+        intake = new Intake(hardwareMap, buttons.handlerLeftTrigger, buttons.handlerLeftStick_Up, buttons.handlerLeftStick_Down);
 
         ledRibbons = new LEDRibbons(hardwareMap);
 
@@ -71,6 +50,7 @@ public class Robot {
         createTeleopStateTransitions();
 
     }
+
 
     private void createStateMachine() {
         stateMachine = new StateMachine();
@@ -197,18 +177,6 @@ public class Robot {
 
     private void createTeleopStateTransitions() {
         // button triggers
-        BooleanSupplier handlerButtonAPressed = handlerA::Pressed;
-        BooleanSupplier handlerButtonBPressed = handlerB::Pressed;
-        // BooleanSupplier handlerButtonXPressed = handlerX::Pressed;
-        // BooleanSupplier handlerButtonYPressed = handlerY::Pressed;
-        // BooleanSupplier handlerButtonLeftBumperPressed = handlerLeftBumper::Pressed;
-        // BooleanSupplier handlerButtonRightBumperPressed = handlerRightBumper::Pressed;
-        BooleanSupplier handlerButtonLeftTriggerPressed = handlerLeftTrigger::Pressed;
-        // BooleanSupplier handlerButtonRightTriggerPressed = handlerRightTrigger::Pressed;
-        // BooleanSupplier handlerDPad_DownPressed = handlerDPad_Down::Pressed;
-        // BooleanSupplier handlerDPad_UpPressed = handlerDPad_Up::Pressed;
-        // BooleanSupplier handlerDPad_LeftPressed = handlerDPad_Left::Pressed;
-        // BooleanSupplier handlerDPad_RightPressed = handlerDPad_Right::Pressed;
         BooleanSupplier twoPixelsInPossession = intake.pixels::hasTwoPixels;
 
         BooleanSupplier alwaysTrue = ()-> true;
@@ -217,29 +185,29 @@ public class Robot {
         // adding transitions
 
         // intaking pixels
-        idle.addTransitionTo(intakingPixels, handlerButtonAPressed,
+        idle.addTransitionTo(intakingPixels, buttons.handlerA::Pressed,
                 startIntakingPixels);
 
-        intakingPixels.addTransitionTo(idle, handlerButtonLeftTriggerPressed, empty);
+        intakingPixels.addTransitionTo(idle, buttons.handlerLeftTrigger::Pressed, empty);
 
         intakingPixels.addTransitionTo(holdingPixels, twoPixelsInPossession,
                 holdPixels);
 
-        holdingPixels.addTransitionTo(intakingPixels, handlerButtonAPressed,
+        holdingPixels.addTransitionTo(intakingPixels, buttons.handlerA::Pressed,
                 holdingPixelsToIntakingPixels);
 
         // rejecting pixels
-        holdingPixels.addTransitionTo(idle, handlerButtonLeftTriggerPressed,
+        holdingPixels.addTransitionTo(idle, buttons.handlerLeftTrigger::Pressed,
                 holdingPixelsToIdle);
 
-        /*idle.addTransitionTo(holdingPixels, handlerButtonLeftTriggerPressed,
+        /*idle.addTransitionTo(holdingPixels, buttons.handlerLeftTrigger::Pressed,
                 idleToHoldingPixels);*/
 
-        holdingPixels.addTransitionTo(outTakingPixels, handlerButtonBPressed,
+        holdingPixels.addTransitionTo(outTakingPixels, buttons.handlerB::Pressed,
                 outTake);
 
         // in exitingOutTake state, lift cannot be controlled manually
-        outTakingPixels.addTransitionTo(exitingOutTake, handlerButtonBPressed,
+        outTakingPixels.addTransitionTo(exitingOutTake, buttons.handlerB::Pressed,
                 empty);
 
         exitingOutTake.addTransitionTo(idle, alwaysTrue,
@@ -281,42 +249,19 @@ public class Robot {
     public static OverrideMotor intakeMotor;
     public static Hanger skyHook;
 
-    public static Button handlerA, handlerB, handlerX, handlerY,
-            handlerLeftBumper, handlerRightBumper, handlerLeftTrigger, handlerRightTrigger,
-            handlerDPad_Down, handlerDPad_Up, handlerDPad_Left, handlerDPad_Right,
-            handlerLeftStick_Up, handlerLeftStick_Down, handlerLeftStick_Left, handlerLeftStick_Right;
 
-
-    Gamepad gamepad1, gamepad2;
+    Buttons buttons;
     Deadline teleopDeadline;
 
     boolean isEndgame = false;
-    private void updateButtons(){
-        handlerA.updateButton(gamepad2);
-        handlerB.updateButton(gamepad2);
-        handlerX.updateButton(gamepad2);
-        handlerY.updateButton(gamepad2);
-        handlerLeftBumper.updateButton(gamepad2);
-        handlerRightBumper.updateButton(gamepad2);
-        handlerLeftTrigger.updateButton(gamepad2);
-        handlerRightTrigger.updateButton(gamepad2);
-        handlerDPad_Down.updateButton(gamepad2);
-        handlerDPad_Up.updateButton(gamepad2);
-        handlerDPad_Left.updateButton(gamepad2);
-        handlerDPad_Right.updateButton(gamepad2);
-        handlerLeftStick_Up.updateButton(gamepad2);
-        handlerLeftStick_Down.updateButton(gamepad2);
-        handlerLeftStick_Left.updateButton(gamepad2);
-        handlerLeftStick_Right.updateButton(gamepad2);
-    }
 
     public void updateSync() {
         stateMachine.updateStateSync(); //Do one call to process potential trigger
     }
 
     public void update(){
-        updateButtons();
-        if (teleopDeadline.hasExpired() || handlerLeftBumper.Pressed()) {
+        buttons.update();
+        if(teleopDeadline.hasExpired() || buttons.handlerLeftBumper.Pressed()) {
             isEndgame = true;
         }
 

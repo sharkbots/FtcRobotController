@@ -1,19 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.tools.Buttons;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.ServoActionManager;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Claw {
 
-    public Claw(HardwareMap hardwareMap, Gamepad gamepad2) {
+    public Claw(HardwareMap hardwareMap, Buttons buttons) {
         clawPitch = hardwareMap.servo.get("clawPitch");
         clawYaw = hardwareMap.servo.get("clawYaw");
         clawGrip = hardwareMap.servo.get("clawGrip");
@@ -28,10 +25,10 @@ public class Claw {
         clawYawServoActionManager = new ServoActionManager(clawYaw, clawYawAnalogSensor);
         clawGripServoActionManager = new ServoActionManager(clawGrip);
 
-        this.gamepad2 = gamepad2;
+        this.buttons = buttons;
     }
 
-    Gamepad gamepad2;
+    Buttons buttons;
     public static Servo clawPitch, clawYaw, clawGrip;
     public static AnalogInput clawYawAnalogSensor, clawPitchAnalogSensor;
     public static ServoActionManager clawPitchServoActionManger, clawYawServoActionManager, clawGripServoActionManager;
@@ -100,8 +97,8 @@ public class Claw {
 
     public void update(){
         //telemetry.addData("Requested position: ", Robot.clawYaw.getPosition());
-        if(Robot.handlerDPad_Left.Pressed()){
-            if(Robot.handlerRightTrigger.On()){
+        if(buttons.handlerDPad_Left.Pressed()){
+            if(buttons.handlerRightTrigger.On()){
                 Robot.claw.setYawPosition(Claw.yawPositions.RIGHT_HORIZONTAL);
                 //Robot.clawYaw.setPosition(Robot.clawYawRightHorizontal);
             }
@@ -111,8 +108,8 @@ public class Claw {
             }
         }
 
-        if(Robot.handlerDPad_Down.Pressed()){
-            if(Robot.handlerRightTrigger.On()){
+        if(buttons.handlerDPad_Down.Pressed()){
+            if(buttons.handlerRightTrigger.On()){
                 Robot.claw.setYawPosition(Claw.yawPositions.RIGHT_SLANT_UP);
                 //Robot.clawYaw.setPosition(Robot.clawYawRightSlantedUp);
             }
@@ -122,8 +119,8 @@ public class Claw {
             }
         }
 
-        if(Robot.handlerDPad_Up.Pressed()){
-            if(Robot.handlerRightTrigger.On()){
+        if(buttons.handlerDPad_Up.Pressed()){
+            if(buttons.handlerRightTrigger.On()){
                 Robot.claw.setYawPosition(Claw.yawPositions.RIGHT_SLANT_DOWN);
                 //Robot.clawYaw.setPosition(Robot.clawYawRightSlantedDown);
             }
@@ -134,8 +131,8 @@ public class Claw {
             }
         }
 
-        if(Robot.handlerDPad_Right.Pressed()){
-            if(Robot.handlerRightTrigger.On()){
+        if(buttons.handlerDPad_Right.Pressed()){
+            if(buttons.handlerRightTrigger.On()){
                 //Robot.clawYaw.setPosition(Robot.clawYawIntake);
                 Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
             }
@@ -146,14 +143,14 @@ public class Claw {
         }
 
 
-        if(Robot.handlerRightBumper.Pressed()){
+        if(buttons.handlerRightBumper.Pressed()){
             Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
             //Robot.clawGrip.setPosition(Robot.clawOpen);
         }
-//        if(Robot.handlerLeftBumper.Pressed()){
-//            Robot.claw.setGripPosition(Claw.gripPositions.CLOSE);
-//            //Robot.clawGrip.setPosition(Robot.clawClose);
-//        }
+        if(buttons.handlerLeftBumper.Pressed()){
+            Robot.claw.setGripPosition(Claw.gripPositions.CLOSE);
+            //Robot.clawGrip.setPosition(Robot.clawClose);
+        }
 
     }
 

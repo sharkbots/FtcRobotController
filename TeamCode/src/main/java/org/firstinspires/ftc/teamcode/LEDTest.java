@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 @TeleOp(name = "A LED")
 public class LEDTest extends LinearOpMode {
     private SetDriveMotors driveMotors;
-
-    private LEDRibbons ledRibbons;
-    private PixelsDetection pixelsDetection;
+//
+//    private LEDRibbons ledRibbons;
+//    private PixelsDetection pixelsDetection;
 
 
     AprilTagDetection aprilTagDetection;
@@ -29,8 +30,8 @@ public class LEDTest extends LinearOpMode {
 
         sleep(1000);
 
-        ledRibbons = new LEDRibbons(hardwareMap);
-        pixelsDetection = new PixelsDetection(hardwareMap);
+//        ledRibbons = new LEDRibbons(hardwareMap);
+//        pixelsDetection = new PixelsDetection(hardwareMap);
 
 
         while(!isStarted() && !isStopRequested()){
@@ -51,12 +52,12 @@ public class LEDTest extends LinearOpMode {
         deadline.reset();
         boolean displayPixel1 = true;
 
+        RevBlinkinLedDriver blinkinLedDriver1 = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin1");
+        telemetry.addLine(blinkinLedDriver1.getConnectionInfo());
 
         while(opModeIsActive()){
 
-            pixelsDetection.update();
-            ledRibbons.setPattern(pixelsDetection.pixel1.pattern, pixelsDetection.pixel2.pattern);
-            ledRibbons.update();
+            blinkinLedDriver1.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
         }
 
     }
