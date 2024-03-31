@@ -238,8 +238,8 @@ public abstract class AutoBase extends LinearOpMode {
         Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL4);
         robot.startIntakingPixels.run();
         Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
-        while(!robot.intake.pixels.hasTwoPixels()){
-            robot.intake.pixels.update();
+        while(!Robot.intake.pixels.hasTwoPixels()){
+            Robot.intake.pixels.update();
         }
         robot.holdPixels.run();
         robot.outTake.run();

@@ -32,6 +32,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 import org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.util.PIDFController;
+import org.firstinspires.ftc.teamcode.tools.StateMachine.Actions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -444,6 +445,7 @@ public class Follower {
                         chainIndex++;
                         currentPath = currentPathChain.getPath(chainIndex);
                         closestPose = currentPath.getClosestPoint(poseUpdater.getPose(), BEZIER_CURVE_BINARY_STEP_LIMIT);
+
                     } else {
                         // At last path, run some end detection stuff
                         // set isBusy to false if at end
@@ -840,11 +842,42 @@ public class Follower {
     }
 
     /**
+     * FTC 14903 SharkBots:
+     *
+     * This runs the path chain and does not move on until it is done.
+     * This makes the code sequential and removes the need for a loop to run a path chain.
+     */
+    public void run(PathChain path){
+        this.followPath(path);
+        while(!this.atParametricEnd()){
+            this.update();
+        }
+    }
+
+    /**
+     * FTC 14903 SharkBots:
+     *
+     * This runs the path chain asynchronously in a new thread
+     */
+    public void runAsync(PathChain path){
+        class MyRunnable implements Runnable {
+            @Override
+            public void run() {
+                Follower.this.run(path);
+            }
+        }
+        Thread thread = new Thread(new MyRunnable());
+        thread.start();
+    }
+
+
+    /**
      * This writes out information about the various motion Vectors to the Telemetry specified.
      *
      * @param telemetry this is an instance of Telemetry or the FTC Dashboard telemetry that this
      *                  method will use to output the debug data.
      */
+
     public void telemetryDebug(MultipleTelemetry telemetry) {
         telemetry.addData("follower busy", isBusy());
         telemetry.addData("heading error", headingError);

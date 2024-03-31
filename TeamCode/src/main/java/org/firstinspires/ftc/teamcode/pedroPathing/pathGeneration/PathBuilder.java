@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
+import org.firstinspires.ftc.teamcode.tools.StateMachine.Actions;
+
 import java.util.ArrayList;
 
 /**
@@ -17,6 +19,7 @@ public class PathBuilder {
     private ArrayList<Path> paths = new ArrayList<>();
 
     private ArrayList<PathCallback> callbacks = new ArrayList<>();
+
 
     /**
      * This is an empty constructor for the PathBuilder class so it can get started.
@@ -51,6 +54,18 @@ public class PathBuilder {
         return this;
     }
 
+    /**
+     * FTC 14903 SharkBots:
+     * This runs one of our actions asynchronously.
+     * This does not add a Path to the PathBuilder
+     *
+     * @param action The action that will be run
+     */
+
+    public PathBuilder runActionAsync (Actions action){
+        //action.runAsync();
+        return this;
+    }
     /**
      * This sets a linear heading interpolation on the last Path added to the PathBuilder.
      *

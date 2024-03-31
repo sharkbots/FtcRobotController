@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing.tuning;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -47,6 +48,7 @@ public class StraightBackAndForth extends OpMode {
     public void init() {
         follower = new Follower(hardwareMap);
 
+
         forwards = new Path(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(DISTANCE,0, Point.CARTESIAN)));
         forwards.setConstantHeadingInterpolation(0);
         backwards = new Path(new BezierLine(new Point(DISTANCE,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
@@ -78,7 +80,7 @@ public class StraightBackAndForth extends OpMode {
             }
         }
 
-        telemetryA.addData("going forward", forward);
-        follower.telemetryDebug(telemetryA);
+        //telemetryA.addData("going forward", forward);
+        //follower.telemetryDebug(telemetryA);
     }
 }

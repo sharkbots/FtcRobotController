@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.tools.SetDriveMotors;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -18,16 +19,15 @@ public class TeleopDrive extends LinearOpMode {
 
     Robot robot;
     AprilTagDetection aprilTagDetection;
-    PixelsDetection pixelsDetection;
+    Pose2d startPose;
 
     public void Setup(){
+        startPose = new Pose2d(-36, 62, 90);
         Global.telemetry = telemetry;
         driveMotors = new SetDriveMotors(hardwareMap);
-
-        pixelsDetection = new PixelsDetection(hardwareMap);
-
         robot = new Robot(hardwareMap, gamepad1, gamepad2);
 
+        driveMotors.setPoseEstimate(startPose);
         aprilTagDetection = new AprilTagDetection();
         aprilTagDetection.Setup(hardwareMap, telemetry);
 
@@ -75,6 +75,8 @@ public class TeleopDrive extends LinearOpMode {
                 }
             }
 
+            telemetry.addLine("Pose2d: x: " + driveMotors.pluh().getX() + " y: " + driveMotors.pluh().getY());
+
             Global.telemetry.update();
             double horizontal = gamepad1.left_stick_x;
             double vertical = -gamepad1.left_stick_y;
@@ -95,11 +97,11 @@ public class TeleopDrive extends LinearOpMode {
             }
 
 
+
             driveMotors.driveCommands(horizontal, vertical, turn, goFast, distanceToWall, switchDriveMode, alignToCardinalPoint, resetHeading);
             driveMotors.update();
 
             robot.update();
-            pixelsDetection.update();
 
             if(robot.currentState()==robot.outTakingPixels) {
                 Robot.claw.update();

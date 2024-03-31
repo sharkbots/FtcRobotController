@@ -72,7 +72,6 @@ public class Robot {
 
     }
 
-
     private void createStateMachine() {
         stateMachine = new StateMachine();
 
@@ -164,6 +163,9 @@ public class Robot {
                 .add(startIntakingPixels)
                 .add(intakeActionBuilder.waitForTwoPixelsOrTimeout(3, TimeUnit.SECONDS));
 
+        intakeOn = new Actions()
+                .add(startIntakingPixels);
+
         autoHoldOnePixel = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL))
                 .add(DeadlineAction.waitFor(500, TimeUnit.MILLISECONDS))
@@ -186,6 +188,9 @@ public class Robot {
         autonomousOpenClawYellow = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN_HALFWAY))
                 .add(DeadlineAction.waitFor(300, TimeUnit.MILLISECONDS))
+                .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN));
+
+        openClaw = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN));
     }
 
@@ -270,7 +275,7 @@ public class Robot {
             holdingPixelsToIdle, idleToHoldingPixels, outTake, resetOutTake;
 
     //Autonomous Actions
-    public Actions tryIntakeTwoPixels, autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autonomousOpenClawYellow;
+    public Actions tryIntakeTwoPixels, intakeOn, autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autonomousOpenClawYellow, openClaw;
 
 
     public static OverrideMotor intakeMotor;
@@ -311,7 +316,9 @@ public class Robot {
 
     public void update(){
         updateButtons();
-        isEndgame = teleopDeadline.hasExpired() || handlerLeftBumper.Pressed();
+        if (teleopDeadline.hasExpired() || handlerLeftBumper.Pressed()) {
+            isEndgame = true;
+        }
 
         if(isEndgame){
             skyHook.update();

@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.tools;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.util.Angle;
+import com.google.ar.core.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -89,6 +90,7 @@ public class SetDriveMotors extends OpMode {
         horizontalSlowDeadzone = new DeadzoneSquare(deadzone, DEADZONE_MIN_X, 0.6);
         verticalSlowDeadzone = new DeadzoneSquare(deadzone, DEADZONE_MIN_Y, 0.5);
     }
+
     public void driveCommands(double horizontal, double vertical, double turn, boolean goFast, double distanceToWallMeters, boolean switchDriveMode, boolean alignToCardinalPoint, boolean resetHeading) {
 
         // Read pose
@@ -190,6 +192,15 @@ public class SetDriveMotors extends OpMode {
         }
     }
 
+    public void setPoseEstimate(Pose2d pose){
+        drive.setPoseEstimate(pose);
+    }
+
+    public Pose2d pluh(){
+        return drive.getPoseEstimate();
+    }
+
+
     private boolean isAutoBrake(double distanceToWallMeters, Pose2d poseEstimate) {
         return distanceToWallMeters != 0 &&
                 distanceToWallMeters < AUTOBRAKE_DISTANCE &&
@@ -199,7 +210,7 @@ public class SetDriveMotors extends OpMode {
     }
 
     public void update() {
-            drive.update();
+        drive.update();
     }
     public double getAngleToCardinalPoint()  {
         Pose2d poseEstimate = drive.getPoseEstimate();

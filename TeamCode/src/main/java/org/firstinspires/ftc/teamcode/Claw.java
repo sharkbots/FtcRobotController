@@ -150,10 +150,10 @@ public class Claw {
             Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
             //Robot.clawGrip.setPosition(Robot.clawOpen);
         }
-        if(Robot.handlerLeftBumper.Pressed()){
-            Robot.claw.setGripPosition(Claw.gripPositions.CLOSE);
-            //Robot.clawGrip.setPosition(Robot.clawClose);
-        }
+//        if(Robot.handlerLeftBumper.Pressed()){
+//            Robot.claw.setGripPosition(Claw.gripPositions.CLOSE);
+//            //Robot.clawGrip.setPosition(Robot.clawClose);
+//        }
 
     }
 

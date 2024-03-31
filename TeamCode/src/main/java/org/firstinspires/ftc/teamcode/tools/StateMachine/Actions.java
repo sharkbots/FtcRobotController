@@ -43,6 +43,16 @@ public class Actions {
         thread.start();
     }
 
+    public Runnable getAsyncRunnable(){
+        class MyAsyncRunnable implements Runnable {
+            @Override
+            public void run() {
+                Actions.this.runAsync();
+            }
+        }
+        return new MyAsyncRunnable();
+    }
+
     public boolean isComplete() {
         // Iterate through all actions to see if they are complete
         for (; currentActionIndex < actionList.size(); currentActionIndex++) {

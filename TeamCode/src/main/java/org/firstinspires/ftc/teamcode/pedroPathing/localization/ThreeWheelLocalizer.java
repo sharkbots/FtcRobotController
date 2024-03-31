@@ -44,7 +44,6 @@ public class ThreeWheelLocalizer extends ThreeTrackingWheelLocalizer {
 
     public static double X_MULTIPLIER = 0.9991;
     public static double Y_MULTIPLIER = 1.0223;
-
     public static double LATERAL_DISTANCE = 11.6254;
     public static double leftX = 2.95, leftY = LATERAL_DISTANCE/2, rightX = 2.95, rightY = -LATERAL_DISTANCE/2, strafeX = -6.5, strafeY = 3.0/8;
 
@@ -64,7 +63,7 @@ public class ThreeWheelLocalizer extends ThreeTrackingWheelLocalizer {
 
         // TODO: redo the configs here
         leftEncoder = new RoadRunnerEncoder(hardwareMap.get(DcMotorEx.class, "backLeftMotor"));
-        rightEncoder = new RoadRunnerEncoder(hardwareMap.get(DcMotorEx.class, "intakeMotor"));
+        rightEncoder = new RoadRunnerEncoder(hardwareMap.get(DcMotorEx.class, "backRightMotor"));
         strafeEncoder = new RoadRunnerEncoder(hardwareMap.get(DcMotorEx.class, "frontLeftMotor"));
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
