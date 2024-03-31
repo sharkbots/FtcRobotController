@@ -73,7 +73,7 @@ public class PedroTest extends LinearOpMode {
         Vector2d parkInCorner = new Vector2d(47, 62);
 
         // Side stacks
-        Pose2d stackCenter = new Pose2d(-56, 24, Math.toRadians(180));
+        Pose2d stackCenter = new Pose2d(-58, 24, Math.toRadians(180));
         Pose2d stackCenterSetup = new Pose2d(stackCenter.getX()+10, stackCenter.getY(), stackCenter.getHeading());
 
         Pose2d stackLeft = new Pose2d(stackCenter.getX(), stackCenter.getY()+12, stackCenter.getHeading());
@@ -248,6 +248,7 @@ public class PedroTest extends LinearOpMode {
         return follower.pathBuilder()
                 .addPath(new BezierLine(new Point(setup), new Point(stack)))
                 .addParametricCallback(0.2, robot.tryIntakeTwoPixels.getAsyncRunnable())
+                .addPath(new BezierLine(new Point(stack), new Point(c.centerTrussToBackDropControlPoint)))
                 .setPathEndVelocityConstraint(5)
                 .build();
     }

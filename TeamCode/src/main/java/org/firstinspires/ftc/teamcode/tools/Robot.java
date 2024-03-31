@@ -186,7 +186,7 @@ public class Robot {
 
         // intaking pixels
         idle.addTransitionTo(intakingPixels, buttons.handlerA::Pressed,
-                startIntakingPixels);
+                tryIntakeTwoPixels);
 
         intakingPixels.addTransitionTo(idle, buttons.handlerLeftTrigger::Pressed, empty);
 
