@@ -80,6 +80,10 @@ public class PixelsDetection {
         return (pixel1 != PIXEL_COLOR.UNDEFINED) && (pixel2 != PIXEL_COLOR.UNDEFINED);
     }
 
+    public boolean hasOnePixel() {
+        return (pixel1 != PIXEL_COLOR.UNDEFINED) || (pixel2 != PIXEL_COLOR.UNDEFINED);
+    }
+
     private void setLEDStatus() {
 //        led1red.enableLight(pixel1==PIXEL_COLOR.UNDEFINED);
 //        led1green.enableLight(pixel1!=PIXEL_COLOR.UNDEFINED);

@@ -18,7 +18,7 @@ public class Intake {
     public final OverrideMotor intakeMotor;
     public final Servo intakeFlipper;
     private final Button handlerLeftTrigger, handlerLeftStick_Up, handlerLeftStick_Down;
-    public static double intakeFlipperUp = 0.9, intakeFlipperPixel5 = 0.4825, intakeFlipperPixel4 = 0.4665, intakeFlipperPixel3 = 0.4515;
+    public static double intakeFlipperUp = 0.9, intakeFlipperPixel5 = 0.48, intakeFlipperPixel4 = 0.464, intakeFlipperPixel3 = 0.449;
     private FlipperPosition flipperPosition;
     public MotorActionManager intakeMotorActionManager;
     public ServoActionManager intakeFlipperActionManger;

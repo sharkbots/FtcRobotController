@@ -144,6 +144,10 @@ public class Robot {
                 .add(startIntakingPixels)
                 .add(intakeActionBuilder.waitForTwoPixelsOrTimeout(5, TimeUnit.SECONDS));
 
+        tryIntakeOnePixel = new Actions()
+                .add(startIntakingPixels)
+                .add(intakeActionBuilder.waitForOnePixelOrTimeout(5, TimeUnit.SECONDS));
+
         intakeOn = new Actions()
                 .add(startIntakingPixels);
 
@@ -256,7 +260,7 @@ public class Robot {
             holdingPixelsToIdle, idleToHoldingPixels, outTake, resetOutTake;
 
     //Autonomous Actions
-    public Actions tryIntakeTwoPixels, intakeOn, autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autonomousOpenClawYellow,
+    public Actions tryIntakeOnePixel, tryIntakeTwoPixels, intakeOn, autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autonomousOpenClawYellow,
             openClaw, outTakeSetClawYawLeftHorizontal, outTakeSetClawYawRightHorizontal, outTakeSetClawYawRightSlantedUp;
 
 
