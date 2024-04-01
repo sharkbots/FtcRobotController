@@ -264,11 +264,7 @@ public class PedroTest extends LinearOpMode {
 
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
 
-        follower.run(intakeFromStack(STACK_POSITIONS.LEFT));
-
-        while(!robot.intake.pixels.hasTwoPixels()) {
-            follower.update();
-        }
+        follower.run(intakeFromStack(STACK_POSITIONS.LEFT), true);
 
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
 

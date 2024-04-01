@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,12 +12,13 @@ import org.firstinspires.ftc.teamcode.tools.OverrideMotor;
 import org.firstinspires.ftc.teamcode.tools.PixelsDetection;
 import org.firstinspires.ftc.teamcode.tools.ServoActionManager;
 
+@Config
 public class Intake {
     public final PixelsDetection pixels;
     public final OverrideMotor intakeMotor;
     public final Servo intakeFlipper;
     private final Button handlerLeftTrigger, handlerLeftStick_Up, handlerLeftStick_Down;
-    private static final double intakeFlipperUp = 0.85, intakeFlipperPixel5 = 0.4, intakeFlipperPixel4 = 0.3, intakeFlipperPixel3 = 0;
+    public static double intakeFlipperUp = 0.9, intakeFlipperPixel5 = 0.48, intakeFlipperPixel4 = 0.464, intakeFlipperPixel3 = 0.449;
     private FlipperPosition flipperPosition;
     public MotorActionManager intakeMotorActionManager;
     public ServoActionManager intakeFlipperActionManger;
@@ -50,10 +52,10 @@ public class Intake {
     }
 
     public enum FlipperPosition {
-        UP(1.0),
-        PIXEL5(0.62),
-        PIXEL4(0.6075),
-        PIXEL3(0.595);
+        UP(intakeFlipperUp),
+        PIXEL5(intakeFlipperPixel5),
+        PIXEL4(intakeFlipperPixel4),
+        PIXEL3(intakeFlipperPixel3);
 
         public final double value;
 
@@ -65,7 +67,7 @@ public class Intake {
         public FlipperPosition next() {
             // Check if this is the last enum constant
             if (this.ordinal() == values().length - 1) {
-                return this; // Stay on this if it's the last
+                return values()[0]; // Stay on this if it's the last
             } else {
                 return values()[this.ordinal() + 1]; // Move to the next otherwise
             }

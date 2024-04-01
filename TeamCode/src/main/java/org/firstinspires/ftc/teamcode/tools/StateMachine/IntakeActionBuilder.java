@@ -41,5 +41,13 @@ public class IntakeActionBuilder {
         return new DeadlineAction("waitUntilHasTwoPixels", function, timeout, unit);
     }
 
+    public Action waitForOnePixelOrTimeout(long timeout, TimeUnit unit){
+        ActionFunction function = () -> {
+            intake.pixels.update();
+            return intake.pixels.hasOnePixel();
+        };
+        return new DeadlineAction("waitUntilHasOnePixel", function, timeout, unit);
+    }
+
     private final Intake intake;
 }
