@@ -177,6 +177,7 @@ public class roadrunnerTest extends LinearOpMode {
                 .build();
 
         TrajectorySequence stackSetup1 = drive.trajectorySequenceBuilder(purpleDrop.end())
+                .forward(2)
                 .splineToLinearHeading(c.stackLeftSetup, Math.toRadians(180))
                 .build();
 
@@ -187,6 +188,26 @@ public class roadrunnerTest extends LinearOpMode {
         TrajectorySequence goToBackdrop1 = drive.trajectorySequenceBuilder(intakeStack1.end())
                 .lineToLinearHeading(c.backdropCenter)
                 .build();
+
+        TrajectorySequence stackSetup2 = drive.trajectorySequenceBuilder(goToBackdrop1.end())
+                // Readjusts
+                .lineToLinearHeading(new Pose2d(c.backdropCenter.getX()+0.1, c.backdropCenter.getY(), c.backdropCenter.getHeading()))
+                .lineToLinearHeading(c.stackLeftSetup)
+                .build();
+
+        TrajectorySequence intakeStack2 = drive.trajectorySequenceBuilder(stackSetup2.end())
+                .lineToLinearHeading(new Pose2d(c.stackLeft.getX(), c.stackLeft.getY(), c.stackLeft.getHeading()))
+                .build();
+
+        TrajectorySequence goToBackdrop2 = drive.trajectorySequenceBuilder(intakeStack2.end())
+                .lineToLinearHeading(c.backdropCenter)
+                .build();
+
+        TrajectorySequence cycle2Dropoff = drive.trajectorySequenceBuilder(intakeStack2.end())
+                .strafeLeft(7)
+                .build();
+
+
 
         myLocalizer.setPoseEstimate(c.startPose);
         drive.setPoseEstimate(c.startPose); // !!!!!
@@ -204,26 +225,66 @@ public class roadrunnerTest extends LinearOpMode {
         drive.followTrajectorySequence(intakeStack1);
 
         while(!robot.intake.pixels.hasTwoPixels()) {
+            robot.intake.pixels.update();
         }
 
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
         robot.holdPixels.run();
 
         drive.followTrajectorySequence(goToBackdrop1);
-        robot.outTake.run();
-        Deadline deadline = new Deadline(500, TimeUnit.MILLISECONDS);
-        while(!deadline.hasExpired()){
+        robot.outTakeSetClawYawRightHorizontal.run();
+        Deadline deadline1 = new Deadline(500, TimeUnit.MILLISECONDS);
+        while(!deadline1.hasExpired()){
 
         }
 
         robot.openClaw.run();
+        Deadline deadline2 = new Deadline(250, TimeUnit.MILLISECONDS);
+        while(!deadline2.hasExpired()){
+
+        }
+        robot.resetOutTake.runAsync();
+
+        myLocalizer.setPoseEstimate(new Pose2d(c.backdropCenter.getX()-2, c.backdropCenter.getY()+4, c.backdropCenter.getHeading()));
+        drive.setPoseEstimate(new Pose2d(c.backdropCenter.getX()-2, c.backdropCenter.getY()+4, c.backdropCenter.getHeading()));
 
 
-        while(!isStopRequested()){
+        drive.followTrajectorySequence(stackSetup2);
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL4);
+        robot.tryIntakeTwoPixels.runAsync();
+
+
+        drive.followTrajectorySequence(intakeStack2);
+        Deadline deadline3 = new Deadline(200, TimeUnit.MILLISECONDS);
+        while(!deadline3.hasExpired()){
+        }
+
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
+
+
+        while(!robot.intake.pixels.hasTwoPixels()) {
+            robot.intake.pixels.update();
+        }
+
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+        robot.holdPixels.run();
+
+        drive.followTrajectorySequence(goToBackdrop2);
+
+        drive.followTrajectorySequence(cycle2Dropoff);
+
+        robot.outTakeSetClawYawLeftHorizontal.run();
+        deadline1.reset();
+        while(!deadline1.hasExpired()){
 
         }
 
+        robot.openClaw.run();
+        deadline2.reset();
+        while(!deadline2.hasExpired()){
 
+        }
+        robot.resetOutTake.runAsync();
 
 
 

@@ -53,7 +53,7 @@ public class PedroTest extends LinearOpMode {
         //Blue near side
         Pose2d startPose = new Pose2d(12, 62, Math.toRadians(90.0));
         Pose2d leftTeamProp = new Pose2d(20, 38, Math.toRadians(90.0));
-        Pose2d centerTeamProp = new Pose2d(12, 32, Math.toRadians(90.00));
+        Pose2d centerTeamProp = new Pose2d(12, 30, Math.toRadians(90.00));
         Pose2d rightTeamProp = new Pose2d(9, 32, Math.toRadians(0.00));
 
         // near side
@@ -76,8 +76,9 @@ public class PedroTest extends LinearOpMode {
         Pose2d stackCenter = new Pose2d(-56, 24, Math.toRadians(180));
         Pose2d stackCenterSetup = new Pose2d(stackCenter.getX()+10, stackCenter.getY(), stackCenter.getHeading());
 
-        Pose2d stackLeft = new Pose2d(stackCenter.getX(), stackCenter.getY()+12, stackCenter.getHeading());
-        Pose2d stackLeftSetup = new Pose2d(stackLeft.getX()+10, stackLeft.getY(), stackLeft.getHeading());
+        Pose2d stackLeft = new Pose2d(-58, 36, stackCenter.getHeading());
+        Pose2d stackLeftSetup = new Pose2d(-48, 36, stackLeft.getHeading());
+
 
         Pose2d stackRight = new Pose2d(stackCenter.getX(), stackCenter.getY()-12, stackCenter.getHeading());
         Pose2d stackRightSetup = new Pose2d(stackRight.getX()+10, stackRight.getY(), stackRight.getHeading());

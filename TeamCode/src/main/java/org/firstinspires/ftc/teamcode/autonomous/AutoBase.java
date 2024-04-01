@@ -268,6 +268,12 @@ public abstract class AutoBase extends LinearOpMode {
         robot.resetOutTake.run();
 
 
+
+        AutoDataStorage.currentPose = drive.getPoseEstimate();
+        AutoDataStorage.comingFromAutonomous = true;
+
+        waitForStart();
+
 /*
         //Raise lift so the pixel doesn't drag on the ground
         robot.autoOutTakeYellowLow.run();
@@ -313,10 +319,8 @@ public abstract class AutoBase extends LinearOpMode {
         AutoDataStorage.currentPose = drive.getPoseEstimate();
         AutoDataStorage.comingFromAutonomous = true;
 
-
- */
         waitForStart();
-
+*/
     }
 
 
