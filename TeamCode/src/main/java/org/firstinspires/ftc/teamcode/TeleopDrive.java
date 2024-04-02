@@ -21,7 +21,6 @@ public class TeleopDrive extends LinearOpMode {
     Pose2d startPose;
 
     public void Setup(){
-        startPose = new Pose2d(-36, 62, 90);
         Global.telemetry = telemetry;
         driveMotors = new SetDriveMotors(hardwareMap);
 
