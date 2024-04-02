@@ -37,7 +37,7 @@ public class SetDriveMotors extends OpMode {
         ROBOT_CENTRIC
     }
 
-    private DriveMode driveMode = DriveMode.FIELD_CENTRIC;
+    private DriveMode driveMode = DriveMode.ROBOT_CENTRIC;
 
     static final double BACKDROP_APPROACH_SPEED = -0.25;
 

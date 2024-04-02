@@ -123,6 +123,11 @@ public class Robot {
                 .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.Position.MIN))
                 .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.OUTTAKE));
 
+        outTake22 = new Actions()
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.AUTO_MIN_YELLOW_HIGH, 1))
+                .add(liftActionBuilder.waitForLiftMotorAbovePosition(Lift.Position.AUTO_MIN_YELLOW_HIGH))
+                .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.OUTTAKE));
+
         resetOutTake = new Actions()
                 .add(clawActionBuilder.setYawPosition(Claw.yawPositions.INTAKE))
                 .add(clawActionBuilder.waitForAnalogYawSensorAtPosition(Claw.yawPositions.RESET,5))
@@ -180,10 +185,10 @@ public class Robot {
 
         outTakeSetClawYawLeftHorizontal = new Actions()
                 .add(outTake)
-                .add(clawActionBuilder.setYawPosition(Claw.yawPositions.LEFT_HORIZONTAL));
+                .add(clawActionBuilder.setYawPosition(Claw.yawPositions.RIGHT_HORIZONTAL));
 
         outTakeSetClawYawRightHorizontal = new Actions()
-                .add(outTake)
+                .add(outTake22)
                 .add(clawActionBuilder.setYawPosition(Claw.yawPositions.RIGHT_HORIZONTAL));
 
         outTakeSetClawYawRightSlantedUp = new Actions()
@@ -257,7 +262,7 @@ public class Robot {
 
     //TeleOp Actions
     public Actions startIntakingPixels, holdPixels, holdingPixelsToIntakingPixels,
-            holdingPixelsToIdle, idleToHoldingPixels, outTake, resetOutTake;
+            holdingPixelsToIdle, idleToHoldingPixels, outTake, outTake22, resetOutTake;
 
     //Autonomous Actions
     public Actions tryIntakeOnePixel, tryIntakeTwoPixels, intakeOn, autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autonomousOpenClawYellow,

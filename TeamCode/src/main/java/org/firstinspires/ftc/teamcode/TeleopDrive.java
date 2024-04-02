@@ -88,7 +88,7 @@ public class TeleopDrive extends LinearOpMode {
             boolean alignToCardinalPoint = gamepad1.a;
             boolean resetHeading = gamepad1.y;
 
-
+            emergencyBrakeOverride = true;
             double distanceToWall = 0;
             if (!emergencyBrakeOverride){
                 // AprilTag detection of positions if costly

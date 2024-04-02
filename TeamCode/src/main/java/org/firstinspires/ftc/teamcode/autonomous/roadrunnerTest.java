@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Intake;
+import org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
@@ -186,21 +187,25 @@ public class roadrunnerTest extends LinearOpMode {
                 .build();
 
         TrajectorySequence goToBackdrop1 = drive.trajectorySequenceBuilder(intakeStack1.end())
-                .lineToLinearHeading(c.backdropCenter)
+                .lineToLinearHeading(c.backdropCenter, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence stackSetup2 = drive.trajectorySequenceBuilder(goToBackdrop1.end())
                 // Readjusts
                 .lineToLinearHeading(new Pose2d(c.backdropCenter.getX()+0.1, c.backdropCenter.getY(), c.backdropCenter.getHeading()))
-                .lineToLinearHeading(c.stackLeftSetup)
+                .lineToLinearHeading(c.stackLeftSetup, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence intakeStack2 = drive.trajectorySequenceBuilder(stackSetup2.end())
-                .lineToLinearHeading(new Pose2d(c.stackLeft.getX(), c.stackLeft.getY(), c.stackLeft.getHeading()))
+                .lineToLinearHeading(new Pose2d(c.stackLeft.getX()-1, c.stackLeft.getY(), c.stackLeft.getHeading()))
                 .build();
 
         TrajectorySequence goToBackdrop2 = drive.trajectorySequenceBuilder(intakeStack2.end())
-                .lineToLinearHeading(c.backdropCenter)
+                .lineToLinearHeading(new Pose2d(c.stackLeft.getX()+0.1, c.stackLeft.getY(), c.stackLeft.getHeading()))
+                .lineToLinearHeading(c.backdropCenter, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence cycle2Dropoff = drive.trajectorySequenceBuilder(intakeStack2.end())
@@ -244,13 +249,19 @@ public class roadrunnerTest extends LinearOpMode {
 
         }
         robot.resetOutTake.runAsync();
+        Deadline deadline21 = new Deadline(5, TimeUnit.SECONDS);
+        while(!deadline21.hasExpired()){
 
-        myLocalizer.setPoseEstimate(new Pose2d(c.backdropCenter.getX()-2, c.backdropCenter.getY()+4, c.backdropCenter.getHeading()));
-        drive.setPoseEstimate(new Pose2d(c.backdropCenter.getX()-2, c.backdropCenter.getY()+4, c.backdropCenter.getHeading()));
+        }
+
+        /*
+
+        myLocalizer.setPoseEstimate(new Pose2d(c.backdropCenter.getX()-2, c.backdropCenter.getY()+4.5, c.backdropCenter.getHeading()));
+        drive.setPoseEstimate(new Pose2d(c.backdropCenter.getX()-2, c.backdropCenter.getY()+4.5, c.backdropCenter.getHeading()));
 
 
         drive.followTrajectorySequence(stackSetup2);
-        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL4);
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
         robot.tryIntakeTwoPixels.runAsync();
 
 
@@ -259,6 +270,10 @@ public class roadrunnerTest extends LinearOpMode {
         while(!deadline3.hasExpired()){
         }
 
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL4);
+        deadline3.reset();
+        while(!deadline3.hasExpired()){
+        }
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
 
 
@@ -269,11 +284,17 @@ public class roadrunnerTest extends LinearOpMode {
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
         robot.holdPixels.run();
 
+        myLocalizer.setPoseEstimate(new Pose2d(c.stackLeft.getX(), c.stackLeft.getY()+2, c.stackLeft.getHeading()));
+        drive.setPoseEstimate(new Pose2d(c.stackLeft.getX(), c.stackLeft.getY()+2, c.stackLeft.getHeading()));
+
         drive.followTrajectorySequence(goToBackdrop2);
 
-        drive.followTrajectorySequence(cycle2Dropoff);
 
-        robot.outTakeSetClawYawLeftHorizontal.run();
+
+        AutoDataStorage.currentPose = drive.getPoseEstimate();
+        AutoDataStorage.comingFromAutonomous = true;
+
+        robot.outTakeSetClawYawRightHorizontal.run();
         deadline1.reset();
         while(!deadline1.hasExpired()){
 
@@ -285,8 +306,15 @@ public class roadrunnerTest extends LinearOpMode {
 
         }
         robot.resetOutTake.runAsync();
+        deadline3.reset();
+        while(!deadline3.hasExpired()){
+        }
 
+*/
+        AutoDataStorage.currentPose = drive.getPoseEstimate();
+        AutoDataStorage.comingFromAutonomous = true;
 
+        waitForStart();
 
     }
 
