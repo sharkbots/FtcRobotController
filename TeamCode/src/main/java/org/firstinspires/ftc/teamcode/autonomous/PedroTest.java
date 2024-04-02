@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
-import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
@@ -54,7 +53,7 @@ public class PedroTest extends LinearOpMode {
         //Blue near side
         Pose2d startPose = new Pose2d(12, 62, Math.toRadians(90.0));
         Pose2d leftTeamProp = new Pose2d(20, 38, Math.toRadians(90.0));
-        Pose2d centerTeamProp = new Pose2d(12, 32, Math.toRadians(90.00));
+        Pose2d centerTeamProp = new Pose2d(12, 30, Math.toRadians(90.00));
         Pose2d rightTeamProp = new Pose2d(9, 32, Math.toRadians(0.00));
 
         // near side
@@ -64,9 +63,9 @@ public class PedroTest extends LinearOpMode {
 
         //Blue backdrop
         Pose2d backdropStrafeForCenter = new Pose2d(51, 45, Math.toRadians(180.00));
-        Pose2d backdropLeft = new Pose2d(51, 37, Math.toRadians(180.00));
-        Pose2d backdropCenter = new Pose2d(51, 31.5, Math.toRadians(180.00));
-        Pose2d backdropRight = new Pose2d(51, 27, Math.toRadians(180.00));
+        Pose2d backdropLeft = new Pose2d(51, 41, Math.toRadians(180.00));
+        Pose2d backdropCenter = new Pose2d(51, 34, Math.toRadians(180.00));
+        Pose2d backdropRight = new Pose2d(51, 31, Math.toRadians(180.00));
 
         // Blue alliance parking
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
@@ -74,22 +73,23 @@ public class PedroTest extends LinearOpMode {
         Vector2d parkInCorner = new Vector2d(47, 62);
 
         // Side stacks
-        Pose2d stackCenter = new Pose2d(-57, 24, Math.toRadians(180));
+        Pose2d stackCenter = new Pose2d(-56, 24, Math.toRadians(180));
         Pose2d stackCenterSetup = new Pose2d(stackCenter.getX()+10, stackCenter.getY(), stackCenter.getHeading());
 
-        Pose2d stackLeft = new Pose2d(stackCenter.getX(), stackCenter.getY()+12, stackCenter.getHeading());
-        Pose2d stackLeftSetup = new Pose2d(stackLeft.getX()+10, stackLeft.getY(), stackLeft.getHeading());
+        Pose2d stackLeft = new Pose2d(-58, 36, stackCenter.getHeading());
+        Pose2d stackLeftSetup = new Pose2d(-48, 36, stackLeft.getHeading());
+
 
         Pose2d stackRight = new Pose2d(stackCenter.getX(), stackCenter.getY()-12, stackCenter.getHeading());
         Pose2d stackRightSetup = new Pose2d(stackRight.getX()+10, stackRight.getY(), stackRight.getHeading());
 
 
 
-        Pose2d purpleToStackLeftControlPoint = new Pose2d(-36, 34);
+        Pose2d purpleToStackLeftControlPoint = new Pose2d(-36, 36);
 
         // To Backdrop
-        Pose2d centerTruss = new Pose2d(-14, 34);
-        Pose2d centerTrussToBackDropControlPoint = new Pose2d(30, 31.5);
+        Pose2d centerTruss = new Pose2d(-14, 36);
+        Pose2d centerTrussToBackDropControlPoint = new Pose2d(30, 36);
 
 
         public Coordinates(Boolean isBlueAlliance, Boolean isNearSide) {
@@ -176,15 +176,10 @@ public class PedroTest extends LinearOpMode {
     PedroTest.Coordinates c = new Coordinates(true, false);
     Robot robot;
 
-
     public void setup() {
         Global.telemetry = telemetry;
         robot = new Robot(hardwareMap, gamepad1, gamepad2);
-        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
-        Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
-        Robot.claw.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL);
-
-
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
 
         follower = new Follower(hardwareMap);
 
@@ -212,14 +207,14 @@ public class PedroTest extends LinearOpMode {
 
         telemetryA.addLine("Good to start, go for it.");
         telemetryA.update();
-        Global.telemetry.speak("Sharkbots go go go!");
+        Global.telemetry.speak("SHARKBOTS IS ALIVE");
 
     }
 
     private PathChain goToBackdropThroughCenterTruss(Pose2d backdropPosition) {
         return follower.pathBuilder()
                 .addPath(new BezierLine(new Point(c.stackLeft), new Point(c.centerTruss)))
-                .addParametricCallback(0.8, robot.outTakeSetClawYawRightSlantedUp.getAsyncRunnable())
+                .addParametricCallback(0.8, robot.outTake.getAsyncRunnable())
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .addPath(new BezierCurve(new Point(c.centerTruss), new Point(c.centerTrussToBackDropControlPoint), new Point(backdropPosition)))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -228,17 +223,16 @@ public class PedroTest extends LinearOpMode {
 
     private PathChain goToStackSetupThroughCenterTruss(Pose2d backdropPosition) {
         return follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(backdropPosition), new Point(c.centerTrussToBackDropControlPoint), new Point(c.stackLeftSetup)))
+                .addPath(new BezierCurve(new Point(backdropPosition), new Point(c.centerTrussToBackDropControlPoint), new Point(c.centerTruss)))
+                .addParametricCallback(0.1, robot.resetOutTake.getAsyncRunnable())
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .addPath(new BezierLine(new Point(c.centerTruss), new Point(c.stackLeftSetup)))
-                .addParametricCallback(0.8, robot.outTakeSetClawYawRightSlantedUp.getAsyncRunnable())
-                
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
     }
 
     private enum STACK_POSITIONS{LEFT, CENTER, RIGHT}
-    private PathChain intakeFromStack(STACK_POSITIONS position, boolean goFarther){
+    private PathChain intakeFromStack(STACK_POSITIONS position){
         Pose2d setup = new Pose2d(), stack = new Pose2d();
         if (position == STACK_POSITIONS.LEFT){
             stack = c.stackLeft;
@@ -252,9 +246,8 @@ public class PedroTest extends LinearOpMode {
             stack = c.stackRight;
             setup = c.stackRightSetup;
         }
-        Point stackPoint = new Point(stack.getX()-(goFarther?3:0), stack.getY(), Point.CARTESIAN);
         return follower.pathBuilder()
-                .addPath(new BezierLine(new Point(setup), stackPoint))
+                .addPath(new BezierLine(new Point(setup), new Point(stack)))
                 .addParametricCallback(0.2, robot.tryIntakeTwoPixels.getAsyncRunnable())
                 .setPathEndVelocityConstraint(5)
                 .build();
@@ -270,55 +263,104 @@ public class PedroTest extends LinearOpMode {
 
         follower.run(purpleToLeftSideStackSetup);
 
-        goGrabPixels(Intake.FlipperPosition.PIXEL5);
-        goDropPixels(goToBackdropCenterThroughCenterTruss);
-        follower.run(goToStackSetupThroughCenterTrussFromCenterBackdrop);
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+
+        follower.run(intakeFromStack(STACK_POSITIONS.LEFT), true);
+
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+
+        robot.holdPixels.run();
+//
+//
+//        follower.update();
+//        follower.telemetryDebug(telemetryA);
+//        follower.update();
+
+        follower.run(goToBackdropCenterThroughCenterTruss, true);
+
+        robot.openClaw.run();
 
 
-        goGrabPixels(Intake.FlipperPosition.PIXEL4);
-        goDropPixels(goToBackdropLeftThroughCenterTruss);
-        follower.run(goToStackSetupThroughCenterTrussFromLeftBackdrop);
+        follower.run(goToStackSetupThroughCenterTrussFromLeftBackdrop, true);
 
-        goGrabPixels(Intake.FlipperPosition.UP);
-        goDropPixels(goToBackdropLeftThroughCenterTruss);
-        follower.run(goToStackSetupThroughCenterTrussFromLeftBackdrop);
 
 
         while(!isStopRequested()){
+
         }
 
-    }
+        //robot.openClaw.run();
+        //robot.resetOutTake.run();
+        //follower.run(goToStackSetupThroughCenterTrussFromCenterBackdrop);
 
-    private void goDropPixels(PathChain backdropPathChain) {
-        follower.run(backdropPathChain);
-        follower.breakFollowing();
-        robot.openClaw.run();
-        Deadline deadline = new Deadline(300, TimeUnit.MILLISECONDS);
-        while(!deadline.hasExpired()){
-            follower.update();
-        }
+        //Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+        //follower.run(intakeFromStack(STACK_POSITIONS.LEFT));
+        //Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+        //follower.run(goToBackdropRightThroughCenterTruss);
+        //follower.run(goToStackSetupThroughCenterTrussFromRightBackdrop);
 
-        robot.resetOutTake.run();
-        deadline = new Deadline(500, TimeUnit.MILLISECONDS);
-        while(!deadline.hasExpired()){
-            follower.update();
-        }
-    }
+        //follower.run(intakeFromStack(STACK_POSITIONS.LEFT));
+        //follower.run(goToBackdropLeftThroughCenterTruss);
+        //follower.run(goToStackSetupThroughCenterTrussFromLeftBackdrop);
 
-    private void goGrabPixels(Intake.FlipperPosition flipperPosition) {
-        Robot.intake.setIntakeFlipperPosition(flipperPosition);
-        follower.run(intakeFromStack(STACK_POSITIONS.LEFT, flipperPosition==Intake.FlipperPosition.UP));
-        if (flipperPosition==Intake.FlipperPosition.PIXEL4) {
-            while(!Robot.intake.pixels.hasOnePixel()){
-                follower.update();
-            }
-            Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
-        }
-        while(!Robot.intake.pixels.hasTwoPixels()){
-            follower.update();
-        }
+/*
+        // first cycle (yellow preload + white from stack)
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+        do {
+            robot.tryIntakeTwoPixels.run();
+        } while(!Robot.intake.pixels.hasTwoPixels());
+
         robot.holdPixels.run();
+        // go to backdrop
+
+        robot.outTake.run();
+        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+        Deadline waitFarSide = new Deadline(1, TimeUnit.SECONDS);
+        //noinspection StatementWithEmptyBody
+        while(!waitFarSide.hasExpired()) {
+        }
+        robot.resetOutTake.run();
+
+
+        // second cycle (2 whites from stack)
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL4);
+        robot.startIntakingPixels.run();
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
+        do {
+            robot.tryIntakeTwoPixels.run();
+        } while(!Robot.intake.pixels.hasTwoPixels());
+        robot.holdPixels.run();
+        robot.outTake.run();
+        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+        waitFarSide.reset();
+        //noinspection StatementWithEmptyBody
+        while(!waitFarSide.hasExpired()) {
+        }
+        robot.resetOutTake.run();
+
+
+
+        // third cycle (2 whites from stack)
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+        robot.startIntakingPixels.run();
+        do {
+            robot.tryIntakeTwoPixels.run();
+        } while(!Robot.intake.pixels.hasTwoPixels());
+        robot.holdPixels.run();
+        robot.outTake.run();
+        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+        waitFarSide.reset();
+        //noinspection StatementWithEmptyBody
+        while(!waitFarSide.hasExpired()) {
+        }
+        robot.resetOutTake.run();
+
+
+*/
     }
+
+
+
 
 
 }
