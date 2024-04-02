@@ -89,7 +89,7 @@ public class TeamPropDetection {
     public void Setup(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam");
+        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
         camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
         teamPropDetectionPipeline = new TeamPropDetectionPipeline(fx, fy, cx, cy, telemetry);

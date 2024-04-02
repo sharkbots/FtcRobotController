@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode.tools;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.util.Angle;
-import com.google.ar.core.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -37,7 +36,7 @@ public class SetDriveMotors extends OpMode {
         ROBOT_CENTRIC
     }
 
-    private DriveMode driveMode = DriveMode.ROBOT_CENTRIC;
+    private DriveMode driveMode = DriveMode.FIELD_CENTRIC;
 
     static final double BACKDROP_APPROACH_SPEED = -0.25;
 
@@ -196,7 +195,7 @@ public class SetDriveMotors extends OpMode {
         drive.setPoseEstimate(pose);
     }
 
-    public Pose2d pluh(){
+    public Pose2d getPoseEstimate(){
         return drive.getPoseEstimate();
     }
 

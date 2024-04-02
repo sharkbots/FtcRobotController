@@ -26,7 +26,6 @@ public class TeleopDrive extends LinearOpMode {
 
         robot = new Robot(hardwareMap, gamepad1, gamepad2);
 
-        driveMotors.setPoseEstimate(startPose);
         aprilTagDetection = new AprilTagDetection();
         aprilTagDetection.Setup(hardwareMap, telemetry);
 
@@ -87,7 +86,6 @@ public class TeleopDrive extends LinearOpMode {
             boolean alignToCardinalPoint = gamepad1.a;
             boolean resetHeading = gamepad1.y;
 
-            emergencyBrakeOverride = true;
             double distanceToWall = 0;
             if (!emergencyBrakeOverride){
                 // AprilTag detection of positions if costly
