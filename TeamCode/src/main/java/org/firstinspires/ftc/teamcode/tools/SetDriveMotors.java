@@ -96,7 +96,7 @@ public class SetDriveMotors extends OpMode {
         Pose2d poseEstimate = drive.getPoseEstimate();
 
         if (resetHeading){
-            drive.setPoseEstimate(new Pose2d(poseEstimate.getY(), Math.toRadians(270)));
+            drive.setPoseEstimate(new Pose2d(poseEstimate.getX(), poseEstimate.getY(), Math.PI));
         }
 
         //deadzones

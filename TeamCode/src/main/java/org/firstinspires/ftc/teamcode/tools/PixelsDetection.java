@@ -3,6 +3,10 @@ package org.firstinspires.ftc.teamcode.tools;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.internal.system.Deadline;
+
+import java.util.concurrent.TimeUnit;
+
 public class PixelsDetection {
 
 //    private final LED led1red;
@@ -15,6 +19,8 @@ public class PixelsDetection {
     public PIXEL_COLOR pixel1 = PIXEL_COLOR.UNDEFINED;
     public PIXEL_COLOR pixel2 = PIXEL_COLOR.UNDEFINED;
 
+    Deadline twoPixelsDetectionDelay;
+
 
     public PixelsDetection(HardwareMap hardwareMap) {
 //        led1red = hardwareMap.get(LED.class, "led1red");
@@ -24,7 +30,7 @@ public class PixelsDetection {
 
         colorSensor1 = hardwareMap.get(RevColorSensorV3.class, "colorsensor1");
         colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorsensor2");
-
+        twoPixelsDetectionDelay = new Deadline(200, TimeUnit.MILLISECONDS);
 //        led1red.enable(true);
 //        led1green.enable(true);
 //        led2red.enable(true);
@@ -45,6 +51,10 @@ public class PixelsDetection {
     public void update() {
         pixel1 = detectColorFrom(colorSensor1, "1- ");
         pixel2 = detectColorFrom(colorSensor2, "2- ");
+        if(!hasTwoPixelsRaw()) {
+            twoPixelsDetectionDelay.reset();
+        }
+
         setLEDStatus();
         Global.telemetry.update();
 
@@ -77,6 +87,13 @@ public class PixelsDetection {
     }
 
     public boolean hasTwoPixels() {
+        // Add delay before acknoledging two pixels are in
+        // Gives time to the intake getting the pixels really in
+        // or avoid false positive signal on a passing first pixel through
+        return  twoPixelsDetectionDelay.hasExpired() && hasTwoPixelsRaw();
+    }
+
+    private boolean hasTwoPixelsRaw() {
         return (pixel1 != PIXEL_COLOR.UNDEFINED) && (pixel2 != PIXEL_COLOR.UNDEFINED);
     }
 

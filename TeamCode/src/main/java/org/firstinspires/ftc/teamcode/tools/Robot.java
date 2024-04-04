@@ -91,6 +91,7 @@ public class Robot {
                 .add(intakeActionBuilder.startIntakeMotorWithNoEncoder(1));
 
         holdPixels = new Actions()
+                .add(intakeActionBuilder.setFlipperServoPosition(Intake.FlipperPosition.UP))
                 .add(DeadlineAction.waitFor(150, TimeUnit.MILLISECONDS))
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE))
                 .add(DeadlineAction.waitFor(500, TimeUnit.MILLISECONDS))
