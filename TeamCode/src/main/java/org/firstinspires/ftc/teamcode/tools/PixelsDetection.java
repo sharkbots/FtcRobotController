@@ -2,44 +2,62 @@ package org.firstinspires.ftc.teamcode.tools;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.LED;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class PixelsDetection {
 
-//    private final LED led1red;
-//    private final LED led1green;
-//    private final LED led2red;
-//    private final LED led2green;
+    public enum LEDMode {
+        SOLID,
+        BLINKING
+    };
+
+    private enum LEDColor {
+        RED,
+        GREEN,
+        BLACK
+    };
+
+
     private final RevColorSensorV3 colorSensor1;
     private final RevColorSensorV3 colorSensor2;
 
     public PIXEL_COLOR pixel1 = PIXEL_COLOR.UNDEFINED;
     public PIXEL_COLOR pixel2 = PIXEL_COLOR.UNDEFINED;
 
-    Deadline twoPixelsDetectionDelay;
+
+    private final ArrayList<LED> ledsRed = new ArrayList<LED>(4);
+    private final ArrayList<LED> ledsGreen = new ArrayList<LED>(4);
+    private LEDMode ledMode = LEDMode.BLINKING;
+    private final Deadline twoPixelsDetectionDelay, blinkingDelay;
+    private boolean isLedOnForBlinking = true;
+
 
 
     public PixelsDetection(HardwareMap hardwareMap) {
-//        led1red = hardwareMap.get(LED.class, "led1red");
-//        led1green = hardwareMap.get(LED.class, "led1green");
-//        led2red = hardwareMap.get(LED.class, "led2red");
-//        led2green = hardwareMap.get(LED.class, "led2green");
+        for(int i=0; i<4;i++) {
+            ledsRed.add(  i, hardwareMap.get(LED.class, "led" + (i+1) + "red"));
+            ledsGreen.add(i, hardwareMap.get(LED.class, "led" + (i+1) + "green"));
+        }
 
         colorSensor1 = hardwareMap.get(RevColorSensorV3.class, "colorsensor1");
         colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorsensor2");
+
         twoPixelsDetectionDelay = new Deadline(200, TimeUnit.MILLISECONDS);
-//        led1red.enable(true);
-//        led1green.enable(true);
-//        led2red.enable(true);
-//        led2green.enable(true);
-//
-//        led1red.enableLight(false);
-//        led1green.enableLight(false);
-//        led2red.enableLight(false);
-//        led2green.enableLight(false);
+        blinkingDelay = new Deadline(50, TimeUnit.MILLISECONDS);
+
+        for(LED ledRed: ledsRed) {
+            ledRed.enable(true);
+            ledRed.enableLight(false);
+        }
+        for(LED ledGreen: ledsGreen) {
+            ledGreen.enable(true);
+            ledGreen.enableLight(false);
+        }
 
         colorSensor1.enableLed(true);
         colorSensor2.enableLed(true);
@@ -54,11 +72,13 @@ public class PixelsDetection {
         if(!hasTwoPixelsRaw()) {
             twoPixelsDetectionDelay.reset();
         }
+        if(ledMode==LEDMode.BLINKING && blinkingDelay.hasExpired()){
+            blinkingDelay.reset();
+            isLedOnForBlinking = !isLedOnForBlinking;
+        }
 
         setLEDStatus();
         Global.telemetry.update();
-
-
     }
 
     private PIXEL_COLOR detectColorFrom(RevColorSensorV3 colorSensor, String debugPrefix) {
@@ -86,6 +106,9 @@ public class PixelsDetection {
         return detectedColor;
     }
 
+    public void SetLEDMode(LEDMode mode) {
+        ledMode = mode;
+    }
     public boolean hasTwoPixels() {
         // Add delay before acknoledging two pixels are in
         // Gives time to the intake getting the pixels really in
@@ -102,12 +125,30 @@ public class PixelsDetection {
     }
 
     private void setLEDStatus() {
-//        led1red.enableLight(pixel1==PIXEL_COLOR.UNDEFINED);
-//        led1green.enableLight(pixel1!=PIXEL_COLOR.UNDEFINED);
-//        led2red.enableLight(pixel2==PIXEL_COLOR.UNDEFINED);
-//        led2green.enableLight(pixel2!=PIXEL_COLOR.UNDEFINED);
+        if(ledMode==LEDMode.BLINKING && !isLedOnForBlinking) {
+            setLED1(LEDColor.BLACK);
+            setLED2(LEDColor.BLACK);
+        } else if(hasTwoPixels()) { // For two pixels, comply to delay to provide visual feedback
+            setLED1(LEDColor.GREEN);
+            setLED2(LEDColor.GREEN);
+        } else {
+            setLED1((pixel1 == PIXEL_COLOR.UNDEFINED)?LEDColor.RED:LEDColor.GREEN);
+            setLED2((pixel2 == PIXEL_COLOR.UNDEFINED)?LEDColor.RED:LEDColor.GREEN);
+        }
     }
-
+    private void setLED1(LEDColor ledColor) {
+        setLED(0, ledColor);
+    }
+    private void setLED2(LEDColor ledColor) {
+        setLED(1, ledColor);
+    }
+    private void setLED(int ledLogicalIndex, LEDColor ledColor) {
+        ledLogicalIndex *= 2; // LEDs come in pairs
+        ledsRed.get(ledLogicalIndex).enableLight(ledColor==LEDColor.RED);
+        ledsRed.get(ledLogicalIndex+1).enableLight(ledColor==LEDColor.RED);
+        ledsGreen.get(ledLogicalIndex).enableLight(ledColor==LEDColor.GREEN);
+        ledsGreen.get(ledLogicalIndex+1).enableLight(ledColor==LEDColor.GREEN);
+    }
 
 
 }

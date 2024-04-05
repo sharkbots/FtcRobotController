@@ -29,21 +29,26 @@
 
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
+import static org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase.getCenterStageTagLibrary;
+
 import android.util.Size;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -111,20 +116,29 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
     private DcMotor rightBackDrive   = null;  //  Used to control the right back drive wheel
 
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
-    private static final int DESIRED_TAG_ID = 2;     // Choose the tag you want to approach or set to -1 for ANY tag.
+
+    private static final boolean DETECT_ALL = false;
+    private static final int[] BLUE_DESIRED_TAG_IDS = {1, 2, 3}; // Blue backdrop ids
+    private static final int[] RED_DESIRED_TAG_IDS = {4, 5, 6}; // Red backdrop ids
+    private final boolean IS_BLUE_SIDE = true;
+
     private VisionPortal visionPortal;               // Used to manage the video source.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
     private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
 
+    private final AprilTagLibrary centerStageTags = getCenterStageTagLibrary();
+
     @Override public void runOpMode()
     {
+        //Quaternion a = centerStageTags.lookupTag(2).fieldOrientation.
+
         boolean targetFound     = false;    // Set to true when an AprilTag target is detected
         double  drive           = 0;        // Desired forward power/speed (-1 to +1)
         double  strafe          = 0;        // Desired strafe power/speed (-1 to +1)
         double  turn            = 0;        // Desired turning power/speed (-1 to +1)
 
         // Initialize the Apriltag Detection process
-        initAprilTag();
+        initAprilTag(true, hardwareMap);
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must match the names assigned during the robot configuration.
@@ -161,7 +175,7 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
                 // Look to see if we have size info on this tag.
                 if (detection.metadata != null) {
                     //  Check to see if we want to track towards this tag.
-                    if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+                    if (DETECT_ALL || isDesiredTag(detection.id)) {
                         // Yes, we want to use this tag.
                         targetFound = true;
                         desiredTag = detection;
@@ -183,6 +197,11 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
                 telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
                 telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
                 telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
+
+                telemetry.addLine();
+                telemetry.addData("Range error ",  "%5.1f inches", (desiredTag.ftcPose.range - DESIRED_DISTANCE));
+                telemetry.addData("Heading error","%3.0f degrees", desiredTag.ftcPose.bearing);
+                telemetry.addData("Yaw error","%3.0f degrees", desiredTag.ftcPose.yaw);
             } else {
                 telemetry.addData("\n>","Drive using joysticks to find valid target\n");
             }
@@ -255,7 +274,9 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
     /**
      * Initialize the AprilTag processor.
      */
-    private void initAprilTag() {
+    private void initAprilTag(Boolean isBlueSide, HardwareMap hardwareMap) {
+        isBlueSide = this.IS_BLUE_SIDE;
+
         // Create the AprilTag processor by using a builder.
         aprilTag = new AprilTagProcessor.Builder().build();
 
@@ -274,7 +295,6 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
                     .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                     .addProcessor(aprilTag)
                     .setLiveViewContainerId(hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName()))
-
                     .setCameraResolution(new Size(800, 600))
                     .enableLiveView(true)
                     .setAutoStopLiveView(true)
@@ -324,4 +344,25 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
             sleep(20);
         }
     }
+
+    private boolean isDesiredTag(int tagId) {
+        if (IS_BLUE_SIDE) {
+            for (int desiredId : BLUE_DESIRED_TAG_IDS) {
+                if (tagId == desiredId) {
+                    return true;
+                }
+            }
+        } else {
+            for (int desiredId : RED_DESIRED_TAG_IDS) {
+                if (tagId == desiredId) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
+
+
+
+
