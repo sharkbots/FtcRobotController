@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tools.StateMachine;
+package org.firstinspires.ftc.teamcode.tools.stateMachine;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 

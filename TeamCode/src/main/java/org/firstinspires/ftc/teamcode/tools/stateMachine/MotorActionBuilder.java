@@ -1,8 +1,6 @@
-package org.firstinspires.ftc.teamcode.tools.StateMachine;
+package org.firstinspires.ftc.teamcode.tools.stateMachine;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-
-import org.firstinspires.ftc.teamcode.tools.Robot;
 
 public class MotorActionBuilder {
     MotorActionBuilder(DcMotor singleMotor) {

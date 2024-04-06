@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tools.StateMachine;
+package org.firstinspires.ftc.teamcode.tools.stateMachine;
 
 import androidx.annotation.NonNull;
 

@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.tools.Buttons;
 import org.firstinspires.ftc.teamcode.tools.Global;
-import org.firstinspires.ftc.teamcode.tools.StateMachine.StateMachine;
-import org.firstinspires.ftc.teamcode.tools.StateMachine.Action;
+import org.firstinspires.ftc.teamcode.tools.stateMachine.StateMachine;
+import org.firstinspires.ftc.teamcode.tools.stateMachine.Action;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

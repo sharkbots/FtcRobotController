@@ -34,6 +34,9 @@ import static org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase.getCent
 import android.util.Size;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+
+
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -45,6 +48,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
+import org.firstinspires.ftc.teamcode.tools.math.Pose2dGeometry;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
@@ -95,8 +99,23 @@ import java.util.concurrent.TimeUnit;
  */
 
 @TeleOp(name="AprilTag Test")
+@Disabled
 public class AprilTagPoseDetection extends LinearOpMode
 {
+    // We can define a coordinate system with the robot center as the origin.
+    // Coordinates of the camera pose on that coordinate system.
+    private final double CAMERA_RELATIVE_X_FROM_ROBOT_CENTER = -8.25;
+    private final double CAMERA_RELATIVE_Y_FROM_ROBOT_CENTER = 0.0;
+
+    private final double FIELD_BACKDROP_X_OFFSET = 2.0; //Backdrop can be setup differently than game manual
+    private final double FIELD_BACKDROP_Y_OFFSET = 0.0; // Check World fields to set offset if any
+
+    private final double CAMERA_RELATIVE_HEADING = Math.toRadians(180);
+    private final Pose2d CAMERA_POS_RELATIVE_TO_ROBOT = new Pose2d(CAMERA_RELATIVE_X_FROM_ROBOT_CENTER, CAMERA_RELATIVE_Y_FROM_ROBOT_CENTER, CAMERA_RELATIVE_HEADING);
+    private final double CAMERA_DISTANCE_FROM_ROBOT_CENTER = CAMERA_POS_RELATIVE_TO_ROBOT.vec().norm();
+    private final double CAMERA_TO_ROBOT_BEARING = Math.atan(CAMERA_RELATIVE_Y_FROM_ROBOT_CENTER/CAMERA_RELATIVE_X_FROM_ROBOT_CENTER);
+
+
     // Adjust these numbers to suit your robot.
     final double DESIRED_DISTANCE = 5.0; //  this is how close the camera should get to the target (inches)
 
@@ -128,6 +147,7 @@ public class AprilTagPoseDetection extends LinearOpMode
     private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
 
     private final AprilTagLibrary centerStageTags = getCenterStageTagLibrary();
+
 
     @Override public void runOpMode()
     {
@@ -195,16 +215,26 @@ public class AprilTagPoseDetection extends LinearOpMode
             if (targetFound) {
                 telemetry.addData("\n>","HOLD Left-Bumper to Drive to Target\n");
                 telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-                telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
-                telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
-                telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
 
                 telemetry.addLine();
-                telemetry.addData("Range error ",  "%5.1f inches", (desiredTag.ftcPose.range - DESIRED_DISTANCE));
+                Pose2d cameraRelativeOffset = getCameraRelativeOffset(desiredTag);
+
                 telemetry.addData("Heading error","%3.0f degrees", desiredTag.ftcPose.bearing);
                 telemetry.addData("Yaw error","%3.0f degrees", desiredTag.ftcPose.yaw);
-                telemetry.addData("X error","%5.1f inches", desiredTag.ftcPose.x);
-                telemetry.addData("Y error","%5.1finches", desiredTag.ftcPose.y);
+                telemetry.addData("X error","%5.1f inches", cameraRelativeOffset.getX());
+                telemetry.addData("Y error","%5.1finches", cameraRelativeOffset.getY());
+
+                Pose2d robotRelativeOffset = getRobotRelativeOffset(cameraRelativeOffset);
+                telemetry.addLine();
+                telemetry.addData("Robot relative offset", " x: %5.1f  , y: %5.1f , heading: %3.0f",
+                                    robotRelativeOffset.getX(), robotRelativeOffset.getY(), Math.toDegrees(robotRelativeOffset.getHeading()));
+
+                Pose2d robotPose = getPoseFromTags(desiredTag);
+                telemetry.addData("Robot x position", "%5.1f", robotPose.getX());
+                telemetry.addData("Robot y position", "%5.1f",  robotPose.getY());
+                telemetry.addData("Robot heading position", "%3.0f",  Math.toDegrees(robotPose.getHeading()));
+
+
             } else {
                 telemetry.addData("\n>","Drive using joysticks to find valid target\n");
             }
@@ -365,12 +395,44 @@ public class AprilTagPoseDetection extends LinearOpMode
         return false;
     }
 
-    private Pose2d cameraRelativeOffset(AprilTagDetection tag) {
+    public Pose2d getPoseFromTags(AprilTagDetection tag){
+        Pose2d cameraOffset = getCameraRelativeOffset(tag);
+        Pose2d robotOffset = getRobotRelativeOffset(cameraOffset);
+
+        return getRobotPositionFromOffset(robotOffset, tag);
+    }
+
+    private Pose2d getCameraRelativeOffset(AprilTagDetection tag) {
         double x = tag.ftcPose.x;
         double y = tag.ftcPose.y;
-        double heading = tag.ftcPose.yaw;
+        double headingDegrees = tag.ftcPose.yaw;  // might be store with negative sign, to be checked
 
-        return new Pose2d(x, y, heading);
+        return new Pose2d(x, y, Math.toRadians(headingDegrees));
+    }
+
+    private Pose2d getRobotRelativeOffset(Pose2d cameraOffset) {
+
+        double alpha = Math.toRadians(90)-CAMERA_TO_ROBOT_BEARING-cameraOffset.getHeading();
+
+        double x = CAMERA_DISTANCE_FROM_ROBOT_CENTER*Math.cos(alpha);
+        double y = CAMERA_DISTANCE_FROM_ROBOT_CENTER*Math.sin(alpha);
+
+        // TODO: add logic to convert camera plane to camera heading for all positions
+        return new Pose2d(x+cameraOffset.getX(), y+cameraOffset.getY(), Math.toRadians(90)-cameraOffset.getHeading());
+    }
+
+    private Pose2d getRobotPositionFromOffset(Pose2d robotOffset, AprilTagDetection tag){
+
+        double tagX = centerStageTags.lookupTag(tag.id).fieldPosition.get(0)+FIELD_BACKDROP_X_OFFSET;
+        double tagY = centerStageTags.lookupTag(tag.id).fieldPosition.get(1)+FIELD_BACKDROP_Y_OFFSET;
+        // TODO: use field positions to get heading of tag instead of assuming 180 degrees
+        double tagHeading = Math.toRadians(90);
+
+
+        Pose2d tagPose = new Pose2d(tagX, tagY, tagHeading);
+
+
+        return Pose2dGeometry.getPointInTransformedCoordinateSystem(tagPose, new Pose2d(0, 0, 0), robotOffset);
     }
 
 }

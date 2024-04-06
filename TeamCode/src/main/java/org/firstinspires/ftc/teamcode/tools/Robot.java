@@ -4,20 +4,18 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Hanger;
 import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.Lift;
 import org.firstinspires.ftc.teamcode.PlaneLauncher;
-import org.firstinspires.ftc.teamcode.tools.StateMachine.Action;
-import org.firstinspires.ftc.teamcode.tools.StateMachine.Actions;
-import org.firstinspires.ftc.teamcode.tools.StateMachine.ClawActionBuilder;
-import org.firstinspires.ftc.teamcode.tools.StateMachine.IntakeActionBuilder;
-import org.firstinspires.ftc.teamcode.tools.StateMachine.LiftActionBuilder;
-import org.firstinspires.ftc.teamcode.tools.StateMachine.StateMachine;
-import org.firstinspires.ftc.teamcode.tools.StateMachine.DeadlineAction;
+import org.firstinspires.ftc.teamcode.tools.stateMachine.Actions;
+import org.firstinspires.ftc.teamcode.tools.stateMachine.ClawActionBuilder;
+import org.firstinspires.ftc.teamcode.tools.stateMachine.IntakeActionBuilder;
+import org.firstinspires.ftc.teamcode.tools.stateMachine.LiftActionBuilder;
+import org.firstinspires.ftc.teamcode.tools.stateMachine.StateMachine;
+import org.firstinspires.ftc.teamcode.tools.stateMachine.DeadlineAction;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;

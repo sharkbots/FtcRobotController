@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration;
 
-import org.firstinspires.ftc.teamcode.tools.StateMachine.Actions;
+import org.firstinspires.ftc.teamcode.tools.stateMachine.Actions;
 
 import java.util.ArrayList;
 

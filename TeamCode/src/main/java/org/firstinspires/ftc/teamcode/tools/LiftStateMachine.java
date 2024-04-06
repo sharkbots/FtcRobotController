@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.tools;
 
-import org.firstinspires.ftc.teamcode.tools.StateMachine.StateMachine;
+import org.firstinspires.ftc.teamcode.tools.stateMachine.StateMachine;
 
 public class LiftStateMachine extends StateMachine {
 
