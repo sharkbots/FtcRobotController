@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.tools.StateMachine;
 
 import org.firstinspires.ftc.teamcode.Intake;
+import org.firstinspires.ftc.teamcode.tools.PixelsDetection;
 
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +49,12 @@ public class IntakeActionBuilder {
         };
         return new DeadlineAction("waitUntilHasOnePixel", function, timeout, unit);
     }
+
+    public Action setLEDMode(PixelsDetection.LEDMode mode){
+        ActionFunction function = () -> {intake.pixels.setLEDMode(mode); return true;};
+        return new Action ("setLEDMode", function);
+    }
+
 
     private final Intake intake;
 }

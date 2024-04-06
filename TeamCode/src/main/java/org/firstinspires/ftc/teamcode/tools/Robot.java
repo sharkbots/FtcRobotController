@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.Hanger;
 import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.Lift;
 import org.firstinspires.ftc.teamcode.PlaneLauncher;
+import org.firstinspires.ftc.teamcode.tools.StateMachine.Action;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.Actions;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.ClawActionBuilder;
 import org.firstinspires.ftc.teamcode.tools.StateMachine.IntakeActionBuilder;
@@ -82,6 +83,7 @@ public class Robot {
         ////////////////
         startIntakingPixels = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN))
+                .add(intakeActionBuilder.setLEDMode(PixelsDetection.LEDMode.BLINKING))
                 .add(DeadlineAction.waitFor(150, TimeUnit.MILLISECONDS))
                 .add(liftActionBuilder.startMotorWithEncoder(-1))
                 .add(liftActionBuilder.waitUntilLiftTouchDownPressed())
@@ -95,6 +97,7 @@ public class Robot {
                 .add(DeadlineAction.waitFor(150, TimeUnit.MILLISECONDS))
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE))
                 .add(DeadlineAction.waitFor(500, TimeUnit.MILLISECONDS))
+                .add(intakeActionBuilder.setLEDMode(PixelsDetection.LEDMode.SOLID))
                 .add(intakeActionBuilder.startIntakeMotorWithNoEncoder(-1))
                 .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.INTAKE))
                 .add(DeadlineAction.waitFor(150, TimeUnit.MILLISECONDS))
@@ -109,7 +112,8 @@ public class Robot {
                 .add(liftActionBuilder.waitUntilLiftTouchDownPressed())
                 .add(liftActionBuilder.stopLiftMotor())
                 .add(liftActionBuilder.resetLiftMotorEncoder())
-                .add(intakeActionBuilder.startIntakeMotorWithNoEncoder(1));
+                .add(intakeActionBuilder.startIntakeMotorWithNoEncoder(1))
+                .add(intakeActionBuilder.setLEDMode(PixelsDetection.LEDMode.BLINKING));
 
         holdingPixelsToIdle = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN));

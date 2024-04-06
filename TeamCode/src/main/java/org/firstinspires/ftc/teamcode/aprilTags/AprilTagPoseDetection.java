@@ -27,12 +27,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode.aprilTags;
 
 import static org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase.getCenterStageTagLibrary;
 
 import android.util.Size;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -93,8 +94,8 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
-@TeleOp(name="A A Omni Drive To AprilTag")
-public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
+@TeleOp(name="AprilTag Test")
+public class AprilTagPoseDetection extends LinearOpMode
 {
     // Adjust these numbers to suit your robot.
     final double DESIRED_DISTANCE = 5.0; //  this is how close the camera should get to the target (inches)
@@ -118,7 +119,7 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
 
     private static final boolean DETECT_ALL = false;
-    private static final int[] BLUE_DESIRED_TAG_IDS = {1, 2, 3}; // Blue backdrop ids
+    private static final int[] BLUE_DESIRED_TAG_IDS = {2}; // Blue backdrop ids
     private static final int[] RED_DESIRED_TAG_IDS = {4, 5, 6}; // Red backdrop ids
     private final boolean IS_BLUE_SIDE = true;
 
@@ -202,6 +203,8 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
                 telemetry.addData("Range error ",  "%5.1f inches", (desiredTag.ftcPose.range - DESIRED_DISTANCE));
                 telemetry.addData("Heading error","%3.0f degrees", desiredTag.ftcPose.bearing);
                 telemetry.addData("Yaw error","%3.0f degrees", desiredTag.ftcPose.yaw);
+                telemetry.addData("X error","%5.1f inches", desiredTag.ftcPose.x);
+                telemetry.addData("Y error","%5.1finches", desiredTag.ftcPose.y);
             } else {
                 telemetry.addData("\n>","Drive using joysticks to find valid target\n");
             }
@@ -360,6 +363,14 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
             }
         }
         return false;
+    }
+
+    private Pose2d cameraRelativeOffset(AprilTagDetection tag) {
+        double x = tag.ftcPose.x;
+        double y = tag.ftcPose.y;
+        double heading = tag.ftcPose.yaw;
+
+        return new Pose2d(x, y, heading);
     }
 
 }

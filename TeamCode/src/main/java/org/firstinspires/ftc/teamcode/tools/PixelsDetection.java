@@ -32,7 +32,7 @@ public class PixelsDetection {
 
     private final ArrayList<LED> ledsRed = new ArrayList<LED>(4);
     private final ArrayList<LED> ledsGreen = new ArrayList<LED>(4);
-    private LEDMode ledMode = LEDMode.BLINKING;
+    private LEDMode ledMode = LEDMode.SOLID;
     private final Deadline twoPixelsDetectionDelay, blinkingDelay;
     private boolean isLedOnForBlinking = true;
 
@@ -106,7 +106,7 @@ public class PixelsDetection {
         return detectedColor;
     }
 
-    public void SetLEDMode(LEDMode mode) {
+    public void setLEDMode(LEDMode mode) {
         ledMode = mode;
     }
     public boolean hasTwoPixels() {
