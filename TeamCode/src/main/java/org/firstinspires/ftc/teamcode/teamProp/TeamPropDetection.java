@@ -43,11 +43,11 @@ public class TeamPropDetection {
 
     static final double FEET_PER_METER = 3.28084;
 
-    static final Point ORIGIN = new Point(0, 0);
+    public static final Point ORIGIN = new Point(0, 0);
 
     // These correspond to where the team prop is to be in either left, center or right position (in pixels)
-    static final double LEFT_BOUNDING_BOX_X = 300;
-    static final double RIGHT_BOUNDING_BOX_X = 600;
+    public static final double LEFT_BOUNDING_BOX_X = 300;
+    public static final double RIGHT_BOUNDING_BOX_X = 600;
 
 
 
@@ -68,44 +68,5 @@ public class TeamPropDetection {
         NULL
     }
 
-
-
-    public propLocation GetPropLocation() {
-        //telemetry.addLine("X Position is:" + teamPropDetectionPipeline.getLatestPosition().x + "Y Position is:" + teamPropDetectionPipeline.getLatestPosition().y);
-        if (Objects.equals(teamPropDetectionPipeline.getLatestPosition(), ORIGIN)){
-            return propLocation.NULL;
-        }
-        if (teamPropDetectionPipeline.getLatestPosition().x < LEFT_BOUNDING_BOX_X){
-                return propLocation.LEFT;
-            }
-        if (teamPropDetectionPipeline.getLatestPosition().x > RIGHT_BOUNDING_BOX_X){
-                return propLocation.RIGHT;
-            }
-        else {
-                return propLocation.CENTER;
-            }
-    }
-
-    public void Setup(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.telemetry = telemetry;
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
-        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-
-        teamPropDetectionPipeline = new TeamPropDetectionPipeline(fx, fy, cx, cy, telemetry);
-
-        camera.setPipeline(teamPropDetectionPipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                camera.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
-            }
-
-            @Override
-            public void onError(int errorCode) {
-
-            }
-        });
-    }
 
 }

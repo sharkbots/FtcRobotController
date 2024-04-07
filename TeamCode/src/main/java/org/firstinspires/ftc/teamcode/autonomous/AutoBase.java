@@ -4,9 +4,12 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Intake;
+import org.firstinspires.ftc.teamcode.aprilTags.AprilTagPoseDetection;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
@@ -14,6 +17,7 @@ import org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -149,8 +153,8 @@ public abstract class AutoBase extends LinearOpMode {
         Global.telemetry = telemetry;
         Robot robot = new Robot(hardwareMap, gamepad1, gamepad2);
 
-        TeamPropDetection teamPropDetection = new TeamPropDetection();
-        teamPropDetection.Setup(hardwareMap, telemetry);
+//        TeamPropDetection teamPropDetection = new TeamPropDetection();
+        //teamPropDetection.Setup(hardwareMap, telemetry);
         telemetry.setMsTransmissionInterval(50);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
@@ -162,42 +166,59 @@ public abstract class AutoBase extends LinearOpMode {
         // Let's have at list 33% chance to pick it right if nothing works
         TeamPropDetection.propLocation propLoc = TeamPropDetection.propLocation.CENTER;
 
-        /*
-
-        Robot.lift.startLiftMotorWithEncoder(0.5);
-        //Robot.lift.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //Robot.lift.liftMotor.setPower(0.5);
-
-        //noinspection StatementWithEmptyBody
-        while (Robot.lift.getCurrentLiftMotorPosition() < 15*0.95) {
-            // Waiting for lift motor position to reach target
-        }
-        Robot.lift.stopLiftMotor();
-        //Robot.lift.liftMotor.setPower(0);
-
-        Robot.claw.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL);
-        Robot.claw.setPitchPosition(Claw.pitchPositions.INTAKE);
-        Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
-        Robot.planeLauncher.storePlane();
-
-        //Robot.clawGrip.setPosition(Robot.clawCloseOnePixel);
-        //Robot.clawPitch.setPosition(Robot.clawPitchIntake);
-        //Robot.clawYaw.setPosition(Robot.clawYawIntake);
-
-        */
-
         TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
         ArrayList<TrajectorySequence> finalTrajectory;
 
+        AprilTagPoseDetection apriltags = new AprilTagPoseDetection();
+        apriltags.setup(c.isBlueAlliance, hardwareMap);
+
+        apriltags.visionPortal.stopStreaming();
+        apriltags.visionPortal.setProcessorEnabled(apriltags.aprilTag, false);
+        apriltags.visionPortal.setProcessorEnabled(apriltags.teamPropDetectionPipeline, true);
+        apriltags.visionPortal.resumeStreaming();
+
+        // Make sure camera is streaming before we try to set the exposure controls
+        if (apriltags.visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            Global.telemetry.addData("Camera", "Waiting");
+            Global.telemetry.update();
+            while (!isStopRequested() && (apriltags.visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+            Global.telemetry.addData("Camera", "Ready");
+            Global.telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!isStopRequested())
+        {
+            ExposureControl exposureControl = apriltags.visionPortal.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure((long)6, TimeUnit.MILLISECONDS);
+            sleep(20);
+            GainControl gainControl = apriltags.visionPortal.getCameraControl(GainControl.class);
+            gainControl.setGain(250);
+            sleep(20);
+        }
+
+
         while (!isStarted() && !isStopRequested())
         {
-            TeamPropDetection.propLocation currentPropLoc = teamPropDetection.GetPropLocation();
+            TeamPropDetection.propLocation currentPropLoc = apriltags.GetPropLocation();
             if(currentPropLoc!=TeamPropDetection.propLocation.NULL) {
                 propLoc = currentPropLoc;
                 telemetry.addLine("Detected:" + propLoc);
                 telemetry.update();
             }
         }
+
+        apriltags.visionPortal.stopStreaming();
+        apriltags.visionPortal.setProcessorEnabled(apriltags.aprilTag, true);
+        apriltags.visionPortal.setProcessorEnabled(apriltags.teamPropDetectionPipeline, false);
+        apriltags.visionPortal.resumeStreaming();
+
 
         myLocalizer.setPoseEstimate(c.startPose);
         drive.setPoseEstimate(c.startPose); // !!!!!
@@ -212,67 +233,77 @@ public abstract class AutoBase extends LinearOpMode {
             finalTrajectory = trajectoryBuilder.trajectorySequenceRight;
         }
 
+        waitForStart();
+
+        while (!isStopRequested()) {
+            Pose2d robotPose = apriltags.getRobotPosFromTags();
+        Global.telemetry.addData("Robot x position", "%5.1f", robotPose.getX());
+        Global.telemetry.addData("Robot y position", "%5.1f",  robotPose.getY());
+        Global.telemetry.addData("Robot heading position", "%3.0f",  Math.toDegrees(robotPose.getHeading()));
+        Global.telemetry.update();
+        }
+
         //robot.updateSync();
         // Purple on spike mark
-
-
-        // first cycle (yellow preload + white from stack)
-        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
-        do {
-            robot.tryIntakeTwoPixels.run();
-        } while(Robot.intake.pixels.hasTwoPixels());
-
-        robot.holdPixels.run();
-        // go to backdrop
-
-        robot.outTake.run();
-        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
-        Deadline waitFarSide = new Deadline(1, TimeUnit.SECONDS);
-        //noinspection StatementWithEmptyBody
-        while(!waitFarSide.hasExpired()) {
-        }
-        robot.resetOutTake.run();
-
-
-        // second cycle (2 whites from stack)
-        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL4);
-        robot.startIntakingPixels.run();
-        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
-        while(!Robot.intake.pixels.hasTwoPixels()){
-            Robot.intake.pixels.update();
-        }
-        robot.holdPixels.run();
-        robot.outTake.run();
-        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
-        waitFarSide.reset();
-        //noinspection StatementWithEmptyBody
-        while(!waitFarSide.hasExpired()) {
-        }
-        robot.resetOutTake.run();
-
-
-
-        // third cycle (2 whites from stack)
-        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
-        robot.startIntakingPixels.run();
-        while(!robot.intake.pixels.hasTwoPixels()){
-            robot.intake.pixels.update();
-        }
-        robot.holdPixels.run();
-        robot.outTake.run();
-        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
-        waitFarSide.reset();
-        //noinspection StatementWithEmptyBody
-        while(!waitFarSide.hasExpired()) {
-        }
-        robot.resetOutTake.run();
-
-
-
-        AutoDataStorage.currentPose = drive.getPoseEstimate();
-        AutoDataStorage.comingFromAutonomous = true;
-
-        waitForStart();
+//
+//
+//        // first cycle (yellow preload + white from stack)
+//        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+//        do {
+//            robot.tryIntakeTwoPixels.run();
+//        } while(Robot.intake.pixels.hasTwoPixels());
+//
+//        robot.holdPixels.run();
+//        // go to backdrop
+//
+//        robot.outTake.run();
+//        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+//        Deadline waitFarSide = new Deadline(1, TimeUnit.SECONDS);
+//        //noinspection StatementWithEmptyBody
+//        while(!waitFarSide.hasExpired()) {
+//        }
+//        robot.resetOutTake.run();
+//
+//
+//        // second cycle (2 whites from stack)
+//        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL4);
+//        robot.startIntakingPixels.run();
+//        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
+//        while(!Robot.intake.pixels.hasTwoPixels()){
+//            Robot.intake.pixels.update();
+//        }
+//        robot.holdPixels.run();
+//        robot.outTake.run();
+//        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+//        waitFarSide.reset();
+//        //noinspection StatementWithEmptyBody
+//        while(!waitFarSide.hasExpired()) {
+//        }
+//        robot.resetOutTake.run();
+//
+//
+//
+//        // third cycle (2 whites from stack)
+//        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+//        robot.startIntakingPixels.run();
+//        while(!robot.intake.pixels.hasTwoPixels()){
+//            robot.intake.pixels.update();
+//        }
+//        robot.holdPixels.run();
+//        robot.outTake.run();
+//        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+//        waitFarSide.reset();
+//        //noinspection StatementWithEmptyBody
+//        while(!waitFarSide.hasExpired()) {
+//        }
+//        robot.resetOutTake.run();
+//
+//
+//
+//        AutoDataStorage.currentPose = drive.getPoseEstimate();
+//        AutoDataStorage.comingFromAutonomous = true;
+//
+//        waitForStart();
 
 /*
         //Raise lift so the pixel doesn't drag on the ground

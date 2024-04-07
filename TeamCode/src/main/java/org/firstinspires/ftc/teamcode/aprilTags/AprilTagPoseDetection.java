@@ -29,6 +29,9 @@
 
 package org.firstinspires.ftc.teamcode.aprilTags;
 
+import static org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection.LEFT_BOUNDING_BOX_X;
+import static org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection.ORIGIN;
+import static org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection.RIGHT_BOUNDING_BOX_X;
 import static org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase.getCenterStageTagLibrary;
 
 import android.util.Size;
@@ -37,14 +40,13 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection;
+import org.firstinspires.ftc.teamcode.teamProp.TeamPropDetectionPipeline;
 import org.firstinspires.ftc.teamcode.tools.Global;
 import org.firstinspires.ftc.teamcode.tools.math.Pose2dGeometry;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -54,6 +56,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /*
@@ -121,14 +124,15 @@ public class AprilTagPoseDetection
     private static final int[] RED_DESIRED_TAG_IDS = {4, 5, 6}; // Red backdrop ids
     private boolean IS_BLUE_SIDE = true;
 
-    private VisionPortal visionPortal;               // Used to manage the video source.
-    private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
+    public VisionPortal visionPortal;               // Used to manage the video source.
+    public AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
+    public TeamPropDetectionPipeline teamPropDetectionPipeline;
 
     private final AprilTagLibrary centerStageTags = getCenterStageTagLibrary();
 
     
 
-    private Pose2d getRobotPosFromTags() {
+    public Pose2d getRobotPosFromTags() {
         // Step through the list of detected tags and look for a matching tag
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -173,14 +177,37 @@ public class AprilTagPoseDetection
         }
     }
 
+
+
+    public TeamPropDetection.propLocation GetPropLocation() {
+        //telemetry.addLine("X Position is:" + teamPropDetectionPipeline.getLatestPosition().x + "Y Position is:" + teamPropDetectionPipeline.getLatestPosition().y);
+        if (Objects.equals(teamPropDetectionPipeline.getLatestPosition(), ORIGIN)){
+            return TeamPropDetection.propLocation.NULL;
+        }
+        if (teamPropDetectionPipeline.getLatestPosition().x < LEFT_BOUNDING_BOX_X){
+            return TeamPropDetection.propLocation.LEFT;
+        }
+        if (teamPropDetectionPipeline.getLatestPosition().x > RIGHT_BOUNDING_BOX_X){
+            return TeamPropDetection.propLocation.RIGHT;
+        }
+        else {
+            return TeamPropDetection.propLocation.CENTER;
+        }
+    }
     /**
      * Initialize the AprilTag processor.
      */
-    private void setup(Boolean isBlueSide, HardwareMap hardwareMap) {
+    public void setup(Boolean isBlueSide, HardwareMap hardwareMap) {
         this.IS_BLUE_SIDE = isBlueSide;
 
         // Create the AprilTag processor by using a builder.
         aprilTag = new AprilTagProcessor.Builder().build();
+        // You will need to do your own calibration for other configurations!
+        double fx = 578.272;
+        double fy = 578.272;
+        double cx = 402.145;
+        double cy = 221.506;
+        teamPropDetectionPipeline = new TeamPropDetectionPipeline(fx, fy, cx, cy, Global.telemetry);
 
         // Adjust Image Decimation to trade-off detection-range for detection-rate.
         // eg: Some typical detection data using a Logitech C920 WebCam
@@ -196,6 +223,7 @@ public class AprilTagPoseDetection
             visionPortal = new VisionPortal.Builder()
                     .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                     .addProcessor(aprilTag)
+                    .addProcessor(teamPropDetectionPipeline)
                     .setLiveViewContainerId(hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName()))
                     .setCameraResolution(new Size(800, 600))
                     .enableLiveView(true)
@@ -208,8 +236,6 @@ public class AprilTagPoseDetection
                     .build();
         }
 
-        if (USE_WEBCAM)
-            setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
 
         // Wait for driver to press start
         Global.telemetry.addData("Camera preview on/off", "3 dots, Camera Stream");
@@ -217,43 +243,6 @@ public class AprilTagPoseDetection
         Global.telemetry.update();
     }
 
-    /*
-     Manually set the camera gain and exposure.
-     This can only be called AFTER calling initAprilTag(), and only works for Webcams;
-    */
-    private void    setManualExposure(int exposureMS, int gain) {
-        // Wait for the camera to be open, then use the controls
-
-        if (visionPortal == null) {
-            return;
-        }
-
-        // Make sure camera is streaming before we try to set the exposure controls
-        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            Global.telemetry.addData("Camera", "Waiting");
-            Global.telemetry.update();
-            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
-                sleep(20);
-            }
-            Global.telemetry.addData("Camera", "Ready");
-            Global.telemetry.update();
-        }
-
-        // Set camera controls unless we are stopping.
-        if (!isStopRequested())
-        {
-            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
-            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
-                exposureControl.setMode(ExposureControl.Mode.Manual);
-                sleep(50);
-            }
-            exposureControl.setExposure((long)exposureMS, TimeUnit.MILLISECONDS);
-            sleep(20);
-            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
-            gainControl.setGain(gain);
-            sleep(20);
-        }
-    }
 
     private boolean isDesiredTag(int tagId) {
         if (IS_BLUE_SIDE) {
@@ -273,25 +262,25 @@ public class AprilTagPoseDetection
     }
 
     private Pose2d getRobotPoseFromTag(AprilTagDetection tag){
-        Global.telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
+//        Global.telemetry.addData("Found", "ID %d (%s)", tag.id, tag.metadata.name);
 
         Global.telemetry.addLine();
         Pose2d cameraRelativeOffset = getCameraRelativeOffset(tag);
-
-        Global.telemetry.addData("Heading error","%3.0f degrees", tag.ftcPose.bearing);
-        Global.telemetry.addData("Yaw error","%3.0f degrees", tag.ftcPose.yaw);
-        Global.telemetry.addData("X error","%5.1f inches", cameraRelativeOffset.getX());
-        Global.telemetry.addData("Y error","%5.1finches", cameraRelativeOffset.getY());
+//
+//        Global.telemetry.addData("Heading error","%3.0f degrees", tag.ftcPose.bearing);
+//        Global.telemetry.addData("Yaw error","%3.0f degrees", tag.ftcPose.yaw);
+//        Global.telemetry.addData("X error","%5.1f inches", cameraRelativeOffset.getX());
+//        Global.telemetry.addData("Y error","%5.1finches", cameraRelativeOffset.getY());
 
         Pose2d robotRelativeOffset = getRobotRelativeOffset(cameraRelativeOffset);
-        Global.telemetry.addLine();
-        Global.telemetry.addData("Robot relative offset", " x: %5.1f  , y: %5.1f , heading: %3.0f",
-                robotRelativeOffset.getX(), robotRelativeOffset.getY(), Math.toDegrees(robotRelativeOffset.getHeading()));
+//        Global.telemetry.addLine();
+//        Global.telemetry.addData("Robot relative offset", " x: %5.1f  , y: %5.1f , heading: %3.0f",
+//                robotRelativeOffset.getX(), robotRelativeOffset.getY(), Math.toDegrees(robotRelativeOffset.getHeading()));
 
         Pose2d robotPose = getRobotPositionFromOffset(robotRelativeOffset, tag);
-        Global.telemetry.addData("Robot x position", "%5.1f", robotPose.getX());
-        Global.telemetry.addData("Robot y position", "%5.1f",  robotPose.getY());
-        Global.telemetry.addData("Robot heading position", "%3.0f",  Math.toDegrees(robotPose.getHeading()));
+//        Global.telemetry.addData("Robot x position", "%5.1f", robotPose.getX());
+//        Global.telemetry.addData("Robot y position", "%5.1f",  robotPose.getY());
+//        Global.telemetry.addData("Robot heading position", "%3.0f",  Math.toDegrees(robotPose.getHeading()));
         return robotPose;
     }
 
