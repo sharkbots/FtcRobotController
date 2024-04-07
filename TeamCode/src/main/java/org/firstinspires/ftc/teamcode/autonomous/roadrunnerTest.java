@@ -225,9 +225,12 @@ public class roadrunnerTest extends LinearOpMode {
 
         drive.followTrajectorySequence(stackSetup1);
 
-        robot.tryIntakeTwoPixels.runAsync();
-
+        robot.startIntakingPixels.runAsync();
         drive.followTrajectorySequence(intakeStack1);
+
+        robot.tryIntakeTwoPixels.run();
+
+
 
         while(!robot.intake.pixels.hasTwoPixels()) {
             robot.intake.pixels.update();

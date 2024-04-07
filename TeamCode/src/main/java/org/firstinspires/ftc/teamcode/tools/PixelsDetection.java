@@ -110,7 +110,7 @@ public class PixelsDetection {
         ledMode = mode;
     }
     public boolean hasTwoPixels() {
-        // Add delay before acknoledging two pixels are in
+        // Add delay before acknowledging two pixels are in
         // Gives time to the intake getting the pixels really in
         // or avoid false positive signal on a passing first pixel through
         return  twoPixelsDetectionDelay.hasExpired() && hasTwoPixelsRaw();

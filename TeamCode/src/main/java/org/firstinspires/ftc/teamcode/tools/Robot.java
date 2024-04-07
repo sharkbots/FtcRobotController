@@ -149,7 +149,6 @@ public class Robot {
         // AUTONOMOUS //
         ////////////////
         tryIntakeTwoPixels = new Actions()
-                .add(startIntakingPixels)
                 .add(intakeActionBuilder.waitForTwoPixelsOrTimeout(5, TimeUnit.SECONDS));
 
         tryIntakeOnePixel = new Actions()

@@ -207,7 +207,7 @@ public class PedroTest extends LinearOpMode {
 
         telemetryA.addLine("Good to start, go for it.");
         telemetryA.update();
-        Global.telemetry.speak("SHARKBOTS IS ALIVE");
+        Global.telemetry.speak("SHARKBOTS is ALIVE");
 
     }
 

@@ -53,6 +53,16 @@ public class Actions {
         return new MyAsyncRunnable();
     }
 
+    public Runnable getRunnable(){
+        class MyAsyncRunnable implements Runnable {
+            @Override
+            public void run() {
+                Actions.this.run();
+            }
+        }
+        return new MyAsyncRunnable();
+    }
+
     public boolean isComplete() {
         // Iterate through all actions to see if they are complete
         for (; currentActionIndex < actionList.size(); currentActionIndex++) {

@@ -1,15 +1,23 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.aprilTags.AprilTagPoseDetection;
+import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
@@ -24,8 +32,13 @@ import java.util.concurrent.TimeUnit;
 
 //@Autonomous(name="Autonomous Base")
 public abstract class AutoBase extends LinearOpMode {
+    private Telemetry telemetryA;
 
-    protected StandardTrackingWheelLocalizer myLocalizer;
+    private Follower follower;
+
+    private PathChain empty, purpleDrop, purpleToLeftSideStackSetup, goToBackdropCenterThroughCenterTruss, goToStackSetupThroughCenterTrussFromCenterBackdrop,goToStackSetupThroughCenterTrussFromLeftBackdrop, goToStackSetupThroughCenterTrussFromRightBackdrop, goToBackdropLeftThroughCenterTruss, goToBackdropRightThroughCenterTruss, backdropToLeftSideStack, park;
+    private Deadline timer;
+    Robot robot;
 
     public static class Coordinates{
         Boolean isBlueAlliance;
@@ -60,6 +73,26 @@ public abstract class AutoBase extends LinearOpMode {
         Vector2d prepareFarDrop = new Vector2d(-37, 59);
 
         Vector2d backdropIntermediateFar = new Vector2d(18, 59);
+
+
+        // Side stacks
+        Pose2d stackCenter = new Pose2d(-56, 24, Math.toRadians(180));
+        Pose2d stackCenterSetup = new Pose2d(stackCenter.getX()+10, stackCenter.getY(), stackCenter.getHeading());
+
+        Pose2d stackLeft = new Pose2d(-57, 36, stackCenter.getHeading());
+        Pose2d stackLeftSetup = new Pose2d(-48, 36, stackLeft.getHeading());
+
+
+        Pose2d stackRight = new Pose2d(stackCenter.getX(), stackCenter.getY()-12, stackCenter.getHeading());
+        Pose2d stackRightSetup = new Pose2d(stackRight.getX()+10, stackRight.getY(), stackRight.getHeading());
+
+
+
+        Pose2d purpleToStackLeftControlPoint = new Pose2d(-36, 36);
+
+        // To Backdrop
+        Pose2d centerTruss = new Pose2d(-14, 36);
+        Pose2d centerTrussToBackDropControlPoint = new Pose2d(30, 36);
 
 
         public Coordinates(Boolean isBlueAlliance, Boolean isNearSide) {
@@ -147,27 +180,98 @@ public abstract class AutoBase extends LinearOpMode {
 
     abstract void Setup();
 
+
+    private PathChain goToBackdropThroughCenterTruss(Pose2d backdropPosition) {
+        return follower.pathBuilder()
+                .addPath(new BezierLine(new Point(c.stackLeft), new Point(c.centerTruss)))
+                .addParametricCallback(0.8, robot.outTake.getAsyncRunnable())
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .addPath(new BezierCurve(new Point(c.centerTruss), new Point(c.centerTrussToBackDropControlPoint), new Point(backdropPosition)))
+                //.addParametricCallback(0.2, )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
+    }
+
+    private PathChain goToStackSetupThroughCenterTruss(Pose2d backdropPosition) {
+        return follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(backdropPosition), new Point(c.centerTrussToBackDropControlPoint), new Point(c.centerTruss)))
+                .addParametricCallback(0.1, robot.resetOutTake.getAsyncRunnable())
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .addPath(new BezierLine(new Point(c.centerTruss), new Point(c.stackLeftSetup)))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
+    }
+
+    private enum STACK_POSITIONS{LEFT, CENTER, RIGHT}
+    private PathChain intakeFromStack(AutoBase.STACK_POSITIONS position){
+        Pose2d setup = new Pose2d(), stack = new Pose2d();
+        if (position == AutoBase.STACK_POSITIONS.LEFT){
+            stack = c.stackLeft;
+            setup = c.stackLeftSetup;
+        }
+        if (position == AutoBase.STACK_POSITIONS.CENTER){
+            stack = c.stackCenter;
+            setup = c.stackCenterSetup;
+        }
+        if (position == AutoBase.STACK_POSITIONS.RIGHT){
+            stack = c.stackRight;
+            setup = c.stackRightSetup;
+        }
+        return follower.pathBuilder()
+                .addPath(new BezierLine(new Point(setup), new Point(stack)))
+                .addParametricCallback(0.2, robot.startIntakingPixels.getRunnable())
+                .setPathEndVelocityConstraint(5)
+                .build();
+    }
     @Override
     public void runOpMode() throws InterruptedException {
         Setup();
+
+
         Global.telemetry = telemetry;
-        Robot robot = new Robot(hardwareMap, gamepad1, gamepad2);
+        robot = new Robot(hardwareMap, gamepad1, gamepad2);
 
 //        TeamPropDetection teamPropDetection = new TeamPropDetection();
         //teamPropDetection.Setup(hardwareMap, telemetry);
         telemetry.setMsTransmissionInterval(50);
 
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        // hardware map for odometry encoders
-        myLocalizer = new StandardTrackingWheelLocalizer(hardwareMap, null, null);
-        // start location (coordinate)
+
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+
+        follower = new Follower(hardwareMap);
+
+        telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        follower.setStartingPose(c.startPose);
+
+        purpleDrop = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(c.startPose), new Point(c.centerTeamProp)))
+                .setConstantHeadingInterpolation(Math.toRadians(90))
+                .build();
+
+        purpleToLeftSideStackSetup = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(c.centerTeamProp), new Point(c.purpleToStackLeftControlPoint), new Point(c.stackLeftSetup)))
+                .setPathEndHeadingConstraint(Math.toRadians(180))
+                .build();
+
+        goToBackdropCenterThroughCenterTruss = goToBackdropThroughCenterTruss(c.backdropCenter);
+        goToBackdropLeftThroughCenterTruss = goToBackdropThroughCenterTruss(c.backdropLeft);
+        goToBackdropRightThroughCenterTruss = goToBackdropThroughCenterTruss(c.backdropRight);
+
+        goToStackSetupThroughCenterTrussFromCenterBackdrop = goToStackSetupThroughCenterTruss(c.backdropCenter);
+        goToStackSetupThroughCenterTrussFromLeftBackdrop = goToStackSetupThroughCenterTruss(c.backdropLeft);
+        goToStackSetupThroughCenterTrussFromRightBackdrop = goToStackSetupThroughCenterTruss(c.backdropRight);
+
+        telemetryA.addLine("Good to start, go for it.");
+        telemetryA.update();
+        Global.telemetry.speak("sharkbots is alive");
 
 
         // Let's have at list 33% chance to pick it right if nothing works
         TeamPropDetection.propLocation propLoc = TeamPropDetection.propLocation.CENTER;
 
-        TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
-        ArrayList<TrajectorySequence> finalTrajectory;
+//        TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
+//        ArrayList<TrajectorySequence> finalTrajectory;
 
         AprilTagPoseDetection apriltags = new AprilTagPoseDetection();
         apriltags.setup(c.isBlueAlliance, hardwareMap);
@@ -220,139 +324,48 @@ public abstract class AutoBase extends LinearOpMode {
         apriltags.visionPortal.resumeStreaming();
 
 
-        myLocalizer.setPoseEstimate(c.startPose);
-        drive.setPoseEstimate(c.startPose); // !!!!!
-
-        if (propLoc == TeamPropDetection.propLocation.LEFT) {
-            finalTrajectory = trajectoryBuilder.trajectorySequenceLeft;
-        }
-        else if (propLoc == TeamPropDetection.propLocation.CENTER) {
-            finalTrajectory = trajectoryBuilder.trajectorySequenceCenter;
-        }
-        else {
-            finalTrajectory = trajectoryBuilder.trajectorySequenceRight;
-        }
+//        myLocalizer.setPoseEstimate(c.startPose);
+//        drive.setPoseEstimate(c.startPose); // !!!!!
+//
+//        if (propLoc == TeamPropDetection.propLocation.LEFT) {
+//            finalTrajectory = trajectoryBuilder.trajectorySequenceLeft;
+//        }
+//        else if (propLoc == TeamPropDetection.propLocation.CENTER) {
+//            finalTrajectory = trajectoryBuilder.trajectorySequenceCenter;
+//        }
+//        else {
+//            finalTrajectory = trajectoryBuilder.trajectorySequenceRight;
+//        }
 
         waitForStart();
 
-        while (!isStopRequested()) {
-            Pose2d robotPose = apriltags.getRobotPosFromTags();
-        Global.telemetry.addData("Robot x position", "%5.1f", robotPose.getX());
-        Global.telemetry.addData("Robot y position", "%5.1f",  robotPose.getY());
-        Global.telemetry.addData("Robot heading position", "%3.0f",  Math.toDegrees(robotPose.getHeading()));
-        Global.telemetry.update();
-        }
-
-        //robot.updateSync();
-        // Purple on spike mark
-//
-//
-//        // first cycle (yellow preload + white from stack)
-//        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
-//        do {
-//            robot.tryIntakeTwoPixels.run();
-//        } while(Robot.intake.pixels.hasTwoPixels());
-//
-//        robot.holdPixels.run();
-//        // go to backdrop
-//
-//        robot.outTake.run();
-//        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
-//        Deadline waitFarSide = new Deadline(1, TimeUnit.SECONDS);
-//        //noinspection StatementWithEmptyBody
-//        while(!waitFarSide.hasExpired()) {
-//        }
-//        robot.resetOutTake.run();
-//
-//
-//        // second cycle (2 whites from stack)
-//        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL4);
-//        robot.startIntakingPixels.run();
-//        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
-//        while(!Robot.intake.pixels.hasTwoPixels()){
-//            Robot.intake.pixels.update();
-//        }
-//        robot.holdPixels.run();
-//        robot.outTake.run();
-//        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
-//        waitFarSide.reset();
-//        //noinspection StatementWithEmptyBody
-//        while(!waitFarSide.hasExpired()) {
-//        }
-//        robot.resetOutTake.run();
-//
-//
-//
-//        // third cycle (2 whites from stack)
-//        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
-//        robot.startIntakingPixels.run();
-//        while(!robot.intake.pixels.hasTwoPixels()){
-//            robot.intake.pixels.update();
-//        }
-//        robot.holdPixels.run();
-//        robot.outTake.run();
-//        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
-//        waitFarSide.reset();
-//        //noinspection StatementWithEmptyBody
-//        while(!waitFarSide.hasExpired()) {
-//        }
-//        robot.resetOutTake.run();
-//
-//
-//
-//        AutoDataStorage.currentPose = drive.getPoseEstimate();
-//        AutoDataStorage.comingFromAutonomous = true;
-//
-//        waitForStart();
-
-/*
-        //Raise lift so the pixel doesn't drag on the ground
-        robot.autoOutTakeYellowLow.run();
-
-        // Deposit purple pixel on spike mark
-        drive.followTrajectorySequence(finalTrajectory.get(0));
-
-        // Raise lift more + angle the claw to outtake
-        if(c.isNearSide) {
-            robot.autoOutTakeYellow.runAsync();
-        }
-        else {
-            Deadline waitFarSide = new Deadline(9, TimeUnit.SECONDS);
-            //noinspection StatementWithEmptyBody
-            while(!waitFarSide.hasExpired()) {
-            }
-        }
-        // Position the robot in front of the backdrop
-        drive.followTrajectorySequence(finalTrajectory.get(1));
-
-        if(!c.isNearSide) {
-
-            if(propLoc == TeamPropDetection.propLocation.CENTER)
-                robot.autoOutTakeYellowHigh.runAsync();
-            else {
-                robot.autoOutTakeYellow.runAsync();
-
-            }
-
-        }
-
-        // Go to the backdrop
-        drive.followTrajectorySequence(finalTrajectory.get(2));
-
-        // Drop yellow pixel
-        robot.autonomousOpenClaw.run();
-
-        // Park
-        robot.exitingOutTakeToIdle.runAsync();
-        drive.followTrajectorySequence(finalTrajectory.get(3));
 
 
-        AutoDataStorage.currentPose = drive.getPoseEstimate();
-        AutoDataStorage.comingFromAutonomous = true;
 
-        waitForStart();
-*/
+        follower.run(purpleDrop);
+
+        follower.run(purpleToLeftSideStackSetup);
+
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+
+        follower.run(intakeFromStack(AutoBase.STACK_POSITIONS.LEFT));
+
+        robot.tryIntakeTwoPixels.run();
+
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+
+
+        robot.holdPixels.run();
+
+        follower.run(goToBackdropCenterThroughCenterTruss, true);
+        follower.setPose(apriltags.getRobotPosFromTags());
+
+        robot.openClaw.run();
+
+
+
+        follower.run(goToStackSetupThroughCenterTrussFromCenterBackdrop, true);
+
     }
-
 
 }
