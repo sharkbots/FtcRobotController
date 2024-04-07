@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
+import org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
@@ -39,6 +40,10 @@ public abstract class AutoBase extends LinearOpMode {
     private PathChain empty, purpleDrop, purpleToLeftSideStackSetup, goToBackdropCenterThroughCenterTruss, goToStackSetupThroughCenterTrussFromCenterBackdrop,goToStackSetupThroughCenterTrussFromLeftBackdrop, goToStackSetupThroughCenterTrussFromRightBackdrop, goToBackdropLeftThroughCenterTruss, goToBackdropRightThroughCenterTruss, backdropToLeftSideStack, park;
     private Deadline timer;
     Robot robot;
+
+    protected StandardTrackingWheelLocalizer myLocalizer;
+    SampleMecanumDrive drive;
+
 
     public static class Coordinates{
         Boolean isBlueAlliance;
@@ -238,6 +243,53 @@ public abstract class AutoBase extends LinearOpMode {
 
         Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
 
+
+        drive = new SampleMecanumDrive(hardwareMap);
+        // hardware map for odometry encoders
+        myLocalizer = new StandardTrackingWheelLocalizer(hardwareMap, null, null);
+        // start location (coordinate)
+
+
+        TrajectorySequence purpleDrop = drive.trajectorySequenceBuilder(c.startPose)
+                .lineToLinearHeading(c.centerTeamProp)
+                .build();
+
+        TrajectorySequence stackSetup1 = drive.trajectorySequenceBuilder(purpleDrop.end())
+                .forward(2)
+                .splineToLinearHeading(c.stackLeftSetup, Math.toRadians(180))
+                .build();
+
+        TrajectorySequence intakeStack1 = drive.trajectorySequenceBuilder(stackSetup1.end())
+                .lineToLinearHeading(c.stackLeft)
+                .build();
+
+        TrajectorySequence goToBackdrop1 = drive.trajectorySequenceBuilder(intakeStack1.end())
+                .lineToLinearHeading(c.backdropCenter, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();
+
+        TrajectorySequence stackSetup2 = drive.trajectorySequenceBuilder(goToBackdrop1.end())
+                // Readjusts
+                .lineToLinearHeading(new Pose2d(c.backdropCenter.getX()+0.1, c.backdropCenter.getY(), c.backdropCenter.getHeading()))
+                .lineToLinearHeading(c.stackLeftSetup, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();
+
+        TrajectorySequence intakeStack2 = drive.trajectorySequenceBuilder(stackSetup2.end())
+                .lineToLinearHeading(new Pose2d(c.stackLeft.getX()-1, c.stackLeft.getY(), c.stackLeft.getHeading()))
+                .build();
+
+        TrajectorySequence goToBackdrop2 = drive.trajectorySequenceBuilder(intakeStack2.end())
+                .lineToLinearHeading(new Pose2d(c.stackLeft.getX()+0.1, c.stackLeft.getY(), c.stackLeft.getHeading()))
+                .lineToLinearHeading(c.backdropCenter, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();
+
+        TrajectorySequence cycle2Dropoff = drive.trajectorySequenceBuilder(intakeStack2.end())
+                .strafeLeft(7)
+                .build();
+
+        /*
         follower = new Follower(hardwareMap);
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -261,7 +313,7 @@ public abstract class AutoBase extends LinearOpMode {
         goToStackSetupThroughCenterTrussFromCenterBackdrop = goToStackSetupThroughCenterTruss(c.backdropCenter);
         goToStackSetupThroughCenterTrussFromLeftBackdrop = goToStackSetupThroughCenterTruss(c.backdropLeft);
         goToStackSetupThroughCenterTrussFromRightBackdrop = goToStackSetupThroughCenterTruss(c.backdropRight);
-
+*/
         telemetryA.addLine("Good to start, go for it.");
         telemetryA.update();
         Global.telemetry.speak("sharkbots is alive");
@@ -339,10 +391,84 @@ public abstract class AutoBase extends LinearOpMode {
 
         waitForStart();
 
+        drive.followTrajectorySequence(purpleDrop);
+
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+
+        drive.followTrajectorySequence(stackSetup1);
+
+        robot.startIntakingPixels.runAsync();
+        drive.followTrajectorySequence(intakeStack1);
+
+        robot.tryIntakeTwoPixels.run();
 
 
 
-        follower.run(purpleDrop);
+        while(!robot.intake.pixels.hasTwoPixels()) {
+            robot.intake.pixels.update();
+        }
+
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+        robot.holdPixels.run();
+
+        drive.followTrajectorySequence(goToBackdrop1);
+        robot.outTakeSetClawYawRightHorizontal.run();
+        Deadline deadline1 = new Deadline(500, TimeUnit.MILLISECONDS);
+        while(!deadline1.hasExpired()){
+
+        }
+
+        robot.openClaw.run();
+        Deadline deadline2 = new Deadline(250, TimeUnit.MILLISECONDS);
+        while(!deadline2.hasExpired()){
+
+        }
+        drive.setPoseEstimate(apriltags.getRobotPosFromTags());
+
+        robot.resetOutTake.runAsync();
+
+        drive.followTrajectorySequence(stackSetup2);
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+        robot.startIntakingPixels.runAsync();
+        drive.followTrajectorySequence(intakeStack2);
+
+        robot.tryIntakeTwoPixels.run();
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL4);
+        deadline2.reset();
+        while(!deadline2.hasExpired())
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
+
+
+
+        while(!robot.intake.pixels.hasTwoPixels()) {
+            robot.intake.pixels.update();
+        }
+
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+        robot.holdPixels.run();
+
+        drive.followTrajectorySequence(goToBackdrop2);
+        robot.outTakeSetClawYawRightHorizontal.run();
+        deadline1.reset();
+        while(!deadline1.hasExpired()){
+
+        }
+
+        robot.openClaw.run();
+        deadline2.reset();
+        while(!deadline2.hasExpired()){
+
+        }
+
+        /*Deadline deadline21 = new Deadline(5, TimeUnit.SECONDS);
+        while(!deadline21.hasExpired()){
+
+        }*/
+
+
+
+
+        /*follower.run(purpleDrop);
 
         follower.run(purpleToLeftSideStackSetup);
 
@@ -364,7 +490,7 @@ public abstract class AutoBase extends LinearOpMode {
 
 
 
-        follower.run(goToStackSetupThroughCenterTrussFromCenterBackdrop, true);
+        follower.run(goToStackSetupThroughCenterTrussFromCenterBackdrop, true);*/
 
     }
 
