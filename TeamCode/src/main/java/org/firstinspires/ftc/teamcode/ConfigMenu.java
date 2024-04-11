@@ -34,7 +34,7 @@ public class ConfigMenu {
         sm.setInitialState(navigateMenu);
 
         navigateMenu.addTransitionTo(editMenuItem, buttons.handlerA::Pressed, new Action("enterEdit", this::backupCurrentField));
-        editMenuItem.addTransitionTo(navigateMenu, buttons.handlerA::Pressed, new Action("nextMenuItem", ()->true));
+        editMenuItem.addTransitionTo(navigateMenu, buttons.handlerA::Pressed, new Action("nextMenuItem", ()->{fieldBackup=null; return true;}));
         editMenuItem.addTransitionTo(navigateMenu, buttons.handlerX::Pressed, new Action("nextMenuItem", this::restoreCurrentField));
 
         navigateMenu.addTransitionTo(navigateMenu, buttons.handlerDPad_Down::Pressed, new Action("nextMenuItem", this::nextMenuItem));
