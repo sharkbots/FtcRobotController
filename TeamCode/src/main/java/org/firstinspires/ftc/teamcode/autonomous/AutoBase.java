@@ -51,7 +51,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         //Blue near side
         Pose2d startPose = new Pose2d(12, 62, Math.toRadians(90.0));
-        Pose2d leftTeamProp = new Pose2d(20, 38, Math.toRadians(90.0));
+        Pose2d leftTeamProp = new Pose2d(20, 38, Math.toRadians(180.0));
         Pose2d centerTeamProp = new Pose2d(12, 32, Math.toRadians(90.00));
         Pose2d rightTeamProp = new Pose2d(9, 32, Math.toRadians(0.00));
 
@@ -81,6 +81,9 @@ public abstract class AutoBase extends LinearOpMode {
 
 
         // Side stacks
+        Vector2d purpleDropToStackPreSetup = new Vector2d(-39.0, 45.0);
+        Pose2d purpleDropToStackSetup = new Pose2d(-51, 51, Math.toRadians(180));
+
         Pose2d stackCenter = new Pose2d(-56, 24, Math.toRadians(180));
         Pose2d stackCenterSetup = new Pose2d(stackCenter.getX()+10, stackCenter.getY(), stackCenter.getHeading());
 
@@ -137,6 +140,16 @@ public abstract class AutoBase extends LinearOpMode {
                 parkInCorner = flipVectorAcrossX(parkInCorner);
                 parkBetweenBackdrops = flipVectorAcrossX(parkBetweenBackdrops);
                 backdropIntermediateFar = flipVectorAcrossX(backdropIntermediateFar);
+
+                purpleDropToStackPreSetup = flipVectorAcrossX(purpleDropToStackPreSetup);
+                purpleDropToStackSetup = flipAcrossX(purpleDropToStackSetup);
+
+                stackCenter = flipAcrossX(stackCenter);
+                stackCenterSetup = flipAcrossX(stackCenterSetup);
+                stackLeft = flipAcrossX(stackLeft);
+                stackLeftSetup = flipAcrossX(stackLeftSetup);
+                stackRight = flipAcrossX(stackRight);
+                stackRightSetup = flipAcrossX(stackRightSetup);
 
                 AutoDataStorage.redSide = true;
 

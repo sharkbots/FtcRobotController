@@ -50,6 +50,8 @@ public class TrajectoryBuilder {
         }
 
         assert drive != null;
+
+        // ACTION 0: Drop pixel on spike mark
         TrajectorySequenceBuilder purpleDropBuilder = drive.trajectorySequenceBuilder(c.startPose);
         if (c.startPose.getHeading()!=teamPropCoordinate.getHeading()) { // RIGHT case but could be other rotations in the future
             purpleDropBuilder = purpleDropBuilder.back(20);
@@ -59,9 +61,64 @@ public class TrajectoryBuilder {
         finalTrajectory.add(purpleDrop); //get 0
 
 
-        TrajectorySequence setupForBackdropNear = drive.trajectorySequenceBuilder(purpleDrop.end())
-                .lineTo(c.setupForBackdrop)
-                .build();
+        // ACTION 1: setup for backdrop / setup to get pixel from stack
+        // near side
+        TrajectorySequenceBuilder setupForBackdropNearBuilder = drive.trajectorySequenceBuilder(purpleDrop.end())
+                .lineTo(c.setupForBackdrop);
+        TrajectorySequence setupForBackdropNear = setupForBackdropNearBuilder.build();
+
+        // far side
+        TrajectorySequenceBuilder purpleDropToStackSetupBuilder = drive.trajectorySequenceBuilder(purpleDrop.end());
+        if (propLoc == propLocations.RIGHT) {
+            purpleDropToStackSetupBuilder = purpleDropToStackSetupBuilder.lineTo(c.purpleDropToStackPreSetup);
+        }
+        // lineToLinearHeading might not be possible here for right pos, lineTo + turn
+        purpleDropToStackSetupBuilder = purpleDropToStackSetupBuilder.lineToLinearHeading(c.purpleDropToStackSetup);
+        TrajectorySequence purpleDropToStackSetup = purpleDropToStackSetupBuilder.build();
+
+        Pose2d endPurpleDrop;
+        if (c.isNearSide) {
+            finalTrajectory.add(setupForBackdropNear);
+            endPurpleDrop = setupForBackdropNear.end();
+        } else{
+            finalTrajectory.add(purpleDropToStackSetup);
+            endPurpleDrop = purpleDropToStackSetup.end();
+        } // get 1
+
+
+        // ACTION 2: go to backdrop / go to stacks (from Purple Drop)
+        // near side
+        TrajectorySequenceBuilder goToBackdropBuilder = drive.trajectorySequenceBuilder(endPurpleDrop)
+                .lineToSplineHeading(backdropIntermediateCoordinate)
+                .lineToLinearHeading(backdropCoordinate);
+
+        if (c.startPose.getHeading()!=teamPropCoordinate.getHeading()) {
+            if (c.isBlueAlliance) {
+                goToBackdropBuilder = goToBackdropBuilder.strafeLeft(4);
+            } else {
+                goToBackdropBuilder = goToBackdropBuilder.strafeRight(6);
+            }
+        }
+        TrajectorySequence goToBackdrop = goToBackdropBuilder.build();
+
+        // far side
+        TrajectorySequenceBuilder goToStackPDSetupBuilder = drive.trajectorySequenceBuilder(endPurpleDrop)
+                .lineToLinearHeading(c.stackLeftSetup);
+        TrajectorySequence goToStackPDSetup = goToStackPDSetupBuilder.build();
+
+        TrajectorySequenceBuilder goToStackBuilder = drive.trajectorySequenceBuilder(endPurpleDrop)
+                .lineToLinearHeading(c.stackLeft);
+        TrajectorySequence goToStack = goToStackBuilder.build();
+
+        if (c.isNearSide) {
+            finalTrajectory.add(goToBackdrop); // get 1
+        } else{
+            finalTrajectory.add(goToStackPDSetup); // get 1
+            finalTrajectory.add(goToStack); // get
+        }
+
+
+
 
         TrajectorySequence setupForBackdropFar = drive.trajectorySequenceBuilder(purpleDrop.end())
                 .forward(8)
@@ -71,17 +128,8 @@ public class TrajectoryBuilder {
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
-        Pose2d endPurpledrop;
-        if (c.isNearSide) {
-            finalTrajectory.add(setupForBackdropNear);
-            endPurpledrop = setupForBackdropNear.end();
-        } else{
-            finalTrajectory.add(setupForBackdropFar);
-            endPurpledrop = setupForBackdropFar.end();
-        } // get 1
-
-        TrajectorySequence goToBackdrop;
-        TrajectorySequenceBuilder goToBackdropBuilder = drive.trajectorySequenceBuilder(endPurpledrop);
+        /*
+        TrajectorySequenceBuilder goToBackdropBuilder = drive.trajectorySequenceBuilder(endPurpleDrop);
         if (c.isNearSide) {
             goToBackdropBuilder = goToBackdropBuilder
                     .lineToSplineHeading(backdropIntermediateCoordinate)
@@ -117,8 +165,8 @@ public class TrajectoryBuilder {
                 }
             }
         }
-        goToBackdrop = goToBackdropBuilder.build();
-        finalTrajectory.add(goToBackdrop); // get 2
+        TrajectorySequence goToBackdrop = goToBackdropBuilder.build();
+        finalTrajectory.add(goToBackdrop); // get 2*/
 
         TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdrop.end())
                 .lineTo(c.parkInCorner)
