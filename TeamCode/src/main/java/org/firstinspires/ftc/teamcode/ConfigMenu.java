@@ -14,6 +14,8 @@ public class ConfigMenu {
 
     Buttons buttons;
     Object object;
+    Object fieldBackup = null;
+
     Field[] fields;
     int currentField = 0;
 
@@ -31,14 +33,40 @@ public class ConfigMenu {
         editMenuItem = new StateMachine.State("editMenuItem");
         sm.setInitialState(navigateMenu);
 
-        navigateMenu.addTransitionTo(editMenuItem, buttons.handlerA::Pressed, new Action("enterEdit", ()->true));
+        navigateMenu.addTransitionTo(editMenuItem, buttons.handlerA::Pressed, new Action("enterEdit", this::backupCurrentField));
         editMenuItem.addTransitionTo(navigateMenu, buttons.handlerA::Pressed, new Action("nextMenuItem", ()->true));
+        editMenuItem.addTransitionTo(navigateMenu, buttons.handlerX::Pressed, new Action("nextMenuItem", this::restoreCurrentField));
 
         navigateMenu.addTransitionTo(navigateMenu, buttons.handlerDPad_Down::Pressed, new Action("nextMenuItem", this::nextMenuItem));
         navigateMenu.addTransitionTo(navigateMenu, buttons.handlerDPad_Up::Pressed, new Action("previousMenuItem", this::previousMenuItem));
 
-        editMenuItem.addTransitionTo(editMenuItem, buttons.handlerDPad_Right::Pressed, new Action("incrementField", this::incrementField));
-        editMenuItem.addTransitionTo(editMenuItem, buttons.handlerDPad_Left::Pressed, new Action("decrementField", this::decrementField));
+        editMenuItem.addTransitionTo(editMenuItem, buttons.handlerDPad_Right::Pressed, new Action("incrementField", ()->changeFieldBy(1.0)));
+        editMenuItem.addTransitionTo(editMenuItem, buttons.handlerDPad_Left::Pressed, new Action("decrementField",  ()->changeFieldBy(-1.0)));
+
+        editMenuItem.addTransitionTo(editMenuItem, buttons.handlerRightBumper::Pressed, new Action("incrementField", ()->changeFieldBy(0.1)));
+        editMenuItem.addTransitionTo(editMenuItem, buttons.handlerLeftBumper::Pressed, new Action("decrementField",  ()->changeFieldBy(-0.1)));
+    }
+
+    private Boolean backupCurrentField() {
+        Field field = fields[currentField];
+        field.setAccessible(true);
+        try {
+            fieldBackup = field.get(object);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    private Boolean restoreCurrentField() {
+        Field field = fields[currentField];
+        field.setAccessible(true);
+        try {
+             field.set(object, fieldBackup);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
     public void update() {
@@ -47,18 +75,24 @@ public class ConfigMenu {
         updateDisplay();
     }
 
-    private boolean incrementField()  {
+    private boolean changeFieldBy(double value)  {
+        assert(value!=0);
         Field field = fields[currentField];
         field.setAccessible(true);
         Class<?> type = field.getType();
         Global.telemetry.addLine(type.getName());
+        int intValue = (int)Math.round(value); // used of integer like values below after unboxing field
+        if(intValue==0) { // case where double input is within ]-0.5;+0.5[
+            intValue = value>=0? 1:-1;
+        }
+
         try {
             if (type.equals(Integer.class) || type.equals(int.class)) {
-                field.setInt(object, field.getInt(object) + 1);
+                field.setInt(object, field.getInt(object) + intValue);
             } else if (type.equals(Double.class) || type.equals(double.class)) {
-                field.setDouble(object, field.getDouble(object) + 0.1);
+                field.setDouble(object, field.getDouble(object) + value);
             } else if (type.equals(Float.class) || type.equals(float.class)) {
-                field.setFloat(object, field.getFloat(object) + 0.1f);
+                field.setFloat(object, field.getFloat(object) + (float)value);
             } else if (type.equals(Boolean.class) || type.equals(boolean.class)) {
                 Boolean currentValue = (Boolean) field.get(object);
                 field.set(object, !currentValue); // Toggle the boolean value
@@ -67,7 +101,8 @@ public class ConfigMenu {
                 Object currentValue = field.get(object);
                 for (int i = 0; i < enumValues.length; i++) {
                     if (enumValues[i].equals(currentValue)) {
-                        Object nextValue = enumValues[(i + 1) % enumValues.length];
+                        int len = enumValues.length;
+                        Object nextValue = enumValues[(((i + intValue) % len) + len) % len];//Java modulo conserves sign: -1%5 = -1 and not 4, need positive index all the time
                         field.set(object, nextValue);
                         break;
                     }
@@ -81,38 +116,8 @@ public class ConfigMenu {
         return true;
     }
 
-    private boolean decrementField() {
-        Field field = fields[currentField];
-        field.setAccessible(true);
-        Class<?> type = field.getType();
-        try {
-            if (type.equals(Integer.class) || type.equals(int.class)) {
-                field.setInt(object, field.getInt(object) - 1);
-            } else if (type.equals(Double.class) || type.equals(double.class)) {
-                field.setDouble(object, field.getDouble(object) - 0.1);
-            } else if (type.equals(Float.class) || type.equals(float.class)) {
-                field.setFloat(object, field.getFloat(object) - 0.1f);
-            } else if (type.equals(Boolean.class) || type.equals(boolean.class)) {
-                Boolean currentValue = (Boolean) field.get(object);
-                field.set(object, !currentValue); // Toggle the boolean value
-            } else if (type.isEnum()) {
-                Object[] enumValues = type.getEnumConstants();
-                Object currentValue = field.get(object);
-                for (int i = 0; i < enumValues.length; i++) {
-                    if (enumValues[i].equals(currentValue)) {
-                        Object nextValue = enumValues[i==0? enumValues.length-1 : (i - 1) % enumValues.length];
-                        field.set(object, nextValue);
-                        break;
-                    }
-                }
-            }
-        }
-        catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
 
-        return true;
-    }
+
 
     private boolean previousMenuItem() {
         currentField = Range.clip(currentField-1, 0, fields.length-1);
@@ -132,7 +137,7 @@ public class ConfigMenu {
                 Field field = fields[i];
                 field.setAccessible(true);
                 Object value = field.get(Modifier.isStatic(field.getModifiers())?null:object); // Use null for static fields
-                Global.telemetry.addData(formattedFieldName(i), value != null ? formattedValue(i, value.toString()) : "null");
+                Global.telemetry.addData(formattedFieldName(i), value!=null ? formattedValue(i, value.toString()) : "null");
             }
 
         } catch (IllegalAccessException e) {
