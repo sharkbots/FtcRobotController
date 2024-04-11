@@ -6,23 +6,20 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
-import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 //@Autonomous(name="Autonomous Base")
 @Autonomous(name = "{rr a}", group = "Autonomous Pathing Tuning")
-public class roadrunnerTest extends LinearOpMode {
+public class RoadrunnerTest extends LinearOpMode {
 
     protected StandardTrackingWheelLocalizer myLocalizer;
     SampleMecanumDrive drive;

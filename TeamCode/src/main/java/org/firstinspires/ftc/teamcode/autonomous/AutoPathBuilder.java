@@ -10,39 +10,71 @@ import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySe
 
 import java.util.ArrayList;
 
-public class TrajectoryBuilder {
-    public AutoBase.Coordinates c;
-    public SampleMecanumDrive drive;
+public class AutoPathBuilder {
+    private final AutoBase.Coordinates c;
+    private final SampleMecanumDrive drive;
 
-    public TrajectoryBuilder(AutoBase.Coordinates coordinates, SampleMecanumDrive drive){
-        this.c = coordinates;
-        this.drive = drive;
+    private PROP_LOCATIONS propLocation;
+    private STACK_LOCATIONS stackLocation;
+    private TRUSS_LOCATIONS trussLocation;
 
-        trajectorySequenceLeft = computeTrajectory(propLocations.LEFT, drive, c);
-        trajectorySequenceCenter = computeTrajectory(propLocations.CENTER, drive, c);
-        trajectorySequenceRight = computeTrajectory(propLocations.RIGHT, drive, c);
-    }
 
-    public enum propLocations{
+    public enum PROP_LOCATIONS {
         LEFT,
         CENTER,
         RIGHT
     }
 
+    public enum STACK_LOCATIONS {
+        LEFT,
+        CENTER,
+        RIGHT
+    }
+
+    public enum TRUSS_LOCATIONS {
+        OUTSIDE,
+        CENTER,
+        STAGE_DOOR
+    }
 
 
-    public ArrayList<TrajectorySequence> computeTrajectory(propLocations propLoc, SampleMecanumDrive drive, AutoBase.Coordinates c) {
+
+    public AutoPathBuilder(AutoBase.Coordinates coordinates, SampleMecanumDrive drive){
+        this.c = coordinates;
+        this.drive = drive;
+
+        propLocation = PROP_LOCATIONS.LEFT;
+        trajectorySequenceLeft = computeTrajectory();
+
+        propLocation = PROP_LOCATIONS.CENTER;
+        trajectorySequenceCenter = computeTrajectory();
+
+        propLocation = PROP_LOCATIONS.RIGHT;
+        trajectorySequenceRight = computeTrajectory();
+    }
+
+    public void setAutoConfig(STACK_LOCATIONS stackLocation, TRUSS_LOCATIONS trussLocation){
+        this.stackLocation = stackLocation;
+        this.trussLocation = trussLocation;
+
+    }
+
+    public ArrayList<TrajectorySequence> computeTrajectory() {
         ArrayList<TrajectorySequence> finalTrajectory = new ArrayList<>();
+
+
+
+
 
         Vector2d backdropIntermediateFar = c.backdropIntermediateFar;
         Pose2d backdropIntermediateCoordinate;
-        if (propLoc == propLocations.LEFT) {
+        if (propLocation == PROP_LOCATIONS.LEFT) {
             teamPropCoordinate = c.leftTeamProp;
             backdropIntermediateCoordinate = c.backdropIntermediateLeft;
             backdropCoordinate = c.backdropLeft;
             backdropStrafeCoordinate = c.backdropRight;
         }
-        else if (propLoc == propLocations.RIGHT) {
+        else if (propLocation == PROP_LOCATIONS.RIGHT) {
             teamPropCoordinate = c.rightTeamProp;
             backdropIntermediateCoordinate = c.backdropIntermediateRight;
             backdropCoordinate = c.backdropRight;
@@ -104,7 +136,7 @@ public class TrajectoryBuilder {
             }
         }
         else {
-            if (propLoc != propLocations.CENTER) {
+            if (propLocation != PROP_LOCATIONS.CENTER) {
                 goToBackdropBuilder = goToBackdropBuilder
                     // Stop 3 inches before touching backdrop so that heading / robot pivoting is smooth and doesn't scratch backdrop
                     .lineToSplineHeading(new Pose2d(backdropStrafeCoordinate.getX() - 3,
@@ -145,6 +177,7 @@ public class TrajectoryBuilder {
 
         return finalTrajectory;
     }
+
 
 
     public ArrayList<TrajectorySequence> trajectorySequenceLeft, trajectorySequenceCenter, trajectorySequenceRight;

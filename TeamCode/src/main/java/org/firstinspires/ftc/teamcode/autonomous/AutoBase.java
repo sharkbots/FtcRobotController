@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 //@Autonomous(name="Autonomous Base")
 public abstract class AutoBase extends LinearOpMode {
+
     private Telemetry telemetryA;
 
     private Follower follower;
@@ -386,8 +387,6 @@ public abstract class AutoBase extends LinearOpMode {
 //            finalTrajectory = trajectoryBuilder.trajectorySequenceCenter;
 //        }
 //        else {
-//            finalTrajectory = trajectoryBuilder.trajectorySequenceRight;
-//        }
 
         waitForStart();
 
@@ -435,9 +434,9 @@ public abstract class AutoBase extends LinearOpMode {
         robot.tryIntakeTwoPixels.run();
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL4);
         deadline2.reset();
-        while(!deadline2.hasExpired())
-        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
-
+        while(!deadline2.hasExpired()) {
+            robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL3);
+        }
 
 
         while(!robot.intake.pixels.hasTwoPixels()) {
