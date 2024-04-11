@@ -5,15 +5,16 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.tools.Global;
+import org.firstinspires.ftc.teamcode.tools.Buttons;
 import org.firstinspires.ftc.teamcode.tools.MotorActionManager;
 
 public class Lift {
     public MotorActionManager liftMotorActionManager;
     public DcMotorEx liftMotor;
     public TouchSensor liftTouchDown;
-    Gamepad gamepad2;
+    Buttons buttons;
 
     private final double handlerLiftDeadzone = 0.05;
 
@@ -34,7 +35,7 @@ public class Lift {
 
     }
 
-    public Lift(HardwareMap hardwareMap, Gamepad gamepad2){
+    public Lift(HardwareMap hardwareMap, Buttons buttons){
         liftMotor = (DcMotorEx) hardwareMap.dcMotor.get("liftMotor");
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -44,7 +45,7 @@ public class Lift {
 
 
         liftMotorActionManager = new MotorActionManager(liftMotor);
-        this.gamepad2 = gamepad2;
+        this.buttons = buttons;
     }
 
     @SuppressWarnings("unboxing")
@@ -110,21 +111,20 @@ public class Lift {
     public void update() {
 
         // Bit of a hack (so that when it comes from state machine target pos is not 0)
-        int lastSetPosition = Global.ensureWithin(liftMotor.getTargetPosition(), Position.MIN.value, Position.MAX.value);
-
+        int lastSetPosition = Range.clip(liftMotor.getTargetPosition(), Position.MIN.value, Position.MAX.value);
         // If the handler does not want to move motor, then hold the last position set by the handler
         // Else, move the motor normally
-        if ((Math.abs(gamepad2.right_stick_y)<handlerLiftDeadzone) ||
-                (-gamepad2.right_stick_y>0 && lastSetPosition ==Position.MAX.value) ||
-                (-gamepad2.right_stick_y<0 && lastSetPosition ==Position.MIN.value)){
+        if ((Math.abs(buttons.gamepad2.right_stick_y)<handlerLiftDeadzone) ||
+                (-buttons.gamepad2.right_stick_y>0 && lastSetPosition ==Position.MAX.value) ||
+                (-buttons.gamepad2.right_stick_y<0 && lastSetPosition ==Position.MIN.value)){
             holdPosition(lastSetPosition);
         }
         else{
-            setLiftPowerBasedOnGamepad(gamepad2);
+            setLiftPowerBasedOnGamepad(buttons.gamepad2);
             lastSetPosition = liftMotor.getCurrentPosition();
 
             // Hack continued :-)
-            liftMotor.setTargetPosition(Global.ensureWithin(lastSetPosition, Position.MIN.value, Position.MAX.value));
+            liftMotor.setTargetPosition(Range.clip(lastSetPosition, Position.MIN.value, Position.MAX.value));
         }
     }
 

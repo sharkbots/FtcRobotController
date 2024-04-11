@@ -2,14 +2,13 @@ package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.teamcode.aprilTags.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
-import org.firstinspires.ftc.teamcode.tools.PixelsDetection;
 import org.firstinspires.ftc.teamcode.tools.SetDriveMotors;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp(name = "TeleOpDrive", group = "Testing")
 public class TeleopDrive extends LinearOpMode {
@@ -19,13 +18,11 @@ public class TeleopDrive extends LinearOpMode {
 
     Robot robot;
     AprilTagDetection aprilTagDetection;
-    PixelsDetection pixelsDetection;
+    Pose2d startPose;
 
     public void Setup(){
         Global.telemetry = telemetry;
         driveMotors = new SetDriveMotors(hardwareMap);
-
-        pixelsDetection = new PixelsDetection(hardwareMap);
 
         robot = new Robot(hardwareMap, gamepad1, gamepad2);
 
@@ -36,7 +33,7 @@ public class TeleopDrive extends LinearOpMode {
         Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
         Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
         Robot.planeLauncher.storePlane();
-        Robot.intake.setIntakeFlipperPosition(Intake.flipperPositions.UP);
+        Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
         /*Robot.clawPitch.setPosition(Robot.clawPitchIntake); // clawPitchIntake
         Robot.clawYaw.setPosition(Robot.clawYawIntake);
         Robot.clawGrip.setPosition(Robot.clawOpen);
@@ -63,6 +60,7 @@ public class TeleopDrive extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Setup();
+        //Global.telemetry.speak("SHARKBOTS SHARKBOTS SHARKBOTS");
         waitForStart();
         while(opModeIsActive()){
 
@@ -76,6 +74,8 @@ public class TeleopDrive extends LinearOpMode {
                 }
             }
 
+            //telemetry.addLine("Pose2d: x: " + driveMotors.pluh().getX() + " y: " + driveMotors.pluh().getY());
+
             Global.telemetry.update();
             double horizontal = gamepad1.left_stick_x;
             double vertical = -gamepad1.left_stick_y;
@@ -86,7 +86,6 @@ public class TeleopDrive extends LinearOpMode {
             boolean alignToCardinalPoint = gamepad1.a;
             boolean resetHeading = gamepad1.y;
 
-
             double distanceToWall = 0;
             if (!emergencyBrakeOverride){
                 // AprilTag detection of positions if costly
@@ -96,11 +95,11 @@ public class TeleopDrive extends LinearOpMode {
             }
 
 
+
             driveMotors.driveCommands(horizontal, vertical, turn, goFast, distanceToWall, switchDriveMode, alignToCardinalPoint, resetHeading);
             driveMotors.update();
 
             robot.update();
-            pixelsDetection.update();
 
             if(robot.currentState()==robot.outTakingPixels) {
                 Robot.claw.update();

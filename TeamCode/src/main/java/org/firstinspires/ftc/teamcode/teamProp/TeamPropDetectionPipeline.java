@@ -21,7 +21,11 @@
 
 package org.firstinspires.ftc.teamcode.teamProp;
 
+import android.graphics.Canvas;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -38,7 +42,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-class TeamPropDetectionPipeline extends OpenCvPipeline
+public class TeamPropDetectionPipeline implements VisionProcessor
 {
     private Mat currentImage = new Mat();
     // Matrices for OpenCv
@@ -92,9 +96,19 @@ class TeamPropDetectionPipeline extends OpenCvPipeline
         constructMatrix();
 
     }
+    @Override
+    public void init(int i, int i1, CameraCalibration cameraCalibration) {
+
+    }
 
     @Override
-    public Mat processFrame(Mat colorImage) {
+    public void onDrawFrame(Canvas canvas, int i, int i1, float v, float v1, Object o) {
+
+    }
+
+
+    @Override
+    public Object processFrame(Mat colorImage, long l) {
         // Initial blur to filter out some unwanted points
         Imgproc.GaussianBlur(colorImage, blurImage, new Size(9.0, 9.0), 75, 75);
 

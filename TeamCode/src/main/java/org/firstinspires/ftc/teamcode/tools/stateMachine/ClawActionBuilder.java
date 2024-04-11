@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tools.StateMachine;
+package org.firstinspires.ftc.teamcode.tools.stateMachine;
 
 import org.firstinspires.ftc.teamcode.Claw;
 
@@ -23,10 +23,7 @@ public class ClawActionBuilder {
     }
 
     public Action waitForAnalogPitchSensorAtPosition (Claw.pitchPositions pitchPositions, double tolerance) {
-        ActionFunction function = () -> {
-            claw.waitForAnalogPitchSensorAtPosition(pitchPositions, tolerance);
-            return true;
-        };
+        ActionFunction function = () -> claw.waitForAnalogPitchSensorAtPosition(pitchPositions, tolerance);
         return new Action("waitForAnalogPitchSensorAtPosition", function);
     }
 

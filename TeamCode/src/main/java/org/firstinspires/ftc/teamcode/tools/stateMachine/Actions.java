@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tools.StateMachine;
+package org.firstinspires.ftc.teamcode.tools.stateMachine;
 
 import androidx.annotation.NonNull;
 
@@ -41,6 +41,26 @@ public class Actions {
         }
         Thread thread = new Thread(new MyRunnable());
         thread.start();
+    }
+
+    public Runnable getAsyncRunnable(){
+        class MyAsyncRunnable implements Runnable {
+            @Override
+            public void run() {
+                Actions.this.runAsync();
+            }
+        }
+        return new MyAsyncRunnable();
+    }
+
+    public Runnable getRunnable(){
+        class MyAsyncRunnable implements Runnable {
+            @Override
+            public void run() {
+                Actions.this.run();
+            }
+        }
+        return new MyAsyncRunnable();
     }
 
     public boolean isComplete() {

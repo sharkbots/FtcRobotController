@@ -89,13 +89,14 @@ public class SetDriveMotors extends OpMode {
         horizontalSlowDeadzone = new DeadzoneSquare(deadzone, DEADZONE_MIN_X, 0.6);
         verticalSlowDeadzone = new DeadzoneSquare(deadzone, DEADZONE_MIN_Y, 0.5);
     }
+
     public void driveCommands(double horizontal, double vertical, double turn, boolean goFast, double distanceToWallMeters, boolean switchDriveMode, boolean alignToCardinalPoint, boolean resetHeading) {
 
         // Read pose
         Pose2d poseEstimate = drive.getPoseEstimate();
 
         if (resetHeading){
-            drive.setPoseEstimate(new Pose2d(poseEstimate.getY(), Math.toRadians(270)));
+            drive.setPoseEstimate(new Pose2d(poseEstimate.getX(), poseEstimate.getY(), Math.PI));
         }
 
         //deadzones
@@ -190,6 +191,15 @@ public class SetDriveMotors extends OpMode {
         }
     }
 
+    public void setPoseEstimate(Pose2d pose){
+        drive.setPoseEstimate(pose);
+    }
+
+    public Pose2d getPoseEstimate(){
+        return drive.getPoseEstimate();
+    }
+
+
     private boolean isAutoBrake(double distanceToWallMeters, Pose2d poseEstimate) {
         return distanceToWallMeters != 0 &&
                 distanceToWallMeters < AUTOBRAKE_DISTANCE &&
@@ -199,7 +209,7 @@ public class SetDriveMotors extends OpMode {
     }
 
     public void update() {
-            drive.update();
+        drive.update();
     }
     public double getAngleToCardinalPoint()  {
         Pose2d poseEstimate = drive.getPoseEstimate();
