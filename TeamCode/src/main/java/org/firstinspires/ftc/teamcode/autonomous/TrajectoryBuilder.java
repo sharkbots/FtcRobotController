@@ -11,53 +11,62 @@ import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySe
 import java.util.ArrayList;
 
 public class TrajectoryBuilder {
-    public AutoBase.Coordinates c;
-    public SampleMecanumDrive drive;
+    private final AutoBase.Coordinates c;
+    private final SampleMecanumDrive drive;
 
-    public TrajectoryBuilder(AutoBase.Coordinates coordinates, SampleMecanumDrive drive){
-        this.c = coordinates;
-        this.drive = drive;
+    private PROP_LOCATIONS propLocation;
+    private STACK_LOCATIONS stackLocation;
+    private TRUSS_LOCATIONS trussLocation;
 
-        trajectorySequenceLeft = computeTrajectory(propLocations.LEFT, drive, c);
-        trajectorySequenceCenter = computeTrajectory(propLocations.CENTER, drive, c);
-        trajectorySequenceRight = computeTrajectory(propLocations.RIGHT, drive, c);
-    }
 
-    public enum propLocations{
+    public enum PROP_LOCATIONS {
         LEFT,
         CENTER,
         RIGHT
     }
 
+    public enum STACK_LOCATIONS {
+        LEFT,
+        CENTER,
+        RIGHT
+    }
+
+    public enum TRUSS_LOCATIONS {
+        OUTSIDE,
+        CENTER,
+        STAGE_DOOR
+    }
 
 
-    public ArrayList<TrajectorySequence> computeTrajectory(propLocations propLoc, SampleMecanumDrive drive, AutoBase.Coordinates c) {
+
+    public TrajectoryBuilder(AutoBase.Coordinates coordinates, SampleMecanumDrive drive){
+        this.c = coordinates;
+        this.drive = drive;
+
+        propLocation = PROP_LOCATIONS.LEFT;
+        trajectorySequenceLeft = computeTrajectory();
+
+        propLocation = PROP_LOCATIONS.CENTER;
+        trajectorySequenceCenter = computeTrajectory();
+
+        propLocation = PROP_LOCATIONS.RIGHT;
+        trajectorySequenceRight = computeTrajectory();
+    }
+
+    public void setAutoConfig(STACK_LOCATIONS stackLocation, TRUSS_LOCATIONS trussLocation){
+        this.stackLocation = stackLocation;
+        this.trussLocation = trussLocation;
+
+    }
+
+    public ArrayList<TrajectorySequence> computeTrajectory() {
         ArrayList<TrajectorySequence> finalTrajectory = new ArrayList<>();
+
 
         Vector2d backdropIntermediateFar = c.backdropIntermediateFar;
         Pose2d backdropIntermediateCoordinate;
-        if (propLoc == propLocations.LEFT) {
-            teamPropCoordinate = c.leftTeamProp;
-            backdropIntermediateCoordinate = c.backdropIntermediateLeft;
-            backdropCoordinate = c.backdropLeft;
-            backdropStrafeCoordinate = c.backdropRight;
-        }
-        else if (propLoc == propLocations.RIGHT) {
-            teamPropCoordinate = c.rightTeamProp;
-            backdropIntermediateCoordinate = c.backdropIntermediateRight;
-            backdropCoordinate = c.backdropRight;
-            backdropStrafeCoordinate = c.backdropLeft;
 
-        }
-        else {
-            teamPropCoordinate = c.centerTeamProp;
-            backdropIntermediateCoordinate = c.backdropIntermediateCenter;
-            backdropCoordinate = c.backdropCenter;
-            backdropStrafeCoordinate = c.backdropStrafeForCenter;
 
-        }
-
-        assert drive != null;
 
         // ACTION 0: Drop pixel on spike mark
         TrajectorySequenceBuilder purpleDropBuilder = drive.trajectorySequenceBuilder(c.startPose);
@@ -69,6 +78,39 @@ public class TrajectoryBuilder {
         finalTrajectory.add(purpleDrop); //get 0
 
 
+
+        if (propLocation == PROP_LOCATIONS.LEFT) {
+
+
+//            teamPropCoordinate = c.leftTeamProp;
+//            backdropIntermediateCoordinate = c.backdropIntermediateLeft;
+//            backdropCoordinate = c.backdropLeft;
+//            backdropStrafeCoordinate = c.backdropRight;
+        }
+        else if (propLocation == PROP_LOCATIONS.RIGHT) {
+
+//            teamPropCoordinate = c.rightTeamProp;
+//            backdropIntermediateCoordinate = c.backdropIntermediateRight;
+//            backdropCoordinate = c.backdropRight;
+//            backdropStrafeCoordinate = c.backdropLeft;
+
+        }
+        else {
+
+//            teamPropCoordinate = c.centerTeamProp;
+//            backdropIntermediateCoordinate = c.backdropIntermediateCenter;
+//            backdropCoordinate = c.backdropCenter;
+//            backdropStrafeCoordinate = c.backdropStrafeForCenter;
+
+        }
+
+        assert drive != null;
+
+
+
+
+
+
         // ACTION 1: setup for backdrop / setup to get pixel from stack
         // near side
         TrajectorySequenceBuilder setupForBackdropNearBuilder = drive.trajectorySequenceBuilder(purpleDrop.end())
@@ -77,7 +119,7 @@ public class TrajectoryBuilder {
 
         // far side
         TrajectorySequenceBuilder purpleDropToStackSetupBuilder = drive.trajectorySequenceBuilder(purpleDrop.end());
-        if (propLoc == propLocations.RIGHT) {
+        if (propLocation == PROP_LOCATIONS.RIGHT) {
             purpleDropToStackSetupBuilder = purpleDropToStackSetupBuilder.lineTo(c.purpleDropToStackPreSetup);
         }
         // lineToLinearHeading might not be possible here for right pos, lineTo + turn
@@ -97,7 +139,7 @@ public class TrajectoryBuilder {
         // ACTION 2: go to backdrop / go to stacks (from Purple Drop)
         // near side
         TrajectorySequenceBuilder goToBackdropBuilder = drive.trajectorySequenceBuilder(endPurpleDrop)
-                .lineToSplineHeading(backdropIntermediateCoordinate)
+                //.lineToSplineHeading(backdropIntermediateCoordinate)
                 .lineToLinearHeading(backdropCoordinate);
 
         if (c.startPose.getHeading()!=teamPropCoordinate.getHeading()) {

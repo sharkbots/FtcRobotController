@@ -63,9 +63,6 @@ public class AutoPathBuilder {
         ArrayList<TrajectorySequence> finalTrajectory = new ArrayList<>();
 
 
-
-
-
         Vector2d backdropIntermediateFar = c.backdropIntermediateFar;
         Pose2d backdropIntermediateCoordinate;
         if (propLocation == PROP_LOCATIONS.LEFT) {
