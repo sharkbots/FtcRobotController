@@ -63,7 +63,7 @@ public class AutoPathBuilder {
         ArrayList<TrajectorySequence> finalTrajectory = new ArrayList<>();
 
 
-        Vector2d backdropIntermediateFar = c.backdropIntermediateFar;
+        Vector2d backdropIntermediateFar = c.backdropIntermediateFarOutside;
         Pose2d backdropIntermediateCoordinate;
         if (propLocation == PROP_LOCATIONS.LEFT) {
             teamPropCoordinate = c.leftTeamProp;
@@ -102,7 +102,7 @@ public class AutoPathBuilder {
 
         TrajectorySequence setupForBackdropFar = drive.trajectorySequenceBuilder(purpleDrop.end())
                 .forward(8)
-                .lineTo(c.prepareFarDrop, SampleMecanumDrive.getVelocityConstraint(15, 15, DriveConstants.TRACK_WIDTH),
+                .lineTo(c.prepareFarDropOutside, SampleMecanumDrive.getVelocityConstraint(15, 15, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .lineTo(backdropIntermediateFar, SampleMecanumDrive.getVelocityConstraint(15, 15, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))

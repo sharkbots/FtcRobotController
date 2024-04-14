@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -10,7 +8,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
-import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.aprilTags.AprilTagPoseDetection;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
@@ -28,7 +25,6 @@ import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 //@Autonomous(name="Autonomous Base")
@@ -76,9 +72,11 @@ public abstract class AutoBase extends LinearOpMode {
         Vector2d parkInCorner = new Vector2d(47, 62);
 
         //blue far side
-        Vector2d prepareFarDrop = new Vector2d(-37, 59);
+        Vector2d prepareFarDropOutside = new Vector2d(-56, 60);
+        Vector2d prepareFarDropCenter = new Vector2d(-37, 59);
 
-        Vector2d backdropIntermediateFar = new Vector2d(18, 59);
+        Vector2d backdropIntermediateFarOutside = new Vector2d(18, 59);
+        Vector2d backdropIntermediateFarStageDoor = new Vector2d(18, 12);
 
 
         // Side stacks
@@ -140,7 +138,11 @@ public abstract class AutoBase extends LinearOpMode {
                 parkIntermediate = flipAcrossX(parkIntermediate);
                 parkInCorner = flipVectorAcrossX(parkInCorner);
                 parkBetweenBackdrops = flipVectorAcrossX(parkBetweenBackdrops);
-                backdropIntermediateFar = flipVectorAcrossX(backdropIntermediateFar);
+
+                prepareFarDropCenter = flipVectorAcrossX(prepareFarDropCenter);
+                prepareFarDropOutside = flipVectorAcrossX(prepareFarDropOutside);
+                backdropIntermediateFarOutside = flipVectorAcrossX(backdropIntermediateFarOutside);
+                backdropIntermediateFarStageDoor = flipVectorAcrossX(backdropIntermediateFarStageDoor);
 
                 purpleDropToStackPreSetup = flipVectorAcrossX(purpleDropToStackPreSetup);
                 purpleDropToStackSetup = flipAcrossX(purpleDropToStackSetup);
@@ -170,7 +172,7 @@ public abstract class AutoBase extends LinearOpMode {
                     centerTeamProp = flipAcrossCenter(centerTeamProp);
                     rightTeamProp = flipAcrossCenter(rightTeamProp);
 
-                    prepareFarDrop = flipVectorAcrossX(prepareFarDrop);
+                    prepareFarDropOutside = flipVectorAcrossX(prepareFarDropOutside);
                 }
             }
         }
