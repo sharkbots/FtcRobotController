@@ -244,63 +244,64 @@ public abstract class AutoBase extends LinearOpMode {
         // start location (coordinate)
 
 
-        TrajectorySequence purpleDrop = drive.trajectorySequenceBuilder(c.startPose)
-                .lineToLinearHeading(c.centerTeamProp)
+        // AUDIENCE SIDE TO RIGHT STACK
+        // START POSE: new Pose2d(-36.00, 62.00, Math.toRadians(90.00))
+
+
+        TrajectorySequence audienceLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+                .lineTo(new Vector2d(-36.00, 42.00))
+                .lineToLinearHeading(new Pose2d(-32.73, 31.07, Math.toRadians(180.00)))
+                .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
                 .build();
 
-        TrajectorySequence stackSetup1 = drive.trajectorySequenceBuilder(purpleDrop.end())
-                .forward(2)
-                .splineToLinearHeading(c.leftStackSetup, Math.toRadians(180))
+        TrajectorySequence audienceMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+                .lineToLinearHeading(new Pose2d(-40.50, 24.70, Math.toRadians(180.00)))
+                .lineTo(new Vector2d(-44.50, 24.70))
+                .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
                 .build();
 
-        TrajectorySequence intakeStack1 = drive.trajectorySequenceBuilder(stackSetup1.end())
-                .lineToLinearHeading(c.leftStack)
+        TrajectorySequence audienceRightPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+                .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
+                .splineTo(new Vector2d(-35.82, 13.35), Math.toRadians(270.00))
+                .splineTo(new Vector2d(-46.00, 12.00), Math.toRadians(180.00))
                 .build();
 
-        TrajectorySequence goToBackdrop1 = drive.trajectorySequenceBuilder(intakeStack1.end())
-                .lineToLinearHeading(c.backdropCenter, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+
+
+        // BACKDROP SIDE TO LEFT STACK
+        // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
+
+        TrajectorySequence backdropRightPurpleToLeftStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+                .lineTo(new Vector2d(12.00, 42.00))
+                .lineToLinearHeading(new Pose2d(8.73, 24.70, Math.toRadians(0.00)))
                 .build();
 
-        TrajectorySequence stackSetup2 = drive.trajectorySequenceBuilder(goToBackdrop1.end())
-                // Readjusts
-                .lineToLinearHeading(new Pose2d(c.backdropCenter.getX()+0.1, c.backdropCenter.getY(), c.backdropCenter.getHeading()))
-                .lineToLinearHeading(c.leftStackSetup, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+
+        TrajectorySequence e = drive.trajectorySequenceBuilder(c.startPose)
+                .lineTo(new Vector2d(12.00, 34.00))
+                .lineTo(new Vector2d(10.00, 34.00))
+                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
+                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
+                .lineToLinearHeading(c.leftStackSetup)
                 .build();
 
-        TrajectorySequence intakeStack2 = drive.trajectorySequenceBuilder(stackSetup2.end())
-                .lineToLinearHeading(new Pose2d(c.leftStack.getX()-1, c.leftStack.getY(), c.leftStack.getHeading()))
+
+        TrajectorySequence backdropCenterPurpleToLeftStack = drive.trajectorySequenceBuilder(c.startPose)
+                .lineTo(new Vector2d(12.00, 34.00))
+                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
+                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
+                .lineToLinearHeading(c.leftStackSetup)
                 .build();
 
-        TrajectorySequence goToBackdrop2 = drive.trajectorySequenceBuilder(intakeStack2.end())
-                .lineToLinearHeading(new Pose2d(c.leftStack.getX()+0.1, c.leftStack.getY(), c.leftStack.getHeading()))
-                .lineToLinearHeading(c.backdropCenter, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+
+        TrajectorySequence backdropLeftPurpleToLeftStack = drive.trajectorySequenceBuilder(c.startPose)
+                .lineToLinearHeading(new Pose2d(12.00, 34.00, Math.toRadians(0.00)))
+                .lineTo(new Vector2d(14.00, 34.00))
+                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
+                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
+                .lineToLinearHeading(c.leftStackSetup)
                 .build();
 
-        TrajectorySequence cycle2Dropoff = drive.trajectorySequenceBuilder(intakeStack2.end())
-                .strafeLeft(7)
-                .build();
-
-        /*
-        follower = new Follower(hardwareMap);
-
-        telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        follower.setStartingPose(c.startPose);
-
-        purpleDrop = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(c.startPose), new Point(c.centerTeamProp)))
-                .setConstantHeadingInterpolation(Math.toRadians(90))
-                .build();
-
-        purpleToLeftSideStackSetup = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(c.centerTeamProp), new Point(c.purpleToStackLeftControlPoint), new Point(c.stackLeftSetup)))
-                .setPathEndHeadingConstraint(Math.toRadians(180))
-                .build();
-
-*/
 
         // Let's have at list 33% chance to pick it right if nothing works
         TeamPropDetection.propLocation propLoc = TeamPropDetection.propLocation.CENTER;
@@ -375,6 +376,8 @@ public abstract class AutoBase extends LinearOpMode {
 
         waitForStart();
 
+        drive.followTrajectorySequence(backdropRightPurpleToLeftStack);
+
         /*TrajectorySequence untitled0 = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
                 .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
                 .lineTo(new Vector2d(-39.51, 21.65))
@@ -383,83 +386,18 @@ public abstract class AutoBase extends LinearOpMode {
                 .build();
 */
 
-        // AUDIENCE SIDE TO RIGHT STACK
-
-
-        TrajectorySequence audienceRightPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
-                .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
-                .splineTo(new Vector2d(-35.82, 13.35), Math.toRadians(270.00))
-                .splineTo(new Vector2d(-46.00, 12.00), Math.toRadians(180.00))
-                .build();
-
-
-        TrajectorySequence audienceMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
-                .lineToLinearHeading(new Pose2d(-40.50, 24.70, Math.toRadians(180.00)))
-                .lineTo(new Vector2d(-44.50, 24.70))
-                .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
-                .build();
-
-        TrajectorySequence audienceLeftPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
-                .lineTo(new Vector2d(-36.00, 42.00))
-                .lineToLinearHeading(new Pose2d(-32.73, 31.07, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
-                .build();
 
 
 
-        TrajectorySequence intakeRightStack = drive.trajectorySequenceBuilder(audienceRightPurpleToRightStack.end())
-                .lineToLinearHeading(c.rightStack)
-                .build();
 
 
-
-        TrajectorySequence untitled1 = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
-                .lineTo(new Vector2d(11.68, 34.22))
-                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(177.80)))
-                .lineToLinearHeading(new Pose2d(-39.02, 60.07, Math.toRadians(198.03)))
-                .lineToLinearHeading(new Pose2d(-56.00, 36.00, Math.toRadians(180.00)))
-                .lineTo(new Vector2d(-37.70, 10.85))
-                .lineTo(new Vector2d(11.85, 11.19))
-                .lineTo(new Vector2d(51.00, 37.00))
-                .build();
-
-
-        drive.followTrajectorySequence(audienceLeftPurpleToRightStack);
+//        Deadline deadline1 = new Deadline(500, TimeUnit.MILLISECONDS);
+//        while(!deadline1.hasExpired()){
+//
+//        }
 
 
         /*robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
-
-
-        TrajectorySequence purpleCenterAndStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
-                .lineTo(new Vector2d(12.00, 34.00))
-                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
-                .lineToLinearHeading(c.stackRightSetup)
-                .lineToLinearHeading(c.stackRight)
-                .build();
-
-        TrajectorySequence purpleLeftAndStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
-                .lineTo(new Vector2d(12.00, 34.00))
-                .lineTo(new Vector2d(10.00, 34.00))
-                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
-                .lineToLinearHeading(c.stackRightSetup)
-                .lineToLinearHeading(c.stackRight)
-                .build();
-
-        TrajectorySequence purpleRightAndStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
-                .lineToLinearHeading(new Pose2d(12.00, 34.00, Math.toRadians(0.00)))
-                .lineTo(new Vector2d(14.00, 34.00))
-                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
-                .lineToLinearHeading(c.stackRightSetup)
-                .lineToLinearHeading(c.stackRight)
-                .build();
-
-        Deadline deadline1 = new Deadline(500, TimeUnit.MILLISECONDS);
-        while(!deadline1.hasExpired()){
-
-        }
 
         //drive.followTrajectorySequence(stackSetup1);
 
@@ -486,6 +424,15 @@ public abstract class AutoBase extends LinearOpMode {
 
 
 
+//        TrajectorySequence untitled1 = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+//                .lineTo(new Vector2d(11.68, 34.22))
+//                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(177.80)))
+//                .lineToLinearHeading(new Pose2d(-39.02, 60.07, Math.toRadians(198.03)))
+//                .lineToLinearHeading(new Pose2d(-56.00, 36.00, Math.toRadians(180.00)))
+//                .lineTo(new Vector2d(-37.70, 10.85))
+//                .lineTo(new Vector2d(11.85, 11.19))
+//                .lineTo(new Vector2d(51.00, 37.00))
+//                .build();
 
 
 
