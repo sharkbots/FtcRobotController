@@ -403,6 +403,23 @@ public abstract class AutoBase extends LinearOpMode {
 
         waitForStart();
 
+        TrajectorySequence untitled0 = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
+                .lineToLinearHeading(new Pose2d(-37.76, 31.43, Math.toRadians(0.00)))
+                .build();
+
+        drive.followTrajectorySequence(untitled0);
+
+
+
+
+
+
+
+
+
+
+        /** RR code test, previous code for center stack + 1 cycle
+
         drive.followTrajectorySequence(purpleDrop);
 
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
@@ -413,7 +430,6 @@ public abstract class AutoBase extends LinearOpMode {
         drive.followTrajectorySequence(intakeStack1);
 
         robot.tryIntakeTwoPixels.run();
-
 
 
         while(!robot.intake.pixels.hasTwoPixels()) {
@@ -471,6 +487,13 @@ public abstract class AutoBase extends LinearOpMode {
         while(!deadline2.hasExpired()){
 
         }
+
+         **/
+
+
+
+
+        // PREVIOUS CODE
 
         /*Deadline deadline21 = new Deadline(5, TimeUnit.SECONDS);
         while(!deadline21.hasExpired()){
