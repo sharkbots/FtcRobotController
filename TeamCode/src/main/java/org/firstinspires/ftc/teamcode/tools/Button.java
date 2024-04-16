@@ -17,10 +17,8 @@ public class Button {
         this.buttonName = buttonName;
         buttonState = false;//  = generateButtonFunctionMap(gamepad).get(buttonName);
         buttonPreviousState = false; //generateButtonFunctionMap(gamepadPreviousState).get(buttonName);
-        this.updateButton(gamepad);
-
-
     }
+
     public void updateButton(Gamepad gamepad) {
 
         buttonPreviousState = buttonState;
