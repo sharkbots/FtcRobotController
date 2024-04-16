@@ -20,7 +20,7 @@ public class ConfigMenu {
     int currentField = 0;
 
     StateMachine sm;
-    StateMachine.State navigateMenu, editMenuItem;
+    StateMachine.State navigateMenu, editMenuItem, lockMenu;
 
 
     public ConfigMenu(Object object, Buttons buttons) {
@@ -34,8 +34,9 @@ public class ConfigMenu {
         lockMenu = new StateMachine.State("lockMenu");
         sm.setInitialState(navigateMenu);
 
-        navigateMenu.addTransitionTo(editMenuItem, buttons.handlerA::Pressed, new Action("enterEdit", ()->true));
-        editMenuItem.addTransitionTo(navigateMenu, buttons.handlerA::Pressed, new Action("nextMenuItem", ()->true));
+        navigateMenu.addTransitionTo(editMenuItem, buttons.handlerA::Pressed, new Action("enterEdit", this::backupCurrentField));
+        editMenuItem.addTransitionTo(navigateMenu, buttons.handlerA::Pressed, new Action("nextMenuItem", ()->{fieldBackup=null; return true;}));
+        editMenuItem.addTransitionTo(navigateMenu, buttons.handlerB::Pressed, new Action("nextMenuItem", this::restoreCurrentField));
 
         navigateMenu.addTransitionTo(navigateMenu, buttons.handlerDPad_Down::Pressed, new Action("nextMenuItem", this::nextMenuItem));
         navigateMenu.addTransitionTo(navigateMenu, buttons.handlerDPad_Up::Pressed, new Action("previousMenuItem", this::previousMenuItem));
@@ -45,6 +46,8 @@ public class ConfigMenu {
 
         editMenuItem.addTransitionTo(editMenuItem, buttons.handlerRightBumper::Pressed, new Action("incrementField", ()->changeFieldBy(0.1)));
         editMenuItem.addTransitionTo(editMenuItem, buttons.handlerLeftBumper::Pressed, new Action("decrementField",  ()->changeFieldBy(-0.1)));
+
+        lockMenu.addTransitionTo(lockMenu, buttons.handlerX::Pressed, new Action("menu locked", this::lockMenu));
     }
 
 
@@ -69,10 +72,6 @@ public class ConfigMenu {
             e.printStackTrace();
         }
         return true;
-        editMenuItem.addTransitionTo(editMenuItem, buttons.handlerDPad_Right::Pressed, new Action("incrementField", this::incrementField));
-        editMenuItem.addTransitionTo(editMenuItem, buttons.handlerDPad_Left::Pressed, new Action("decrementField", this::decrementField));
-
-        lockMenu.addTransitionTo(lockMenu, buttons.handlerX::Pressed, new Action("menu locked", this::lockMenu));
     }
 
 
@@ -144,7 +143,7 @@ public class ConfigMenu {
     public void updateDisplay() {
         // Assuming Global.telemetry is accessible and correct.
         try {
-            if(!menuLocked) {
+            if(sm.currentState!=lockMenu) {
                 // Display static fields
                 for (int i = 0; i < fields.length; i++) {
                     Field field = fields[i];
