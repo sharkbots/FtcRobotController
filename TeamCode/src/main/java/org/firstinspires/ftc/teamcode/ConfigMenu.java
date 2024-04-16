@@ -158,7 +158,8 @@ public class ConfigMenu {
                 Field field = fields[i];
                 field.setAccessible(true);
                 Object value = field.get(Modifier.isStatic(field.getModifiers()) ? null : object); // Use null for static fields
-                Global.telemetry.addData(sm.currentState==lockMenu? unformattedFieldName(i) : formattedFieldName(i), value != null ? formattedValue(i, value.toString()) : "null");
+                Global.telemetry.addData(sm.currentState==lockMenu? unformattedFieldName(i) : formattedFieldName(i),
+                        value != null ? (sm.currentState==lockMenu? value.toString():formattedValue(i, value.toString())) : "null");
             }
 
         } catch (IllegalAccessException e) {
