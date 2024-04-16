@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 @Autonomous(name="Autonomous")
-public abstract class AutoBase extends LinearOpMode {
+public class AutoBase extends LinearOpMode {
 
     private Deadline timer;
     private boolean alreadyCompiled = false;
@@ -239,10 +239,10 @@ public abstract class AutoBase extends LinearOpMode {
     }
     Coordinates c; //= new Coordinates(true, true); // change values later
 
-    abstract void Setup();
+    public void Setup(){};
 
     private enum STACK_POSITIONS{LEFT, CENTER, RIGHT}
-    private PathChain intakeFromStack(AutoBase.STACK_POSITIONS position){
+    private void intakeFromStack(AutoBase.STACK_POSITIONS position){
         Pose2d setup = new Pose2d(), stack = new Pose2d();
         if (position == AutoBase.STACK_POSITIONS.LEFT){
             stack = c.leftStack;
@@ -256,11 +256,6 @@ public abstract class AutoBase extends LinearOpMode {
             stack = c.rightStack;
             setup = c.rightStackSetup;
         }
-        return follower.pathBuilder()
-                .addPath(new BezierLine(new Point(setup), new Point(stack)))
-                .addParametricCallback(0.2, robot.startIntakingPixels.getRunnable())
-                .setPathEndVelocityConstraint(5)
-                .build();
     }
     @Override
     public void runOpMode() throws InterruptedException {
@@ -268,6 +263,7 @@ public abstract class AutoBase extends LinearOpMode {
 
 
         Global.telemetry = telemetry;
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
         robot = new Robot(hardwareMap, gamepad1, gamepad2);
 
 //        TeamPropDetection teamPropDetection = new TeamPropDetection();
@@ -290,7 +286,7 @@ public abstract class AutoBase extends LinearOpMode {
         // AUDIENCE SIDE TO RIGHT STACK
         // START POSE: new Pose2d(-36.00, 62.00, Math.toRadians(90.00))
 
-        TrajectorySequence audienceSideLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+        /*TrajectorySequence audienceSideLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
                 .lineTo(new Vector2d(-36.00, 42.00))
                 .lineToLinearHeading(new Pose2d(-32.73, 31.07, Math.toRadians(180.00)))
                 .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
@@ -330,7 +326,7 @@ public abstract class AutoBase extends LinearOpMode {
 
         TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(backdropSideCenterPurple.end())
                 .lineToLinearHeading(c.backdropRight)
-                .build();
+                .build();*/
 
 
 
@@ -376,14 +372,6 @@ public abstract class AutoBase extends LinearOpMode {
 
         while (!isStarted() && !isStopRequested())
         {
-            // Team prop detection
-            TeamPropDetection.propLocation currentPropLoc = apriltags.GetPropLocation();
-            if(currentPropLoc!=TeamPropDetection.propLocation.NULL) {
-                propLoc = currentPropLoc;
-                telemetry.addLine("Detected:" + propLoc);
-                telemetry.update();
-            }
-
             // Config menu
             menu.update();
 
@@ -399,8 +387,15 @@ public abstract class AutoBase extends LinearOpMode {
             else if (!menu.isLocked()){
                 alreadyCompiled = false;
             }
-
-
+            if(menu.isLocked()){
+                // Team prop detection
+                TeamPropDetection.propLocation currentPropLoc = apriltags.GetPropLocation();
+                if(currentPropLoc!=TeamPropDetection.propLocation.NULL) {
+                    propLoc = currentPropLoc;
+                    telemetry.addData("Prop", propLoc);
+                    // telemetry.update();
+                }
+            }
         }
 
         apriltags.visionPortal.stopStreaming();
@@ -428,11 +423,11 @@ public abstract class AutoBase extends LinearOpMode {
         waitForStart();
 
 
-        drive.followTrajectorySequence(backdropSideCenterPurple);
-        Pose2d correctedPose = apriltags.getRobotPosFromTags();
-        drive.setPoseEstimate(correctedPose);
-        telemetry.addLine("x: "+correctedPose.getX() + " y: "+correctedPose.getY() + " heading: " + correctedPose.getHeading());
-        telemetry.update();
+//        drive.followTrajectorySequence(backdropSideCenterPurple);
+//        Pose2d correctedPose = apriltags.getRobotPosFromTags();
+//        drive.setPoseEstimate(correctedPose);
+//        telemetry.addLine("x: "+correctedPose.getX() + " y: "+correctedPose.getY() + " heading: " + correctedPose.getHeading());
+//        telemetry.update();
 
         while(!isStopRequested()){
             // wait
