@@ -69,14 +69,14 @@ public class TrajectoryBuilder {
         Vector2d trussCoordinate;
 
         if (stackLocation == STACK_LOCATIONS.LEFT) {
-            stackSetupCoordinate = c.stackLeftSetup;
-            stackCoordinate = c.stackLeft;
+            stackSetupCoordinate = c.leftStackSetup;
+            stackCoordinate = c.leftStack;
         } else if (stackLocation == STACK_LOCATIONS.CENTER) {
-            stackSetupCoordinate = c.stackCenterSetup;
-            stackCoordinate = c.stackCenter;
+            stackSetupCoordinate = c.centerStackSetup;
+            stackCoordinate = c.centerStack;
         } else {
-            stackSetupCoordinate = c.stackRightSetup;
-            stackCoordinate = c.stackRight;
+            stackSetupCoordinate = c.rightStackSetup;
+            stackCoordinate = c.rightStack;
         }
 
         if (trussLocation == TRUSS_LOCATIONS.OUTSIDE) {
@@ -172,11 +172,11 @@ public class TrajectoryBuilder {
 
         // far side
         TrajectorySequenceBuilder goToStackPDSetupBuilder = drive.trajectorySequenceBuilder(endPurpleDrop)
-                .lineToLinearHeading(c.stackLeftSetup); // stack location
+                .lineToLinearHeading(c.leftStackSetup); // stack location
         TrajectorySequence goToStackPDSetup = goToStackPDSetupBuilder.build();
 
         TrajectorySequenceBuilder goToStackBuilder = drive.trajectorySequenceBuilder(endPurpleDrop)
-                .lineToLinearHeading(c.stackLeft);
+                .lineToLinearHeading(c.leftStack);
         TrajectorySequence goToStack = goToStackBuilder.build();
 
         if (c.isNearSide) {

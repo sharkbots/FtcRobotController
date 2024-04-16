@@ -83,15 +83,15 @@ public abstract class AutoBase extends LinearOpMode {
         Vector2d purpleDropToStackPreSetup = new Vector2d(-39.0, 45.0);
         Pose2d purpleDropToStackSetup = new Pose2d(-51, 51, Math.toRadians(180));
 
-        Pose2d stackCenter = new Pose2d(-56, 24, Math.toRadians(180));
-        Pose2d stackCenterSetup = new Pose2d(stackCenter.getX()+10, stackCenter.getY(), stackCenter.getHeading());
+        Pose2d centerStack = new Pose2d(-56, 24, Math.toRadians(180));
+        Pose2d centerStackSetup = new Pose2d(centerStack.getX()+10, centerStack.getY(), centerStack.getHeading());
 
-        Pose2d stackLeft = new Pose2d(-57, 36, stackCenter.getHeading());
-        Pose2d stackLeftSetup = new Pose2d(-48, 36, stackLeft.getHeading());
+        Pose2d leftStack = new Pose2d(-57, 36, centerStack.getHeading());
+        Pose2d leftStackSetup = new Pose2d(-48, 36, leftStack.getHeading());
 
 
-        Pose2d stackRight = new Pose2d(stackCenter.getX(), stackCenter.getY()-12, stackCenter.getHeading());
-        Pose2d stackRightSetup = new Pose2d(stackRight.getX()+10, stackRight.getY(), stackRight.getHeading());
+        Pose2d rightStack = new Pose2d(centerStack.getX(), centerStack.getY()-12, centerStack.getHeading());
+        Pose2d rightStackSetup = new Pose2d(rightStack.getX()+10, rightStack.getY(), rightStack.getHeading());
 
 
 
@@ -147,12 +147,12 @@ public abstract class AutoBase extends LinearOpMode {
                 purpleDropToStackPreSetup = flipVectorAcrossX(purpleDropToStackPreSetup);
                 purpleDropToStackSetup = flipAcrossX(purpleDropToStackSetup);
 
-                stackCenter = flipAcrossX(stackCenter);
-                stackCenterSetup = flipAcrossX(stackCenterSetup);
-                stackLeft = flipAcrossX(stackLeft);
-                stackLeftSetup = flipAcrossX(stackLeftSetup);
-                stackRight = flipAcrossX(stackRight);
-                stackRightSetup = flipAcrossX(stackRightSetup);
+                centerStack = flipAcrossX(centerStack);
+                centerStackSetup = flipAcrossX(centerStackSetup);
+                leftStack = flipAcrossX(leftStack);
+                leftStackSetup = flipAcrossX(leftStackSetup);
+                rightStack = flipAcrossX(rightStack);
+                rightStackSetup = flipAcrossX(rightStackSetup);
 
                 AutoDataStorage.redSide = true;
 
@@ -201,42 +201,20 @@ public abstract class AutoBase extends LinearOpMode {
 
     abstract void Setup();
 
-
-    private PathChain goToBackdropThroughCenterTruss(Pose2d backdropPosition) {
-        return follower.pathBuilder()
-                .addPath(new BezierLine(new Point(c.stackLeft), new Point(c.centerTruss)))
-                .addParametricCallback(0.8, robot.outTake.getAsyncRunnable())
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .addPath(new BezierCurve(new Point(c.centerTruss), new Point(c.centerTrussToBackDropControlPoint), new Point(backdropPosition)))
-                //.addParametricCallback(0.2, )
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .build();
-    }
-
-    private PathChain goToStackSetupThroughCenterTruss(Pose2d backdropPosition) {
-        return follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(backdropPosition), new Point(c.centerTrussToBackDropControlPoint), new Point(c.centerTruss)))
-                .addParametricCallback(0.1, robot.resetOutTake.getAsyncRunnable())
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .addPath(new BezierLine(new Point(c.centerTruss), new Point(c.stackLeftSetup)))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .build();
-    }
-
     private enum STACK_POSITIONS{LEFT, CENTER, RIGHT}
     private PathChain intakeFromStack(AutoBase.STACK_POSITIONS position){
         Pose2d setup = new Pose2d(), stack = new Pose2d();
         if (position == AutoBase.STACK_POSITIONS.LEFT){
-            stack = c.stackLeft;
-            setup = c.stackLeftSetup;
+            stack = c.leftStack;
+            setup = c.leftStackSetup;
         }
         if (position == AutoBase.STACK_POSITIONS.CENTER){
-            stack = c.stackCenter;
-            setup = c.stackCenterSetup;
+            stack = c.centerStack;
+            setup = c.centerStackSetup;
         }
         if (position == AutoBase.STACK_POSITIONS.RIGHT){
-            stack = c.stackRight;
-            setup = c.stackRightSetup;
+            stack = c.rightStack;
+            setup = c.rightStackSetup;
         }
         return follower.pathBuilder()
                 .addPath(new BezierLine(new Point(setup), new Point(stack)))
@@ -272,11 +250,11 @@ public abstract class AutoBase extends LinearOpMode {
 
         TrajectorySequence stackSetup1 = drive.trajectorySequenceBuilder(purpleDrop.end())
                 .forward(2)
-                .splineToLinearHeading(c.stackLeftSetup, Math.toRadians(180))
+                .splineToLinearHeading(c.leftStackSetup, Math.toRadians(180))
                 .build();
 
         TrajectorySequence intakeStack1 = drive.trajectorySequenceBuilder(stackSetup1.end())
-                .lineToLinearHeading(c.stackLeft)
+                .lineToLinearHeading(c.leftStack)
                 .build();
 
         TrajectorySequence goToBackdrop1 = drive.trajectorySequenceBuilder(intakeStack1.end())
@@ -287,16 +265,16 @@ public abstract class AutoBase extends LinearOpMode {
         TrajectorySequence stackSetup2 = drive.trajectorySequenceBuilder(goToBackdrop1.end())
                 // Readjusts
                 .lineToLinearHeading(new Pose2d(c.backdropCenter.getX()+0.1, c.backdropCenter.getY(), c.backdropCenter.getHeading()))
-                .lineToLinearHeading(c.stackLeftSetup, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                .lineToLinearHeading(c.leftStackSetup, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
 
         TrajectorySequence intakeStack2 = drive.trajectorySequenceBuilder(stackSetup2.end())
-                .lineToLinearHeading(new Pose2d(c.stackLeft.getX()-1, c.stackLeft.getY(), c.stackLeft.getHeading()))
+                .lineToLinearHeading(new Pose2d(c.leftStack.getX()-1, c.leftStack.getY(), c.leftStack.getHeading()))
                 .build();
 
         TrajectorySequence goToBackdrop2 = drive.trajectorySequenceBuilder(intakeStack2.end())
-                .lineToLinearHeading(new Pose2d(c.stackLeft.getX()+0.1, c.stackLeft.getY(), c.stackLeft.getHeading()))
+                .lineToLinearHeading(new Pose2d(c.leftStack.getX()+0.1, c.leftStack.getY(), c.leftStack.getHeading()))
                 .lineToLinearHeading(c.backdropCenter, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
@@ -322,13 +300,6 @@ public abstract class AutoBase extends LinearOpMode {
                 .setPathEndHeadingConstraint(Math.toRadians(180))
                 .build();
 
-        goToBackdropCenterThroughCenterTruss = goToBackdropThroughCenterTruss(c.backdropCenter);
-        goToBackdropLeftThroughCenterTruss = goToBackdropThroughCenterTruss(c.backdropLeft);
-        goToBackdropRightThroughCenterTruss = goToBackdropThroughCenterTruss(c.backdropRight);
-
-        goToStackSetupThroughCenterTrussFromCenterBackdrop = goToStackSetupThroughCenterTruss(c.backdropCenter);
-        goToStackSetupThroughCenterTrussFromLeftBackdrop = goToStackSetupThroughCenterTruss(c.backdropLeft);
-        goToStackSetupThroughCenterTrussFromRightBackdrop = goToStackSetupThroughCenterTruss(c.backdropRight);
 */
 
         // Let's have at list 33% chance to pick it right if nothing works
@@ -388,11 +359,9 @@ public abstract class AutoBase extends LinearOpMode {
         apriltags.visionPortal.resumeStreaming();
 
 
-//        myLocalizer.setPoseEstimate(c.startPose);
-//        drive.setPoseEstimate(c.startPose); // !!!!!
+        myLocalizer.setPoseEstimate(c.startPose);
+        drive.setPoseEstimate(c.startPose); // !!!!!
 
-        myLocalizer.setPoseEstimate(new Pose2d(12.00, 62.00, Math.toRadians(90.00)));
-        drive.setPoseEstimate(new Pose2d(12.00, 62.00, Math.toRadians(90.00))); // !!!!!
 
 
 //
@@ -413,11 +382,36 @@ public abstract class AutoBase extends LinearOpMode {
                 .splineTo(new Vector2d(-46.00, 12.00), Math.toRadians(180.00))
                 .build();
 */
-        TrajectorySequence untitled0 = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
+
+        // AUDIENCE SIDE TO RIGHT STACK
+
+
+        TrajectorySequence audienceRightPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
                 .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
-                .splineTo(new Vector2d(-34.77, 14.05), Math.toRadians(270.00))
+                .splineTo(new Vector2d(-35.82, 13.35), Math.toRadians(270.00))
                 .splineTo(new Vector2d(-46.00, 12.00), Math.toRadians(180.00))
                 .build();
+
+
+        TrajectorySequence audienceMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+                .lineToLinearHeading(new Pose2d(-40.50, 24.70, Math.toRadians(180.00)))
+                .lineTo(new Vector2d(-44.50, 24.70))
+                .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
+                .build();
+
+        TrajectorySequence audienceLeftPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
+                .lineTo(new Vector2d(-36.00, 42.00))
+                .lineToLinearHeading(new Pose2d(-32.73, 31.07, Math.toRadians(180.00)))
+                .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
+                .build();
+
+
+
+        TrajectorySequence intakeRightStack = drive.trajectorySequenceBuilder(audienceRightPurpleToRightStack.end())
+                .lineToLinearHeading(c.rightStack)
+                .build();
+
+
 
         TrajectorySequence untitled1 = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
                 .lineTo(new Vector2d(11.68, 34.22))
@@ -430,9 +424,33 @@ public abstract class AutoBase extends LinearOpMode {
                 .build();
 
 
+        drive.followTrajectorySequence(audienceLeftPurpleToRightStack);
 
-        //drive.followTrajectorySequence(untitled0);
-        drive.followTrajectorySequence(untitled1);
+
+        /*robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+
+        Deadline deadline1 = new Deadline(500, TimeUnit.MILLISECONDS);
+        while(!deadline1.hasExpired()){
+
+        }
+
+        //drive.followTrajectorySequence(stackSetup1);
+
+        robot.startIntakingPixels.runAsync();
+        drive.followTrajectorySequence(intakeRightStack);
+
+        robot.tryIntakeTwoPixels.run();
+
+
+        while(!robot.intake.pixels.hasTwoPixels()) {
+            robot.intake.pixels.update();
+        }
+
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+        robot.holdPixels.run();*/
+
+
+        //drive.followTrajectorySequence(untitled1);
 
 
 
