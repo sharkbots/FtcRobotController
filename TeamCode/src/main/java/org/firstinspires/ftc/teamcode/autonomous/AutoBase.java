@@ -374,6 +374,14 @@ public abstract class AutoBase extends LinearOpMode {
 //        }
 //        else {
 
+
+
+        TrajectorySequence purpleCenterBackdrop = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
+                .lineTo(new Vector2d(12.00, 34.00))
+                .lineTo(new Vector2d(12.00, 37.00))
+                .lineToLinearHeading(c.backdropCenter)
+                .build();
+
         waitForStart();
 
         drive.followTrajectorySequence(backdropRightPurpleToLeftStack);
@@ -397,7 +405,9 @@ public abstract class AutoBase extends LinearOpMode {
 //        }
 
 
+
         /*robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+
 
         //drive.followTrajectorySequence(stackSetup1);
 
