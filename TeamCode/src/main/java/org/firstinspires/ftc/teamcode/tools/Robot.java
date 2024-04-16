@@ -185,6 +185,9 @@ public class Robot {
         openClaw = new Actions()
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.OPEN));
 
+        closeClaw = new Actions()
+                .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE));
+
         outTakeSetClawYawLeftHorizontal = new Actions()
                 .add(outTake)
                 .add(clawActionBuilder.setYawPosition(Claw.yawPositions.RIGHT_HORIZONTAL));
@@ -268,7 +271,7 @@ public class Robot {
 
     //Autonomous Actions
     public Actions tryIntakeOnePixel, tryIntakeTwoPixels, intakeOn, autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autonomousOpenClawYellow,
-            openClaw, outTakeSetClawYawLeftHorizontal, outTakeSetClawYawRightHorizontal, outTakeSetClawYawRightSlantedUp;
+            openClaw, closeClaw, outTakeSetClawYawLeftHorizontal, outTakeSetClawYawRightHorizontal, outTakeSetClawYawRightSlantedUp;
 
 
     public static OverrideMotor intakeMotor;
