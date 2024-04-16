@@ -63,10 +63,29 @@ public class TrajectoryBuilder {
         ArrayList<TrajectorySequence> finalTrajectory = new ArrayList<>();
 
 
-        Vector2d backdropIntermediateFar = c.backdropIntermediateFar;
-        Pose2d backdropIntermediateCoordinate;
+        Vector2d backdropIntermediateFar = c.backdropIntermediateFarOutside;
+        Pose2d stackCoordinate;
+        Pose2d stackSetupCoordinate;
+        Vector2d trussCoordinate;
 
+        if (stackLocation == STACK_LOCATIONS.LEFT) {
+            stackSetupCoordinate = c.stackLeftSetup;
+            stackCoordinate = c.stackLeft;
+        } else if (stackLocation == STACK_LOCATIONS.CENTER) {
+            stackSetupCoordinate = c.stackCenterSetup;
+            stackCoordinate = c.stackCenter;
+        } else {
+            stackSetupCoordinate = c.stackRightSetup;
+            stackCoordinate = c.stackRight;
+        }
 
+        if (trussLocation == TRUSS_LOCATIONS.OUTSIDE) {
+            trussCoordinate = c.backdropIntermediateFarOutside;
+        } else if (trussLocation ==  TRUSS_LOCATIONS.CENTER){
+            trussCoordinate = c.prepareFarDropCenter;
+        } else {
+            trussCoordinate = c.backdropIntermediateFarStageDoor;
+        }
 
         // ACTION 0: Drop pixel on spike mark
         TrajectorySequenceBuilder purpleDropBuilder = drive.trajectorySequenceBuilder(c.startPose);
@@ -153,7 +172,7 @@ public class TrajectoryBuilder {
 
         // far side
         TrajectorySequenceBuilder goToStackPDSetupBuilder = drive.trajectorySequenceBuilder(endPurpleDrop)
-                .lineToLinearHeading(c.stackLeftSetup);
+                .lineToLinearHeading(c.stackLeftSetup); // stack location
         TrajectorySequence goToStackPDSetup = goToStackPDSetupBuilder.build();
 
         TrajectorySequenceBuilder goToStackBuilder = drive.trajectorySequenceBuilder(endPurpleDrop)
@@ -164,7 +183,7 @@ public class TrajectoryBuilder {
             finalTrajectory.add(goToBackdrop); // get 1
         } else{
             finalTrajectory.add(goToStackPDSetup); // get 1
-            finalTrajectory.add(goToStack); // get
+            finalTrajectory.add(goToStack); // get 2
         }
 
 
@@ -172,11 +191,32 @@ public class TrajectoryBuilder {
 
         TrajectorySequence setupForBackdropFar = drive.trajectorySequenceBuilder(purpleDrop.end())
                 .forward(8)
-                .lineTo(c.prepareFarDrop, SampleMecanumDrive.getVelocityConstraint(15, 15, DriveConstants.TRACK_WIDTH),
+                .lineTo(c.prepareFarDropOutside, SampleMecanumDrive.getVelocityConstraint(15, 15, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .lineTo(backdropIntermediateFar, SampleMecanumDrive.getVelocityConstraint(15, 15, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
+
+        // CYCLE CODE
+        // TODO: include temporal or displacement markers, create var for after which trajectory cycle starts
+        TrajectorySequenceBuilder stackToBackdropBuilder = drive.trajectorySequenceBuilder(goToStackPDSetup.end())
+                .lineToLinearHeading(stackSetupCoordinate);
+        if (trussLocation == TRUSS_LOCATIONS.STAGE_DOOR) {
+            stackToBackdropBuilder = stackToBackdropBuilder.lineTo(c.prepareFarDropOutside);
+        }
+        stackToBackdropBuilder = stackToBackdropBuilder
+                .lineTo(trussCoordinate)
+                .lineToLinearHeading(backdropCoordinate);
+        TrajectorySequence stackToBackdrop = stackToBackdropBuilder.build();
+
+        TrajectorySequenceBuilder backdropToStackBuilder = drive.trajectorySequenceBuilder(goToStackPDSetup.end())
+                .lineTo(trussCoordinate);
+        if (trussLocation == TRUSS_LOCATIONS.STAGE_DOOR) {
+            stackToBackdropBuilder = stackToBackdropBuilder.lineTo(c.prepareFarDropOutside);
+        }
+        stackToBackdropBuilder = stackToBackdropBuilder
+                .lineToLinearHeading(stackSetupCoordinate);
+        TrajectorySequence backdropToStack = backdropToStackBuilder.build();
 
         /*
         TrajectorySequenceBuilder goToBackdropBuilder = drive.trajectorySequenceBuilder(endPurpleDrop);
