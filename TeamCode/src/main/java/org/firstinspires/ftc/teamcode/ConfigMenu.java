@@ -47,6 +47,7 @@ public class ConfigMenu {
         editMenuItem.addTransitionTo(editMenuItem, buttons.handlerLeftBumper::Pressed, new Action("decrementField",  ()->changeFieldBy(-0.1)));
     }
 
+
     private Boolean backupCurrentField() {
         Field field = fields[currentField];
         field.setAccessible(true);
@@ -57,6 +58,7 @@ public class ConfigMenu {
         }
         return true;
     }
+
 
     private Boolean restoreCurrentField() {
         Field field = fields[currentField];
