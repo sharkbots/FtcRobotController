@@ -410,36 +410,45 @@ public abstract class AutoBase extends LinearOpMode {
                .build();
 
 
-        TrajectorySequence purpleCenterAndStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+        TrajectorySequence purpleCenterBackdrop = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
                 .lineTo(new Vector2d(12.00, 34.00))
-                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
-                .lineToLinearHeading(c.stackRightSetup)
-                .lineToLinearHeading(c.stackRight)
+                .lineTo(new Vector2d(12.00, 37.00))
+                .lineToLinearHeading(c.backdropCenter)
                 .build();
 
-        TrajectorySequence purpleLeftAndStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
-                .lineTo(new Vector2d(12.00, 34.00))
-                .lineTo(new Vector2d(10.00, 34.00))
-                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
-                .lineToLinearHeading(c.stackRightSetup)
-                .lineToLinearHeading(c.stackRight)
-                .build();
-
-        TrajectorySequence purpleRightAndStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
-                .lineToLinearHeading(new Pose2d(12.00, 34.00, Math.toRadians(0.00)))
-                .lineTo(new Vector2d(14.00, 34.00))
-                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
-                .lineToLinearHeading(c.stackRightSetup)
-                .lineToLinearHeading(c.stackRight)
-                .build();
+        drive.followTrajectorySequence(purpleCenterBackdrop);
 
 
+//        TrajectorySequence purpleCenterAndStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+//                .lineTo(new Vector2d(12.00, 34.00))
+//                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
+//                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
+//                .lineToLinearHeading(c.stackRightSetup)
+//                .lineToLinearHeading(c.stackRight)
+//                .build();
+//
+//        TrajectorySequence purpleLeftAndStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+//                .lineTo(new Vector2d(12.00, 34.00))
+//                .lineTo(new Vector2d(10.00, 34.00))
+//                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
+//                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
+//                .lineToLinearHeading(c.stackRightSetup)
+//                .lineToLinearHeading(c.stackRight)
+//                .build();
+//
+//        TrajectorySequence purpleRightAndStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+//                .lineToLinearHeading(new Pose2d(12.00, 34.00, Math.toRadians(0.00)))
+//                .lineTo(new Vector2d(14.00, 34.00))
+//                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
+//                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
+//                .lineToLinearHeading(c.stackRightSetup)
+//                .lineToLinearHeading(c.stackRight)
+//                .build();
+        
 
 
-        drive.followTrajectorySequence(purpleCenterAndStack);
+
+
 
 
 
