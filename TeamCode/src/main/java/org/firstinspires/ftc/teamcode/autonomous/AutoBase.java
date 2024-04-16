@@ -416,16 +416,16 @@ public abstract class AutoBase extends LinearOpMode {
 //        else {
 
 
-
-        TrajectorySequence purpleCenterBackdrop = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
-                .lineTo(new Vector2d(12.00, 34.00))
-                .lineTo(new Vector2d(12.00, 37.00))
-                .lineToLinearHeading(c.backdropCenter)
-                .build();
-
         waitForStart();
 
-        drive.followTrajectorySequence(backdropRightPurpleToLeftStack);
+        TrajectorySequence purpleLeft = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
+                .lineTo(new Vector2d(19.30, 34.00))
+                .lineTo(new Vector2d(19.30, 40.00))
+                .lineToLinearHeading(c.backdropLeft)
+                .build();
+
+
+        drive.followTrajectorySequence(purpleLeft);
 
         /*TrajectorySequence untitled0 = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
                 .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
