@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -33,14 +34,9 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-//@Autonomous(name="Autonomous Base")
-public abstract class AutoBase extends LinearOpMode {
+@Autonomous(name="Autonomous")
+public class AutoBase extends LinearOpMode {
 
-    private Telemetry telemetryA;
-
-    private Follower follower;
-
-    private PathChain empty, purpleDrop, purpleToLeftSideStackSetup, goToBackdropCenterThroughCenterTruss, goToStackSetupThroughCenterTrussFromCenterBackdrop,goToStackSetupThroughCenterTrussFromLeftBackdrop, goToStackSetupThroughCenterTrussFromRightBackdrop, goToBackdropLeftThroughCenterTruss, goToBackdropRightThroughCenterTruss, backdropToLeftSideStack, park;
     private Deadline timer;
     private boolean alreadyCompiled = false;
     Buttons buttons;
@@ -48,26 +44,26 @@ public abstract class AutoBase extends LinearOpMode {
 
     ConfigItems config;
 
-    private enum STACK_LOCATION {
+    public enum STACK_LOCATION {
         LEFT,
         CENTER,
         RIGHT,
     }
-    private enum TRUSS_LOCATION {
+    public enum TRUSS_LOCATION {
         LEFT,
         CENTER,
         RIGHT,
     }
-    private enum PARK_LOCATION {
+    public enum PARK_LOCATION {
         LEFT,
         CENTER,
         RIGHT,
     }
-    private enum ALLIANCE {
+    public enum ALLIANCE {
         BLUE,
         RED,
     }
-    private enum SIDE {
+    public enum SIDE {
         NEAR,
         FAR,
     }
@@ -82,13 +78,13 @@ public abstract class AutoBase extends LinearOpMode {
         STACK_LOCATION stack_location = STACK_LOCATION.RIGHT;
         TRUSS_LOCATION truss_location = TRUSS_LOCATION.LEFT;
         PARK_LOCATION park_location = PARK_LOCATION.LEFT;
-        Integer numCycles = 0;
-        Integer waitForStack1 = 0;
-        Integer waitForStack2 = 0;
-        Integer waitForStack3 = 0;
-        Integer waitBackdrop1 = 0;
-        Integer waitBackdrop2 = 0;
-        Integer waitBackdrop3 = 0;
+        int numCycles = 0;
+        int waitForStack1 = 0;
+        int waitForStack2 = 0;
+        int waitForStack3 = 0;
+        int waitBackdrop1 = 0;
+        int waitBackdrop2 = 0;
+        int waitBackdrop3 = 0;
     }
 
 
@@ -243,10 +239,10 @@ public abstract class AutoBase extends LinearOpMode {
     }
     Coordinates c; //= new Coordinates(true, true); // change values later
 
-    abstract void Setup();
+    public void Setup(){};
 
     private enum STACK_POSITIONS{LEFT, CENTER, RIGHT}
-    private PathChain intakeFromStack(AutoBase.STACK_POSITIONS position){
+    private void intakeFromStack(AutoBase.STACK_POSITIONS position){
         Pose2d setup = new Pose2d(), stack = new Pose2d();
         if (position == AutoBase.STACK_POSITIONS.LEFT){
             stack = c.leftStack;
@@ -260,11 +256,6 @@ public abstract class AutoBase extends LinearOpMode {
             stack = c.rightStack;
             setup = c.rightStackSetup;
         }
-        return follower.pathBuilder()
-                .addPath(new BezierLine(new Point(setup), new Point(stack)))
-                .addParametricCallback(0.2, robot.startIntakingPixels.getRunnable())
-                .setPathEndVelocityConstraint(5)
-                .build();
     }
     @Override
     public void runOpMode() throws InterruptedException {
@@ -272,6 +263,7 @@ public abstract class AutoBase extends LinearOpMode {
 
 
         Global.telemetry = telemetry;
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
         robot = new Robot(hardwareMap, gamepad1, gamepad2);
 
 //        TeamPropDetection teamPropDetection = new TeamPropDetection();
@@ -294,35 +286,47 @@ public abstract class AutoBase extends LinearOpMode {
         // AUDIENCE SIDE TO RIGHT STACK
         // START POSE: new Pose2d(-36.00, 62.00, Math.toRadians(90.00))
 
-
-
-        TrajectorySequence audienceLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+        /*TrajectorySequence audienceSideLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
                 .lineTo(new Vector2d(-36.00, 42.00))
                 .lineToLinearHeading(new Pose2d(-32.73, 31.07, Math.toRadians(180.00)))
                 .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
                 .build();
 
-        TrajectorySequence audienceMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+        TrajectorySequence audienceSideMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
                 .lineToLinearHeading(new Pose2d(-40.50, 24.70, Math.toRadians(180.00)))
                 .lineTo(new Vector2d(-44.50, 24.70))
                 .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
                 .build();
 
-        TrajectorySequence audienceRightPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+        TrajectorySequence audienceSideRightPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
                 .lineTo(new Vector2d(12.00, 42.00))
                 .lineToLinearHeading(new Pose2d(9.31, 32.49, Math.toRadians(0.00)))
                 .build();
 
 
 
+
+
         // BACKDROP SIDE TO LEFT STACK
         // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
 
-
-        TrajectorySequence backdropRightPurpleToLeftStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+        TrajectorySequence backdropSideRightPurple = drive.trajectorySequenceBuilder(c.startPose)
                 .lineTo(new Vector2d(12.00, 42.00))
-                .lineToLinearHeading(new Pose2d(11.23, 32.49, Math.toRadians(0.00)))
+                .lineToLinearHeading(new Pose2d(8.23, 33.81, Math.toRadians(0.00)))
+                .lineTo(new Vector2d(15.23, 33.81))
+                .lineToLinearHeading(new Pose2d(15.73, 33.81, Math.toRadians(180.0)))
                 .build();
+
+        TrajectorySequence backdropSideCenterPurple = drive.trajectorySequenceBuilder(c.startPose)
+                .lineTo(new Vector2d(10.50, 31.50))
+                .lineToLinearHeading(new Pose2d(15.50, 38.50, Math.toRadians(90.00)))
+                .lineToLinearHeading(new Pose2d(16.00, 38.50, Math.toRadians(180.00)))
+                .build();
+
+
+        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(backdropSideCenterPurple.end())
+                .lineToLinearHeading(c.backdropRight)
+                .build();*/
 
 
 
@@ -332,7 +336,7 @@ public abstract class AutoBase extends LinearOpMode {
 
 
         AprilTagPoseDetection apriltags = new AprilTagPoseDetection();
-        apriltags.setup(c.isBlueAlliance, hardwareMap);
+        apriltags.setup(config.alliance == ALLIANCE.BLUE, hardwareMap);
 
         apriltags.visionPortal.stopStreaming();
         apriltags.visionPortal.setProcessorEnabled(apriltags.aprilTag, false);
@@ -368,14 +372,6 @@ public abstract class AutoBase extends LinearOpMode {
 
         while (!isStarted() && !isStopRequested())
         {
-            // Team prop detection
-            TeamPropDetection.propLocation currentPropLoc = apriltags.GetPropLocation();
-            if(currentPropLoc!=TeamPropDetection.propLocation.NULL) {
-                propLoc = currentPropLoc;
-                telemetry.addLine("Detected:" + propLoc);
-                telemetry.update();
-            }
-
             // Config menu
             menu.update();
 
@@ -384,15 +380,22 @@ public abstract class AutoBase extends LinearOpMode {
 
                 //Compile all the trajectories using the input menu items
                 Coordinates c = new Coordinates(config.alliance, config.side);
-                TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
+                TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive, config);
                 ArrayList<TrajectorySequence> finalTrajectory;
 
             }
             else if (!menu.isLocked()){
                 alreadyCompiled = false;
             }
-
-
+            if(menu.isLocked()){
+                // Team prop detection
+                TeamPropDetection.propLocation currentPropLoc = apriltags.GetPropLocation();
+                if(currentPropLoc!=TeamPropDetection.propLocation.NULL) {
+                    propLoc = currentPropLoc;
+                    telemetry.addData("Prop", propLoc);
+                    // telemetry.update();
+                }
+            }
         }
 
         apriltags.visionPortal.stopStreaming();
@@ -416,6 +419,7 @@ public abstract class AutoBase extends LinearOpMode {
 //        else {
 
 
+
         waitForStart();
 
         TrajectorySequence purpleLeft = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
@@ -426,6 +430,18 @@ public abstract class AutoBase extends LinearOpMode {
 
 
         drive.followTrajectorySequence(purpleLeft);
+
+
+//        drive.followTrajectorySequence(backdropSideCenterPurple);
+//        Pose2d correctedPose = apriltags.getRobotPosFromTags();
+//        drive.setPoseEstimate(correctedPose);
+//        telemetry.addLine("x: "+correctedPose.getX() + " y: "+correctedPose.getY() + " heading: " + correctedPose.getHeading());
+//        telemetry.update();
+
+        while(!isStopRequested()){
+            // wait
+        }
+        //drive.followTrajectorySequence(goToBackdrop);
 
         /*TrajectorySequence untitled0 = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
                 .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))

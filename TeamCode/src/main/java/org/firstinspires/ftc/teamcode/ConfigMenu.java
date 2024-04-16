@@ -151,13 +151,15 @@ public class ConfigMenu {
         try {
             if(sm.currentState==lockMenu){
                 Global.telemetry.addLine(bold(color("Menu values are locked.", "red")));
+                currentField = 0;
             }
             // Display static fields
             for (int i = 0; i < fields.length; i++) {
                 Field field = fields[i];
                 field.setAccessible(true);
                 Object value = field.get(Modifier.isStatic(field.getModifiers()) ? null : object); // Use null for static fields
-                Global.telemetry.addData(formattedFieldName(i), value != null ? formattedValue(i, value.toString()) : "null");
+                Global.telemetry.addData(sm.currentState==lockMenu? unformattedFieldName(i) : formattedFieldName(i),
+                        value != null ? (sm.currentState==lockMenu? value.toString():formattedValue(i, value.toString())) : "null");
             }
 
         } catch (IllegalAccessException e) {
@@ -168,6 +170,9 @@ public class ConfigMenu {
 
     private String formattedFieldName(int fieldIndex) {
         return formattedValue(fieldIndex, fields[fieldIndex].getName());
+    }
+    private String unformattedFieldName(int fieldIndex) {
+        return fields[fieldIndex].getName();
     }
 
     private String formattedValue(int fieldIndex, String value) {
