@@ -247,34 +247,47 @@ public abstract class AutoBase extends LinearOpMode {
         // AUDIENCE SIDE TO RIGHT STACK
         // START POSE: new Pose2d(-36.00, 62.00, Math.toRadians(90.00))
 
-
-
-        TrajectorySequence audienceLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+        TrajectorySequence audienceSideLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
                 .lineTo(new Vector2d(-36.00, 42.00))
                 .lineToLinearHeading(new Pose2d(-32.73, 31.07, Math.toRadians(180.00)))
                 .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
                 .build();
 
-        TrajectorySequence audienceMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+        TrajectorySequence audienceSideMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
                 .lineToLinearHeading(new Pose2d(-40.50, 24.70, Math.toRadians(180.00)))
                 .lineTo(new Vector2d(-44.50, 24.70))
                 .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
                 .build();
 
-        TrajectorySequence audienceRightPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+        TrajectorySequence audienceSideRightPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
                 .lineTo(new Vector2d(12.00, 42.00))
                 .lineToLinearHeading(new Pose2d(9.31, 32.49, Math.toRadians(0.00)))
                 .build();
 
 
 
+
+
         // BACKDROP SIDE TO LEFT STACK
         // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
 
-
-        TrajectorySequence backdropRightPurpleToLeftStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+        TrajectorySequence backdropSideRightPurple = drive.trajectorySequenceBuilder(c.startPose)
                 .lineTo(new Vector2d(12.00, 42.00))
-                .lineToLinearHeading(new Pose2d(11.23, 32.49, Math.toRadians(0.00)))
+                .lineToLinearHeading(new Pose2d(8.23, 33.81, Math.toRadians(0.00)))
+                .lineTo(new Vector2d(15.23, 33.81))
+                .lineToLinearHeading(new Pose2d(15.73, 33.81, Math.toRadians(180.0)))
+                //.lineToLinearHeading(c.backdropRight)
+                .build();
+
+        TrajectorySequence backdropSideCenterPurple = drive.trajectorySequenceBuilder(c.startPose)
+                .lineTo(new Vector2d(10.50, 31.50))
+                .lineToLinearHeading(new Pose2d(15.50, 38.50, Math.toRadians(90.00)))
+                .lineToLinearHeading(new Pose2d(16.00, 38.50, Math.toRadians(180.00)))
+                .build();
+
+
+        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(backdropSideCenterPurple.end())
+                .lineToLinearHeading(c.backdropRight)
                 .build();
 
 
@@ -352,15 +365,19 @@ public abstract class AutoBase extends LinearOpMode {
 
 
 
-        TrajectorySequence purpleCenterBackdrop = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
-                .lineTo(new Vector2d(12.00, 34.00))
-                .lineTo(new Vector2d(12.00, 37.00))
-                .lineToLinearHeading(c.backdropCenter)
-                .build();
-
         waitForStart();
 
-        drive.followTrajectorySequence(backdropRightPurpleToLeftStack);
+
+        drive.followTrajectorySequence(backdropSideCenterPurple);
+        Pose2d correctedPose = apriltags.getRobotPosFromTags();
+        drive.setPoseEstimate(correctedPose);
+        telemetry.addLine("x: "+correctedPose.getX() + " y: "+correctedPose.getY() + " heading: " + correctedPose.getHeading());
+        telemetry.update();
+
+        while(!isStopRequested()){
+            // wait
+        }
+        //drive.followTrajectorySequence(goToBackdrop);
 
         /*TrajectorySequence untitled0 = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
                 .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
