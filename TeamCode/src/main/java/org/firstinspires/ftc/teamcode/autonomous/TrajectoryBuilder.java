@@ -11,13 +11,11 @@ import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySe
 import java.util.ArrayList;
 
 public class TrajectoryBuilder {
+    AutoBase.ConfigItems config;
     private final AutoBase.Coordinates c;
     private final SampleMecanumDrive drive;
 
     private PROP_LOCATIONS propLocation;
-    private STACK_LOCATIONS stackLocation;
-    private TRUSS_LOCATIONS trussLocation;
-
 
     public enum PROP_LOCATIONS {
         LEFT,
@@ -25,21 +23,9 @@ public class TrajectoryBuilder {
         RIGHT
     }
 
-    public enum STACK_LOCATIONS {
-        LEFT,
-        CENTER,
-        RIGHT
-    }
 
-    public enum TRUSS_LOCATIONS {
-        OUTSIDE,
-        CENTER,
-        STAGE_DOOR
-    }
-
-
-
-    public TrajectoryBuilder(AutoBase.Coordinates coordinates, SampleMecanumDrive drive){
+    public TrajectoryBuilder(AutoBase.Coordinates coordinates, SampleMecanumDrive drive, AutoBase.ConfigItems config){
+        this.config = config;
         this.c = coordinates;
         this.drive = drive;
 
@@ -53,15 +39,10 @@ public class TrajectoryBuilder {
         trajectorySequenceRight = computeTrajectory();
     }
 
-    public void setAutoConfig(STACK_LOCATIONS stackLocation, TRUSS_LOCATIONS trussLocation){
-        this.stackLocation = stackLocation;
-        this.trussLocation = trussLocation;
-
-    }
-
     public ArrayList<TrajectorySequence> computeTrajectory() {
         ArrayList<TrajectorySequence> finalTrajectory = new ArrayList<>();
 
+/*
 
         Vector2d backdropIntermediateFar = c.backdropIntermediateFarOutside;
         Pose2d stackCoordinate;
@@ -77,14 +58,6 @@ public class TrajectoryBuilder {
         } else {
             stackSetupCoordinate = c.rightStackSetup;
             stackCoordinate = c.rightStack;
-        }
-
-        if (trussLocation == TRUSS_LOCATIONS.OUTSIDE) {
-            trussCoordinate = c.backdropIntermediateFarOutside;
-        } else if (trussLocation ==  TRUSS_LOCATIONS.CENTER){
-            trussCoordinate = c.prepareFarDropCenter;
-        } else {
-            trussCoordinate = c.backdropIntermediateFarStageDoor;
         }
 
         // ACTION 0: Drop pixel on spike mark
@@ -146,7 +119,7 @@ public class TrajectoryBuilder {
         TrajectorySequence purpleDropToStackSetup = purpleDropToStackSetupBuilder.build();
 
         Pose2d endPurpleDrop;
-        if (c.isNearSide) {
+        if (config.side == AutoBase.SIDE.NEAR) {
             finalTrajectory.add(setupForBackdropNear);
             endPurpleDrop = setupForBackdropNear.end();
         } else{
@@ -162,7 +135,7 @@ public class TrajectoryBuilder {
                 .lineToLinearHeading(backdropCoordinate);
 
         if (c.startPose.getHeading()!=teamPropCoordinate.getHeading()) {
-            if (c.isBlueAlliance) {
+            if (config.alliance == AutoBase.ALLIANCE.BLUE) {
                 goToBackdropBuilder = goToBackdropBuilder.strafeLeft(4);
             } else {
                 goToBackdropBuilder = goToBackdropBuilder.strafeRight(6);
@@ -179,7 +152,7 @@ public class TrajectoryBuilder {
                 .lineToLinearHeading(c.leftStack);
         TrajectorySequence goToStack = goToStackBuilder.build();
 
-        if (c.isNearSide) {
+        if (config.side == AutoBase.SIDE.NEAR) {
             finalTrajectory.add(goToBackdrop); // get 1
         } else{
             finalTrajectory.add(goToStackPDSetup); // get 1
@@ -256,7 +229,7 @@ public class TrajectoryBuilder {
             }
         }
         TrajectorySequence goToBackdrop = goToBackdropBuilder.build();
-        finalTrajectory.add(goToBackdrop); // get 2*/
+        finalTrajectory.add(goToBackdrop); // get 2
 
         TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdrop.end())
                 .lineTo(c.parkInCorner)
@@ -267,12 +240,12 @@ public class TrajectoryBuilder {
                 .forward(2)
                 .build();
 
-        if (c.isNearSide) {
+        if (config.side == AutoBase.SIDE.NEAR) {
             finalTrajectory.add(parkRight);
         }else{
             finalTrajectory.add(parkLeft);
         }
-
+*/
         return finalTrajectory;
     }
 

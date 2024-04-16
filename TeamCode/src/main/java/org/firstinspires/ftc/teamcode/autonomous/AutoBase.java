@@ -48,26 +48,26 @@ public abstract class AutoBase extends LinearOpMode {
 
     ConfigItems config;
 
-    private enum STACK_LOCATION {
+    public enum STACK_LOCATION {
         LEFT,
         CENTER,
         RIGHT,
     }
-    private enum TRUSS_LOCATION {
+    public enum TRUSS_LOCATION {
         LEFT,
         CENTER,
         RIGHT,
     }
-    private enum PARK_LOCATION {
+    public enum PARK_LOCATION {
         LEFT,
         CENTER,
         RIGHT,
     }
-    private enum ALLIANCE {
+    public enum ALLIANCE {
         BLUE,
         RED,
     }
-    private enum SIDE {
+    public enum SIDE {
         NEAR,
         FAR,
     }
@@ -82,13 +82,13 @@ public abstract class AutoBase extends LinearOpMode {
         STACK_LOCATION stack_location = STACK_LOCATION.RIGHT;
         TRUSS_LOCATION truss_location = TRUSS_LOCATION.LEFT;
         PARK_LOCATION park_location = PARK_LOCATION.LEFT;
-        Integer numCycles = 0;
-        Integer waitForStack1 = 0;
-        Integer waitForStack2 = 0;
-        Integer waitForStack3 = 0;
-        Integer waitBackdrop1 = 0;
-        Integer waitBackdrop2 = 0;
-        Integer waitBackdrop3 = 0;
+        int numCycles = 0;
+        int waitForStack1 = 0;
+        int waitForStack2 = 0;
+        int waitForStack3 = 0;
+        int waitBackdrop1 = 0;
+        int waitBackdrop2 = 0;
+        int waitBackdrop3 = 0;
     }
 
 
@@ -345,7 +345,7 @@ public abstract class AutoBase extends LinearOpMode {
 
 
         AprilTagPoseDetection apriltags = new AprilTagPoseDetection();
-        apriltags.setup(c.isBlueAlliance, hardwareMap);
+        apriltags.setup(config.alliance == ALLIANCE.BLUE, hardwareMap);
 
         apriltags.visionPortal.stopStreaming();
         apriltags.visionPortal.setProcessorEnabled(apriltags.aprilTag, false);
@@ -397,7 +397,7 @@ public abstract class AutoBase extends LinearOpMode {
 
                 //Compile all the trajectories using the input menu items
                 Coordinates c = new Coordinates(config.alliance, config.side);
-                TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
+                TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive, config);
                 ArrayList<TrajectorySequence> finalTrajectory;
 
             }
