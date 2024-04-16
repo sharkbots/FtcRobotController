@@ -330,10 +330,6 @@ public abstract class AutoBase extends LinearOpMode {
         goToStackSetupThroughCenterTrussFromLeftBackdrop = goToStackSetupThroughCenterTruss(c.backdropLeft);
         goToStackSetupThroughCenterTrussFromRightBackdrop = goToStackSetupThroughCenterTruss(c.backdropRight);
 */
-        telemetryA.addLine("Good to start, go for it.");
-        telemetryA.update();
-        Global.telemetry.speak("sharkbots is alive");
-
 
         // Let's have at list 33% chance to pick it right if nothing works
         TeamPropDetection.propLocation propLoc = TeamPropDetection.propLocation.CENTER;
@@ -394,6 +390,11 @@ public abstract class AutoBase extends LinearOpMode {
 
 //        myLocalizer.setPoseEstimate(c.startPose);
 //        drive.setPoseEstimate(c.startPose); // !!!!!
+
+        myLocalizer.setPoseEstimate(new Pose2d(12.00, 62.00, Math.toRadians(90.00)));
+        drive.setPoseEstimate(new Pose2d(12.00, 62.00, Math.toRadians(90.00))); // !!!!!
+
+
 //
 //        if (propLoc == TeamPropDetection.propLocation.LEFT) {
 //            finalTrajectory = trajectoryBuilder.trajectorySequenceLeft;
@@ -405,11 +406,34 @@ public abstract class AutoBase extends LinearOpMode {
 
         waitForStart();
 
+        /*TrajectorySequence untitled0 = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
+                .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
+                .lineTo(new Vector2d(-39.51, 21.65))
+                .splineTo(new Vector2d(-37.58, 7.73), Math.toRadians(270.00))
+                .splineTo(new Vector2d(-46.00, 12.00), Math.toRadians(180.00))
+                .build();
+*/
         TrajectorySequence untitled0 = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
-                .lineToLinearHeading(new Pose2d(-37.76, 31.43, Math.toRadians(0.00)))
+                .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
+                .splineTo(new Vector2d(-34.77, 14.05), Math.toRadians(270.00))
+                .splineTo(new Vector2d(-46.00, 12.00), Math.toRadians(180.00))
                 .build();
 
-        drive.followTrajectorySequence(untitled0);
+        TrajectorySequence untitled1 = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+                .lineTo(new Vector2d(11.68, 34.22))
+                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(177.80)))
+                .lineToLinearHeading(new Pose2d(-39.02, 60.07, Math.toRadians(198.03)))
+                .lineToLinearHeading(new Pose2d(-56.00, 36.00, Math.toRadians(180.00)))
+                .lineTo(new Vector2d(-37.70, 10.85))
+                .lineTo(new Vector2d(11.85, 11.19))
+                .lineTo(new Vector2d(51.00, 37.00))
+                .build();
+
+
+
+        //drive.followTrajectorySequence(untitled0);
+        drive.followTrajectorySequence(untitled1);
+
 
 
 
