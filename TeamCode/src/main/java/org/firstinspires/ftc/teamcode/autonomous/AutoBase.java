@@ -30,6 +30,7 @@ import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
 import org.firstinspires.ftc.vision.VisionPortal;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 //@Autonomous(name="Autonomous Base")
@@ -41,29 +42,32 @@ public abstract class AutoBase extends LinearOpMode {
 
     private PathChain empty, purpleDrop, purpleToLeftSideStackSetup, goToBackdropCenterThroughCenterTruss, goToStackSetupThroughCenterTrussFromCenterBackdrop,goToStackSetupThroughCenterTrussFromLeftBackdrop, goToStackSetupThroughCenterTrussFromRightBackdrop, goToBackdropLeftThroughCenterTruss, goToBackdropRightThroughCenterTruss, backdropToLeftSideStack, park;
     private Deadline timer;
+    private boolean alreadyCompiled = false;
     Buttons buttons;
     ConfigMenu menu;
 
-    enum STACK_LOCATION {
+    ConfigItems config;
+
+    private enum STACK_LOCATION {
         LEFT,
         CENTER,
         RIGHT,
     }
-    enum TRUSS_LOCATION {
+    private enum TRUSS_LOCATION {
         LEFT,
         CENTER,
         RIGHT,
     }
-    enum PARK_LOCATION {
+    private enum PARK_LOCATION {
         LEFT,
         CENTER,
         RIGHT,
     }
-    enum ALLIANCE {
+    private enum ALLIANCE {
         BLUE,
         RED,
     }
-    enum SIDE {
+    private enum SIDE {
         NEAR,
         FAR,
     }
@@ -146,15 +150,11 @@ public abstract class AutoBase extends LinearOpMode {
         Pose2d centerTrussToBackDropControlPoint = new Pose2d(30, 36);
 
 
-        public Coordinates() {
-//            this.isBlueAlliance = isBlueAlliance;
-//            this.isNearSide = isNearSide;
+        public Coordinates(ALLIANCE alliance, SIDE side) {
             AutoDataStorage.redSide = false;
 
-            // Default is blue alliance near side
-
             // Blue alliance far side
-            if(alliance == ALLIANCE.BLUE && !isNearSide){
+            if(alliance == ALLIANCE.BLUE && side == SIDE.FAR){
                 startPose = flipToFarSide(startPose);
                 Pose2d tempLeftTeamProp = leftTeamProp;
                 leftTeamProp = flipToFarSide(rightTeamProp);
@@ -164,7 +164,7 @@ public abstract class AutoBase extends LinearOpMode {
             }
 
             // Red alliance
-            if (!isBlueAlliance){
+            if (alliance == ALLIANCE.RED){
                 // Red backdrop
                 setupForBackdrop = flipVectorAcrossX(setupForBackdrop);
 
@@ -201,7 +201,7 @@ public abstract class AutoBase extends LinearOpMode {
                 AutoDataStorage.redSide = true;
 
                 // Near side
-                if (isNearSide){
+                if (side==SIDE.NEAR){
                     startPose = flipAcrossX(startPose);
                     Pose2d tempLeftTeamProp = leftTeamProp;
                     leftTeamProp = flipAcrossX(rightTeamProp);//blue left spike mark is symmetrical to red right spike mark
@@ -210,7 +210,7 @@ public abstract class AutoBase extends LinearOpMode {
                 }
 
                 // Far side
-                if (!isNearSide){
+                if (side==SIDE.FAR){
                     startPose = flipAcrossCenter(startPose);
                     leftTeamProp = flipAcrossCenter(leftTeamProp);
                     centerTeamProp = flipAcrossCenter(centerTeamProp);
@@ -288,9 +288,9 @@ public abstract class AutoBase extends LinearOpMode {
 
         // start location (coordinate)
 
-
+        config = new ConfigItems();
         buttons = new Buttons(gamepad1, gamepad2);
-        menu = new ConfigMenu(new ConfigItems(), buttons);
+        menu = new ConfigMenu(config, buttons);
         // AUDIENCE SIDE TO RIGHT STACK
         // START POSE: new Pose2d(-36.00, 62.00, Math.toRadians(90.00))
 
@@ -329,8 +329,7 @@ public abstract class AutoBase extends LinearOpMode {
         // Let's have at list 33% chance to pick it right if nothing works
         TeamPropDetection.propLocation propLoc = TeamPropDetection.propLocation.CENTER;
 
-//        TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
-//        ArrayList<TrajectorySequence> finalTrajectory;
+
 
         AprilTagPoseDetection apriltags = new AprilTagPoseDetection();
         apriltags.setup(c.isBlueAlliance, hardwareMap);
@@ -380,7 +379,18 @@ public abstract class AutoBase extends LinearOpMode {
             // Config menu
             menu.update();
 
+            if(menu.isLocked() && !alreadyCompiled){
+                alreadyCompiled = true;
 
+                //Compile all the trajectories using the input menu items
+                Coordinates c = new Coordinates(config.alliance, config.side);
+                TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive);
+                ArrayList<TrajectorySequence> finalTrajectory;
+
+            }
+            else if (!menu.isLocked()){
+                alreadyCompiled = false;
+            }
 
 
         }

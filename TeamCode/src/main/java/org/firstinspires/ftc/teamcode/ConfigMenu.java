@@ -47,7 +47,8 @@ public class ConfigMenu {
         editMenuItem.addTransitionTo(editMenuItem, buttons.handlerRightBumper::Pressed, new Action("incrementField", ()->changeFieldBy(0.1)));
         editMenuItem.addTransitionTo(editMenuItem, buttons.handlerLeftBumper::Pressed, new Action("decrementField",  ()->changeFieldBy(-0.1)));
 
-        lockMenu.addTransitionTo(lockMenu, buttons.handlerX::Pressed, new Action("menu locked", this::lockMenu));
+        navigateMenu.addTransitionTo(lockMenu, buttons.handlerX::Pressed, new Action("menu locked", ()->true));
+        lockMenu.addTransitionTo(navigateMenu, buttons.handlerX::Pressed, new Action("menu locked", ()->true));
     }
 
 
@@ -80,6 +81,7 @@ public class ConfigMenu {
         buttons.update();
         sm.updateState();
         updateDisplay();
+
     }
 
     private boolean changeFieldBy(double value)  {
@@ -131,9 +133,13 @@ public class ConfigMenu {
         return true;
     }
 
-    private boolean lockMenu(){
-
-        return true;
+    public boolean isLocked(){
+        if (sm.currentState!=lockMenu){
+            return false;
+        }
+        else {
+            return true;
+        }
     }
     private boolean nextMenuItem() {
         currentField = Range.clip(currentField+1, 0, fields.length-1);
@@ -143,17 +149,15 @@ public class ConfigMenu {
     public void updateDisplay() {
         // Assuming Global.telemetry is accessible and correct.
         try {
-            if(sm.currentState!=lockMenu) {
-                // Display static fields
-                for (int i = 0; i < fields.length; i++) {
-                    Field field = fields[i];
-                    field.setAccessible(true);
-                    Object value = field.get(Modifier.isStatic(field.getModifiers()) ? null : object); // Use null for static fields
-                    Global.telemetry.addData(formattedFieldName(i), value != null ? formattedValue(i, value.toString()) : "null");
-                }
+            if(sm.currentState==lockMenu){
+                Global.telemetry.addLine(bold(color("Menu values are locked.", "red")));
             }
-            else {
-                Global.telemetry.addLine("Menu values are locked.");
+            // Display static fields
+            for (int i = 0; i < fields.length; i++) {
+                Field field = fields[i];
+                field.setAccessible(true);
+                Object value = field.get(Modifier.isStatic(field.getModifiers()) ? null : object); // Use null for static fields
+                Global.telemetry.addData(formattedFieldName(i), value != null ? formattedValue(i, value.toString()) : "null");
             }
 
         } catch (IllegalAccessException e) {
