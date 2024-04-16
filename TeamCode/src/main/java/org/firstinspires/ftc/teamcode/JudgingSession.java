@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.aprilTags.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
 import org.firstinspires.ftc.teamcode.tools.Global;
+import org.firstinspires.ftc.teamcode.tools.JudgingRobot;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.SetDriveMotors;
 
@@ -16,7 +17,7 @@ public class JudgingSession extends LinearOpMode {
 
     private boolean isLiftReset = false;
 
-    Robot robot;
+    JudgingRobot robot;
     AprilTagDetection aprilTagDetection;
     Pose2d startPose;
 
@@ -24,7 +25,7 @@ public class JudgingSession extends LinearOpMode {
         Global.telemetry = telemetry;
         driveMotors = new SetDriveMotors(hardwareMap);
 
-        robot = new Robot(hardwareMap, gamepad1, gamepad2);
+        robot = new JudgingRobot(hardwareMap, gamepad1, gamepad2);
 
         aprilTagDetection = new AprilTagDetection();
         aprilTagDetection.Setup(hardwareMap, telemetry);
