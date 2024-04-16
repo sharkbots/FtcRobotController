@@ -398,6 +398,21 @@ public class AutoBase extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(9.31, 32.49, Math.toRadians(0.00)))
                 .build();
 
+        TrajectorySequence purpleLeftStraight = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
+                .lineTo(new Vector2d(19.30, 34.00))
+                .lineTo(new Vector2d(19.30, 40.00))
+                .lineToLinearHeading(c.backdropLeft)
+                .build();
+
+        TrajectorySequence purpleLeftTurn = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
+                .lineToLinearHeading(new Pose2d(14.00, 30.00, Math.toRadians(180.00)))
+                .lineTo(new Vector2d(10.00, 30.00))
+                .lineTo(new Vector2d(13.17, 9.20))
+                .build();
+
+
+        drive.followTrajectorySequence(purpleLeftStraight);
+
 
 
 
