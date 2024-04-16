@@ -29,6 +29,7 @@ public class ConfigMenu {
         sm = new StateMachine();
         navigateMenu = new StateMachine.State("navigateMenu");
         editMenuItem = new StateMachine.State("editMenuItem");
+        lockMenu = new StateMachine.State("lockMenu");
         sm.setInitialState(navigateMenu);
 
         navigateMenu.addTransitionTo(editMenuItem, buttons.handlerA::Pressed, new Action("enterEdit", ()->true));
@@ -39,7 +40,11 @@ public class ConfigMenu {
 
         editMenuItem.addTransitionTo(editMenuItem, buttons.handlerDPad_Right::Pressed, new Action("incrementField", this::incrementField));
         editMenuItem.addTransitionTo(editMenuItem, buttons.handlerDPad_Left::Pressed, new Action("decrementField", this::decrementField));
+
+        lockMenu.addTransitionTo(lockMenu, buttons.handlerX::Pressed, new Action("menu locked", this::lockMenu));
     }
+
+
 
     public void update() {
         buttons.update();
@@ -119,6 +124,10 @@ public class ConfigMenu {
         return true;
     }
 
+    private boolean lockMenu(){
+
+        return true;
+    }
     private boolean nextMenuItem() {
         currentField = Range.clip(currentField+1, 0, fields.length-1);
         return true;
@@ -127,12 +136,17 @@ public class ConfigMenu {
     public void updateDisplay() {
         // Assuming Global.telemetry is accessible and correct.
         try {
-            // Display static fields
-            for (int i = 0; i < fields.length; i++) {
-                Field field = fields[i];
-                field.setAccessible(true);
-                Object value = field.get(Modifier.isStatic(field.getModifiers())?null:object); // Use null for static fields
-                Global.telemetry.addData(formattedFieldName(i), value != null ? formattedValue(i, value.toString()) : "null");
+            if(!menuLocked) {
+                // Display static fields
+                for (int i = 0; i < fields.length; i++) {
+                    Field field = fields[i];
+                    field.setAccessible(true);
+                    Object value = field.get(Modifier.isStatic(field.getModifiers()) ? null : object); // Use null for static fields
+                    Global.telemetry.addData(formattedFieldName(i), value != null ? formattedValue(i, value.toString()) : "null");
+                }
+            }
+            else {
+                Global.telemetry.addLine("Menu values are locked.");
             }
 
         } catch (IllegalAccessException e) {
