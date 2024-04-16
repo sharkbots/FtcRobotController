@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.tools;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Claw;
@@ -305,6 +306,11 @@ public class Robot {
         intake.update(!(stateMachine.getCurrentState() == outTakingPixels));
         ledRibbons.setPattern(intake.pixels.pixel1.pattern, intake.pixels.pixel2.pattern);
 
+    }
+
+    public void wait(long time, TimeUnit timeUnit){
+        Deadline deadline = new Deadline(time, timeUnit);
+        while(!deadline.hasExpired()){}
     }
 
     public StateMachine.State currentState(){

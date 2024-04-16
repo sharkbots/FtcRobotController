@@ -13,8 +13,6 @@ import org.firstinspires.ftc.teamcode.tools.SetDriveMotors;
 
 @TeleOp(name = "Judging Session", group = "Testing")
 public class JudgingSession extends LinearOpMode {
-    private SetDriveMotors driveMotors;
-
     private boolean isLiftReset = false;
 
     JudgingRobot robot;
@@ -23,7 +21,6 @@ public class JudgingSession extends LinearOpMode {
 
     public void Setup(){
         Global.telemetry = telemetry;
-        driveMotors = new SetDriveMotors(hardwareMap);
 
         robot = new JudgingRobot(hardwareMap, gamepad1, gamepad2);
 
