@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -33,14 +34,9 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-//@Autonomous(name="Autonomous Base")
+@Autonomous(name="Autonomous")
 public abstract class AutoBase extends LinearOpMode {
 
-    private Telemetry telemetryA;
-
-    private Follower follower;
-
-    private PathChain empty, purpleDrop, purpleToLeftSideStackSetup, goToBackdropCenterThroughCenterTruss, goToStackSetupThroughCenterTrussFromCenterBackdrop,goToStackSetupThroughCenterTrussFromLeftBackdrop, goToStackSetupThroughCenterTrussFromRightBackdrop, goToBackdropLeftThroughCenterTruss, goToBackdropRightThroughCenterTruss, backdropToLeftSideStack, park;
     private Deadline timer;
     private boolean alreadyCompiled = false;
     Buttons buttons;
@@ -323,7 +319,6 @@ public abstract class AutoBase extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(8.23, 33.81, Math.toRadians(0.00)))
                 .lineTo(new Vector2d(15.23, 33.81))
                 .lineToLinearHeading(new Pose2d(15.73, 33.81, Math.toRadians(180.0)))
-                //.lineToLinearHeading(c.backdropRight)
                 .build();
 
         TrajectorySequence backdropSideCenterPurple = drive.trajectorySequenceBuilder(c.startPose)
