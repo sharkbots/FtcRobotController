@@ -248,6 +248,7 @@ public abstract class AutoBase extends LinearOpMode {
         // START POSE: new Pose2d(-36.00, 62.00, Math.toRadians(90.00))
 
 
+
         TrajectorySequence audienceLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
                 .lineTo(new Vector2d(-36.00, 42.00))
                 .lineToLinearHeading(new Pose2d(-32.73, 31.07, Math.toRadians(180.00)))
@@ -260,10 +261,9 @@ public abstract class AutoBase extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
                 .build();
 
-        TrajectorySequence audienceRightPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
-                .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
-                .splineTo(new Vector2d(-35.82, 13.35), Math.toRadians(270.00))
-                .splineTo(new Vector2d(-46.00, 12.00), Math.toRadians(180.00))
+        TrajectorySequence audienceRightPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
+                .lineTo(new Vector2d(12.00, 42.00))
+                .lineToLinearHeading(new Pose2d(9.31, 32.49, Math.toRadians(0.00)))
                 .build();
 
 
@@ -271,36 +271,12 @@ public abstract class AutoBase extends LinearOpMode {
         // BACKDROP SIDE TO LEFT STACK
         // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
 
+
         TrajectorySequence backdropRightPurpleToLeftStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
                 .lineTo(new Vector2d(12.00, 42.00))
-                .lineToLinearHeading(new Pose2d(8.73, 24.70, Math.toRadians(0.00)))
+                .lineToLinearHeading(new Pose2d(11.23, 32.49, Math.toRadians(0.00)))
                 .build();
 
-
-        TrajectorySequence e = drive.trajectorySequenceBuilder(c.startPose)
-                .lineTo(new Vector2d(12.00, 34.00))
-                .lineTo(new Vector2d(10.00, 34.00))
-                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
-                .lineToLinearHeading(c.leftStackSetup)
-                .build();
-
-
-        TrajectorySequence backdropCenterPurpleToLeftStack = drive.trajectorySequenceBuilder(c.startPose)
-                .lineTo(new Vector2d(12.00, 34.00))
-                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
-                .lineToLinearHeading(c.leftStackSetup)
-                .build();
-
-
-        TrajectorySequence backdropLeftPurpleToLeftStack = drive.trajectorySequenceBuilder(c.startPose)
-                .lineToLinearHeading(new Pose2d(12.00, 34.00, Math.toRadians(0.00)))
-                .lineTo(new Vector2d(14.00, 34.00))
-                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(-32.00, 60.00, Math.toRadians(198.00)))
-                .lineToLinearHeading(c.leftStackSetup)
-                .build();
 
 
         // Let's have at list 33% chance to pick it right if nothing works
@@ -428,21 +404,6 @@ public abstract class AutoBase extends LinearOpMode {
         //drive.followTrajectorySequence(untitled1);
 
 
-
-
-
-
-
-
-//        TrajectorySequence untitled1 = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
-//                .lineTo(new Vector2d(11.68, 34.22))
-//                .lineToLinearHeading(new Pose2d(12.00, 59.00, Math.toRadians(177.80)))
-//                .lineToLinearHeading(new Pose2d(-39.02, 60.07, Math.toRadians(198.03)))
-//                .lineToLinearHeading(new Pose2d(-56.00, 36.00, Math.toRadians(180.00)))
-//                .lineTo(new Vector2d(-37.70, 10.85))
-//                .lineTo(new Vector2d(11.85, 11.19))
-//                .lineTo(new Vector2d(51.00, 37.00))
-//                .build();
 
 
 
