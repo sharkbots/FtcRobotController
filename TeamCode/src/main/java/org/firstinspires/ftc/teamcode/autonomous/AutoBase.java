@@ -109,7 +109,7 @@ public class AutoBase extends LinearOpMode {
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
 
         Vector2d parkBetweenBackdropsSetup = new Vector2d(45, 11.5);
-        Vector2d parkBetweenBackdrops = new Vector2d(60, 11.5);
+        Vector2d parkBetweenBackdrops = new Vector2d(60, 9.5);
 
         Vector2d parkInCornerSetup = new Vector2d(45, 62);
         Vector2d parkInCorner = new Vector2d(60, 62);
@@ -201,6 +201,7 @@ public class AutoBase extends LinearOpMode {
                 parkInCorner = flipVectorAcrossX(parkInCorner);
                 parkInCornerSetup = flipVectorAcrossX(parkInCornerSetup);
                 parkBetweenBackdropsSetup = flipVectorAcrossX(parkBetweenBackdropsSetup);
+                parkBetweenBackdrops = flipVectorAcrossX(parkBetweenBackdrops);
 
                 prepareFarDropCenter = flipVectorAcrossX(prepareFarDropCenter);
                 prepareFarDropOutside = flipVectorAcrossX(prepareFarDropOutside);
@@ -440,6 +441,9 @@ public class AutoBase extends LinearOpMode {
             dropOffPixels(finalTrajectory.get(1), apriltags);
         }
         drive.followTrajectorySequence(finalTrajectory.get((finalTrajectory.size())-1));
+
+        AutoDataStorage.currentPose = drive.getPoseEstimate();
+        AutoDataStorage.comingFromAutonomous = true;
 
 
         while(!isStopRequested()){
