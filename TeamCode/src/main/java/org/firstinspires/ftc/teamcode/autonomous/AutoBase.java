@@ -92,6 +92,7 @@ public class AutoBase extends LinearOpMode {
 
         // vectors to set up for backdrop
         Pose2d intermediateCyclePose = new Pose2d(35, 12, Math.toRadians(180));
+        Vector2d spatialMarkerGoToBackdrop = new Vector2d(12, 11);
 
         // near side
         Pose2d backdropIntermediateLeft = new Pose2d(47, 43, Math.toRadians(180.00));
@@ -191,13 +192,13 @@ public class AutoBase extends LinearOpMode {
                 backdropIntermediateCenter = flipAcrossX(backdropIntermediateCenter);
                 backdropIntermediateRight = flipAcrossX(tempLeftPose);
 
-                tempLeftPose = backdropLeft;
-                backdropLeft = flipAcrossX(backdropRight);
+                backdropLeft = flipAcrossX(backdropLeft);
                 backdropCenter = flipAcrossX(backdropCenter);
                 backdropStrafeForCenter = flipAcrossX(backdropStrafeForCenter);
-                backdropRight = flipAcrossX(tempLeftPose);
+                backdropRight = flipAcrossX(backdropRight);
 
                 parkIntermediate = flipAcrossX(parkIntermediate);
+                parkInCorner = flipVectorAcrossX(parkInCorner);
                 parkInCornerSetup = flipVectorAcrossX(parkInCornerSetup);
                 parkBetweenBackdropsSetup = flipVectorAcrossX(parkBetweenBackdropsSetup);
 
@@ -216,6 +217,9 @@ public class AutoBase extends LinearOpMode {
                 rightStack = flipAcrossX(rightStack);
                 rightStackSetup = flipAcrossX(rightStackSetup);
 
+                intermediateCyclePose = flipAcrossX(intermediateCyclePose);
+                spatialMarkerGoToBackdrop = flipVectorAcrossX(spatialMarkerGoToBackdrop);
+
 
                 AutoDataStorage.redSide = true;
 
@@ -230,9 +234,11 @@ public class AutoBase extends LinearOpMode {
                     backdropSideLeftPurpleCoordinateA = flipAcrossX(backdropSideLeftPurpleCoordinateA);
                     backdropSideLeftPurpleCoordinateB = flipAcrossX(backdropSideLeftPurpleCoordinateB);
                     backdropSideLeftPurpleCoordinateC = flipAcrossX(backdropSideLeftPurpleCoordinateC);
+
                     backdropSideCenterPurpleCoordinateA = flipVectorAcrossX(backdropSideCenterPurpleCoordinateA);
                     backdropSideCenterPurpleCoordinateB = flipAcrossX(backdropSideCenterPurpleCoordinateB);
                     backdropSideCenterPurpleCoordinateC = flipAcrossX(backdropSideCenterPurpleCoordinateC);
+
                     backdropSideRightPurpleCoordinateA = flipVectorAcrossX(backdropSideRightPurpleCoordinateA);
                     backdropSideRightPurpleCoordinateB = flipAcrossX(backdropSideRightPurpleCoordinateB);
                     backdropSideRightPurpleCoordinateC = flipVectorAcrossX(backdropSideRightPurpleCoordinateC);
@@ -395,21 +401,26 @@ public class AutoBase extends LinearOpMode {
         apriltags.visionPortal.resumeStreaming();
 
 
-
-
-
-
-
-        if (propLoc == TeamPropDetection.propLocation.RIGHT) {
-            finalTrajectory = trajectoryBuilder.trajectorySequenceRight;
-        }
-        else if (propLoc == TeamPropDetection.propLocation.CENTER) {
-            finalTrajectory = trajectoryBuilder.trajectorySequenceCenter;
+        if(config.alliance == ALLIANCE.RED){
+            if (propLoc == TeamPropDetection.propLocation.LEFT) {
+                finalTrajectory = trajectoryBuilder.trajectorySequenceRight;
+            }
+            else if (propLoc == TeamPropDetection.propLocation.CENTER) {
+                finalTrajectory = trajectoryBuilder.trajectorySequenceCenter;
+            }
+            else {
+                finalTrajectory = trajectoryBuilder.trajectorySequenceLeft;
+            }
         }
         else {
-            finalTrajectory = trajectoryBuilder.trajectorySequenceLeft;
+            if (propLoc == TeamPropDetection.propLocation.RIGHT) {
+                finalTrajectory = trajectoryBuilder.trajectorySequenceRight;
+            } else if (propLoc == TeamPropDetection.propLocation.CENTER) {
+                finalTrajectory = trajectoryBuilder.trajectorySequenceCenter;
+            } else {
+                finalTrajectory = trajectoryBuilder.trajectorySequenceLeft;
+            }
         }
-
 
 
         myLocalizer.setPoseEstimate(c.startPose);

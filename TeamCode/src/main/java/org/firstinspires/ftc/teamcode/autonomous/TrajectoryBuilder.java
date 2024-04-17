@@ -161,7 +161,7 @@ public class TrajectoryBuilder {
                 goToBackdrop1Builder
                         .lineToLinearHeading(c.intermediateCyclePose, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                        .addSpatialMarker(new Vector2d(12, 11), ()-> robot.autoOutTakeYellow.runAsync())
+                        .addSpatialMarker((c.spatialMarkerGoToBackdrop), ()-> robot.autoOutTakeYellow.runAsync())
                         .lineTo(c.backdropRight.vec());
             }
             goToBackdrop1 = goToBackdrop1Builder.build();
