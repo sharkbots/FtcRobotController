@@ -138,6 +138,32 @@ public class AutoBase extends LinearOpMode {
         Pose2d rightStackSetup = new Pose2d(rightStack.getX()+10, rightStack.getY(), rightStack.getHeading());
 
 
+        // AUDIENCE SIDE PURPLE
+        Vector2d audienceSideLeftPurpleToRightStackCoordinateA = new Vector2d(-36.00, 42.00);
+        Pose2d audienceSideLeftPurpleToRightStackCoordinateB = new Pose2d(-32.73, 31.07, Math.toRadians(180.00));
+
+        Pose2d audienceSideMiddlePurpleToRightStackCoordinateA = new Pose2d(-40.50, 24.70, Math.toRadians(180.00));
+        Vector2d audienceSideMiddlePurpleToRightStackCoordinateB = new Vector2d(-44.50, 24.70);
+
+        Pose2d audienceSideRightPurpleToRightStackCoordinateA = new Pose2d(-41.01, 21.65, Math.toRadians(0.00));
+        Vector2d audienceSideRightPurpleToRightStackCoordinateBVector = new Vector2d(-34.77, 14.05);
+        double audienceSideRightPurpleToRightStackCoordinateBAngle = Math.toRadians(270.00);
+        Vector2d audienceSideRightPurpleToRightStackCoordinateCVector = new Vector2d (rightStackSetup.getX(), rightStackSetup.getY());
+        double audienceSideRightPurpleToRightStackCoordinateCAngle = Math.toRadians(180.00);
+
+        // BACKDROP SIDE PURPLE
+        Pose2d backdropSideLeftPurpleCoordinateA = new Pose2d(16.00, 29.00, Math.toRadians(180.00));
+        Pose2d backdropSideLeftPurpleCoordinateB = new Pose2d(13.00, 29.00, Math.toRadians(180.00));
+        Pose2d backdropSideLeftPurpleCoordinateC = new Pose2d(13.00, 45.00, Math.toRadians(180.00));
+
+        Vector2d backdropSideCenterPurpleCoordinateA = new Vector2d(10.50, 31.50);
+        Pose2d backdropSideCenterPurpleCoordinateB = new Pose2d(15.50, 38.50, Math.toRadians(90.00));
+        Pose2d backdropSideCenterPurpleCoordinateC = new Pose2d(16.00, 38.50, Math.toRadians(180.00));
+
+        Vector2d backdropSideRightPurpleCoordinateA = new Vector2d(12.00, 42.00);
+        Pose2d backdropSideRightPurpleCoordinateB = new Pose2d(8.23, 33.81, Math.toRadians(0.00));
+        Vector2d backdropSideRightPurpleCoordinateC = new Vector2d(15.23, 33.81);
+        Pose2d backdropSideRightPurpleCoordinateD = new Pose2d(15.73, 33.81, Math.toRadians(180.0));
 
         Pose2d purpleToStackLeftControlPoint = new Pose2d(-36, 36);
 
@@ -193,18 +219,30 @@ public class AutoBase extends LinearOpMode {
                 rightStack = flipAcrossX(rightStack);
                 rightStackSetup = flipAcrossX(rightStackSetup);
 
+
                 AutoDataStorage.redSide = true;
 
-                // Near side
+                // Near side (Backdrop side)
                 if (side==SIDE.NEAR){
                     startPose = flipAcrossX(startPose);
                     Pose2d tempLeftTeamProp = leftTeamProp;
                     leftTeamProp = flipAcrossX(rightTeamProp);//blue left spike mark is symmetrical to red right spike mark
                     centerTeamProp = flipAcrossX(centerTeamProp);
                     rightTeamProp = flipAcrossX(tempLeftTeamProp);
+
+                    backdropSideLeftPurpleCoordinateA = flipAcrossX(backdropSideLeftPurpleCoordinateA);
+                    backdropSideLeftPurpleCoordinateB = flipAcrossX(backdropSideLeftPurpleCoordinateB);
+                    backdropSideLeftPurpleCoordinateC = flipAcrossX(backdropSideLeftPurpleCoordinateC);
+                    backdropSideCenterPurpleCoordinateA = flipVectorAcrossX(backdropSideCenterPurpleCoordinateA);
+                    backdropSideCenterPurpleCoordinateB = flipAcrossX(backdropSideCenterPurpleCoordinateB);
+                    backdropSideCenterPurpleCoordinateC = flipAcrossX(backdropSideCenterPurpleCoordinateC);
+                    backdropSideRightPurpleCoordinateA = flipVectorAcrossX(backdropSideRightPurpleCoordinateA);
+                    backdropSideRightPurpleCoordinateB = flipAcrossX(backdropSideRightPurpleCoordinateB);
+                    backdropSideRightPurpleCoordinateC = flipVectorAcrossX(backdropSideRightPurpleCoordinateC);
+                    backdropSideRightPurpleCoordinateD = flipAcrossX(backdropSideRightPurpleCoordinateD);
                 }
 
-                // Far side
+                // Far side (Audience side)
                 if (side==SIDE.FAR){
                     startPose = flipAcrossCenter(startPose);
                     leftTeamProp = flipAcrossCenter(leftTeamProp);
@@ -212,6 +250,16 @@ public class AutoBase extends LinearOpMode {
                     rightTeamProp = flipAcrossCenter(rightTeamProp);
 
                     prepareFarDropOutside = flipVectorAcrossX(prepareFarDropOutside);
+
+                    audienceSideLeftPurpleToRightStackCoordinateA = flipVectorAcrossX(audienceSideLeftPurpleToRightStackCoordinateA);
+                    audienceSideLeftPurpleToRightStackCoordinateB = flipAcrossX(audienceSideLeftPurpleToRightStackCoordinateB);
+                    audienceSideMiddlePurpleToRightStackCoordinateA = flipAcrossX(audienceSideMiddlePurpleToRightStackCoordinateA);
+                    audienceSideMiddlePurpleToRightStackCoordinateB = flipVectorAcrossX(audienceSideMiddlePurpleToRightStackCoordinateB);
+                    audienceSideRightPurpleToRightStackCoordinateA = flipAcrossX(audienceSideRightPurpleToRightStackCoordinateA);
+                    audienceSideRightPurpleToRightStackCoordinateBVector = flipVectorAcrossX(audienceSideRightPurpleToRightStackCoordinateBVector);
+                    audienceSideRightPurpleToRightStackCoordinateBAngle = flipAngleAcrossX(audienceSideRightPurpleToRightStackCoordinateBAngle);
+                    audienceSideRightPurpleToRightStackCoordinateCVector = flipVectorAcrossX(audienceSideRightPurpleToRightStackCoordinateCVector);
+                    audienceSideRightPurpleToRightStackCoordinateCAngle = flipAngleAcrossX(audienceSideRightPurpleToRightStackCoordinateCAngle);
                 }
             }
         }
@@ -224,6 +272,10 @@ public class AutoBase extends LinearOpMode {
 
         public Vector2d flipVectorAcrossX(Vector2d vector2d){
             return new Vector2d(vector2d.getX(), -vector2d.getY());
+        }
+
+        public double flipAngleAcrossX(double angle){
+            return -angle%Math.toRadians(360);
         }
 
         // Near side to far side
@@ -382,24 +434,22 @@ public class AutoBase extends LinearOpMode {
         // AUDIENCE SIDE PURPLE
         // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
 
-        TrajectorySequence audienceRightPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
-                .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
-                .splineTo(new Vector2d(-35.82, 13.35), Math.toRadians(270.00))
-                .splineTo(c.rightStackSetup.vec(), Math.toRadians(180.00))
-                .build();
-
-
-
-        TrajectorySequence audienceMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
-                .lineToLinearHeading(new Pose2d(-40.50, 24.70, Math.toRadians(180.00)))
-                .lineTo(new Vector2d(-44.50, 24.70))
+        TrajectorySequence audienceSideLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+                .lineTo(c.audienceSideLeftPurpleToRightStackCoordinateA)
+                .lineToLinearHeading(c.audienceSideLeftPurpleToRightStackCoordinateB)
                 .lineToLinearHeading(c.rightStackSetup)
                 .build();
 
-        TrajectorySequence audienceLeftPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
-                .lineTo(new Vector2d(-36.00, 42.00))
-                .lineToLinearHeading(new Pose2d(-32.73, 31.07, Math.toRadians(180.00)))
+        TrajectorySequence audienceSideMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+                .lineToLinearHeading(c.audienceSideMiddlePurpleToRightStackCoordinateA)
+                .lineTo(c.audienceSideMiddlePurpleToRightStackCoordinateB)
                 .lineToLinearHeading(c.rightStackSetup)
+                .build();
+
+        TrajectorySequence audienceSideRightPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
+                .lineToLinearHeading(c.audienceSideRightPurpleToRightStackCoordinateA)
+                .splineTo(c.audienceSideRightPurpleToRightStackCoordinateBVector, c.audienceSideRightPurpleToRightStackCoordinateBAngle)
+                .splineTo(c.audienceSideRightPurpleToRightStackCoordinateCVector, c.audienceSideRightPurpleToRightStackCoordinateCAngle)
                 .build();
 
 
@@ -409,22 +459,22 @@ public class AutoBase extends LinearOpMode {
         // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
 
         TrajectorySequence backdropSideLeftPurple = drive.trajectorySequenceBuilder(c.startPose)
-                .lineToLinearHeading(new Pose2d(16.00, 29.00, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(13.00, 29.00, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(13.00, 45.00, Math.toRadians(180.00)))
+                .lineToLinearHeading(c.backdropSideLeftPurpleCoordinateA)
+                .lineToLinearHeading(c.backdropSideLeftPurpleCoordinateB)
+                .lineToLinearHeading(c.backdropSideLeftPurpleCoordinateC)
                 .build();
 
         TrajectorySequence backdropSideCenterPurple = drive.trajectorySequenceBuilder(c.startPose)
-                .lineTo(new Vector2d(10.50, 31.50))
-                .lineToLinearHeading(new Pose2d(15.50, 38.50, Math.toRadians(90.00)))
-                .lineToLinearHeading(new Pose2d(16.00, 38.50, Math.toRadians(180.00)))
+                .lineTo(c.backdropSideCenterPurpleCoordinateA)
+                .lineToLinearHeading(c.backdropSideCenterPurpleCoordinateB)
+                .lineToLinearHeading(c.backdropSideCenterPurpleCoordinateC)
                 .build();
 
         TrajectorySequence backdropSideRightPurple = drive.trajectorySequenceBuilder(c.startPose)
-                .lineTo(new Vector2d(12.00, 42.00))
-                .lineToLinearHeading(new Pose2d(8.23, 33.81, Math.toRadians(0.00)))
-                .lineTo(new Vector2d(15.23, 33.81))
-                .lineToLinearHeading(new Pose2d(15.73, 33.81, Math.toRadians(180.0)))
+                .lineTo(c.backdropSideRightPurpleCoordinateA)
+                .lineToLinearHeading(c.backdropSideRightPurpleCoordinateB)
+                .lineTo(c.backdropSideRightPurpleCoordinateC)
+                .lineToLinearHeading(c.backdropSideRightPurpleCoordinateD)
                 .build();
 
 
