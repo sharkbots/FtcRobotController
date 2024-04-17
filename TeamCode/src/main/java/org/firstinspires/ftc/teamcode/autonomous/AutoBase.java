@@ -97,7 +97,8 @@ public class AutoBase extends LinearOpMode {
         Pose2d rightTeamProp = new Pose2d(9, 32, Math.toRadians(0.00));
 
         // vectors to set up for backdrop
-        Vector2d setupForBackdrop = new Vector2d(30, 50);
+        Pose2d setupForBackdrop = new Pose2d(30, 50, Math.toRadians(180));
+        Pose2d intermediateCyclePose = new Pose2d(35, 12, Math.toRadians(180);
 
         // near side
         Pose2d backdropIntermediateLeft = new Pose2d(47, 43, Math.toRadians(180.00));
@@ -422,20 +423,64 @@ public class AutoBase extends LinearOpMode {
 
         waitForStart();
 
+        // trajectories for near side purple and backdrop, one goes straight the other turns
         TrajectorySequence purpleLeftStraight = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
                 .lineTo(new Vector2d(19.30, 34.00))
                 .lineTo(new Vector2d(19.30, 40.00))
                 .lineToLinearHeading(c.backdropLeft)
                 .build();
 
+        // turns
         TrajectorySequence purpleLeftTurn = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
                 .lineToLinearHeading(new Pose2d(14.00, 30.00, Math.toRadians(180.00)))
                 .lineTo(new Vector2d(10.00, 30.00))
                 .lineTo(new Vector2d(13.17, 9.20))
                 .build();
 
+        // TRAJECTORIES FOR CYCLE
 
-        drive.followTrajectorySequence(purpleLeftStraight);
+        // intake
+        TrajectorySequence intake = drive.trajectorySequenceBuilder(c.rightStackSetup)
+                .lineTo(c.rightStack.vec())
+                .build();
+
+// go to backdrop
+        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(c.rightStack)
+                .lineTo(new Vector2d(35.00, 12.00))
+                .addSpatialMarker(new Vector2d(12, 11), ()->{
+                robot.autoOutTakeYellow.runAsync();
+                })
+                .lineTo(c.backdropRight.vec())
+                .addSpatialMarker(c.rightStack.vec(), ()->{
+                    robot.openClaw.runAsync();
+                })
+                .build();
+
+
+        // comes back to stack
+        TrajectorySequence goToStack = drive.trajectorySequenceBuilder(c.backdropRight)
+                .lineToLinearHeading(c.intermediateCyclePose)
+                .addSpatialMarker(c.intermediateCyclePose.vec(), ()->{
+                    robot.resetOutTake.runAsync();
+        })
+                .lineTo(c.rightStackSetup.vec())
+                .lineTo(c.rightStack.vec())
+                .build();
+
+
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+
+
+        robot.startIntakingPixels.runAsync();
+        drive.followTrajectorySequence(intake);
+
+        robot.tryIntakeTwoPixels.run();
+
+
+        while(!robot.intake.pixels.hasTwoPixels()) {
+            robot.intake.pixels.update();
+        }
+
 
 
 //        drive.followTrajectorySequence(backdropSideCenterPurple);
