@@ -15,11 +15,11 @@ public class JudgingRobot extends Robot{
         showAttachments = new StateMachine.State("showAttachments");
         stateMachine.addState(showAttachments);
 
-        stateMachine.setInitialState(idle);
+        //stateMachine.setInitialState(idle);
 
 
-        idle.addTransitionTo(showAttachments, buttons.handlerA::Pressed, holdPixels);
-        showAttachments.addTransitionTo(idle, buttons.handlerA::Pressed, resetOutTake);
+        idle.addTransitionTo(showAttachments, ()->true, outTake);
+        //showAttachments.addTransitionTo(idle, buttons.handlerA::Pressed, resetOutTake);
 
         showAttachments.addTransitionTo(showAttachments, buttons.handlerLeftBumper::Pressed, closeClaw);
         showAttachments.addTransitionTo(showAttachments, buttons.handlerRightBumper::Pressed, openClaw);
