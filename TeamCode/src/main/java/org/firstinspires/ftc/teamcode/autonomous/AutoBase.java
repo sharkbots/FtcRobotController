@@ -106,9 +106,9 @@ public class AutoBase extends LinearOpMode {
 
         //Blue backdrop
         Pose2d backdropStrafeForCenter = new Pose2d(51, 45, Math.toRadians(180.00));
-        Pose2d backdropLeft = new Pose2d(51, 42, Math.toRadians(180.00));
-        Pose2d backdropCenter = new Pose2d(51, 36, Math.toRadians(180.00));
-        Pose2d backdropRight = new Pose2d(51, 30, Math.toRadians(180.00));
+        Pose2d backdropLeft = new Pose2d(51, 41.41, Math.toRadians(180.00));
+        Pose2d backdropCenter = new Pose2d(51, 35.41, Math.toRadians(180.00));
+        Pose2d backdropRight = new Pose2d(51, 29.41, Math.toRadians(180.00));
 
         // Blue alliance parking
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
@@ -381,50 +381,38 @@ public class AutoBase extends LinearOpMode {
         drive.setPoseEstimate(c.startPose); // !!!!!
 
         waitForStart();
+
+        // AUDIENCE SIDE PURPLE
+        // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
+
         TrajectorySequence audienceSideLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
                 .lineTo(new Vector2d(-36.00, 42.00))
                 .lineToLinearHeading(new Pose2d(-32.73, 31.07, Math.toRadians(180.00)))
-                .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
+                .lineToLinearHeading(c.rightStackSetup)
                 .build();
 
         TrajectorySequence audienceSideMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
                 .lineToLinearHeading(new Pose2d(-40.50, 24.70, Math.toRadians(180.00)))
                 .lineTo(new Vector2d(-44.50, 24.70))
-                .lineToLinearHeading(new Pose2d(-46.00, 12.00, Math.toRadians(180.00)))
+                .lineToLinearHeading(c.rightStackSetup)
                 .build();
 
-        TrajectorySequence audienceSideRightPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(12.00, 62.00, Math.toRadians(90.00)))
-                .lineTo(new Vector2d(12.00, 42.00))
-                .lineToLinearHeading(new Pose2d(9.31, 32.49, Math.toRadians(0.00)))
-                .build();
-
-        TrajectorySequence purpleLeftStraight = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
-                .lineTo(new Vector2d(19.30, 34.00))
-                .lineTo(new Vector2d(19.30, 40.00))
-                .lineToLinearHeading(c.backdropLeft)
-                .build();
-
-        TrajectorySequence purpleLeftTurn = drive.trajectorySequenceBuilder(new Pose2d(12.00, 60.00, Math.toRadians(90.00)))
-                .lineToLinearHeading(new Pose2d(14.00, 30.00, Math.toRadians(180.00)))
-                .lineTo(new Vector2d(10.00, 30.00))
-                .lineTo(new Vector2d(13.17, 9.20))
+        TrajectorySequence audienceSideRightPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
+                .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
+                .splineTo(new Vector2d(-34.77, 14.05), Math.toRadians(270.00))
+                .splineTo(c.rightStackSetup.vec(), Math.toRadians(180.00))
                 .build();
 
 
-        drive.followTrajectorySequence(purpleLeftStraight);
 
 
-
-
-
-        // BACKDROP SIDE TO LEFT STACK
+        // BACKDROP SIDE PURPLE
         // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
 
-        TrajectorySequence backdropSideRightPurple = drive.trajectorySequenceBuilder(c.startPose)
-                .lineTo(new Vector2d(12.00, 42.00))
-                .lineToLinearHeading(new Pose2d(8.23, 33.81, Math.toRadians(0.00)))
-                .lineTo(new Vector2d(15.23, 33.81))
-                .lineToLinearHeading(new Pose2d(15.73, 33.81, Math.toRadians(180.0)))
+        TrajectorySequence backdropSideLeftPurple = drive.trajectorySequenceBuilder(c.startPose)
+                .lineToLinearHeading(new Pose2d(16.00, 29.00, Math.toRadians(180.00)))
+                .lineToLinearHeading(new Pose2d(13.00, 29.00, Math.toRadians(180.00)))
+                .lineToLinearHeading(new Pose2d(13.00, 45.00, Math.toRadians(180.00)))
                 .build();
 
         TrajectorySequence backdropSideCenterPurple = drive.trajectorySequenceBuilder(c.startPose)
@@ -433,16 +421,32 @@ public class AutoBase extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(16.00, 38.50, Math.toRadians(180.00)))
                 .build();
 
-
-        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(backdropSideCenterPurple.end())
-                .lineToLinearHeading(c.backdropRight)
+        TrajectorySequence backdropSideRightPurple = drive.trajectorySequenceBuilder(c.startPose)
+                .lineTo(new Vector2d(12.00, 42.00))
+                .lineToLinearHeading(new Pose2d(8.23, 33.81, Math.toRadians(0.00)))
+                .lineTo(new Vector2d(15.23, 33.81))
+                .lineToLinearHeading(new Pose2d(15.73, 33.81, Math.toRadians(180.0)))
                 .build();
 
 
-        drive.followTrajectorySequence(backdropSideCenterPurple);
-        robot.wait(200, TimeUnit.MILLISECONDS); // Makes sure the robot is still
-        Pose2d correctedPose = apriltags.getRobotPosFromTags();
-        drive.setPoseEstimate(correctedPose);
+        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(backdropSideLeftPurple.end())
+                .lineToLinearHeading(c.backdropLeft)
+                .build();
+
+
+        drive.followTrajectorySequence(backdropSideLeftPurple);
+        int retries = 3;
+        Pose2d correctedPose;
+        do {
+            robot.wait(200, TimeUnit.MILLISECONDS); // Makes sure the robot is still
+            correctedPose = apriltags.getRobotPosFromTags();
+            retries -= 1;
+        } while(retries>0 && correctedPose.getX()==0);
+
+        if(correctedPose.getX()!=0) {
+            drive.setPoseEstimate(correctedPose);
+        }
+
         drive.followTrajectorySequence(goToBackdrop);
 
 
@@ -471,9 +475,6 @@ public class AutoBase extends LinearOpMode {
 
 
         /*robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
-
-
-        //drive.followTrajectorySequence(stackSetup1);
 
         robot.startIntakingPixels.runAsync();
         drive.followTrajectorySequence(intakeRightStack);
