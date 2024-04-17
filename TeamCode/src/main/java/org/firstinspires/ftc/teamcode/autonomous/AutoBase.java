@@ -97,8 +97,7 @@ public class AutoBase extends LinearOpMode {
         Pose2d rightTeamProp = new Pose2d(9, 32, Math.toRadians(0.00));
 
         // vectors to set up for backdrop
-        Pose2d setupForBackdrop = new Pose2d(30, 50, Math.toRadians(180));
-        Pose2d intermediateCyclePose = new Pose2d(35, 12, Math.toRadians(180);
+        Pose2d intermediateCyclePose = new Pose2d(35, 12, Math.toRadians(180));
 
         // near side
         Pose2d backdropIntermediateLeft = new Pose2d(47, 43, Math.toRadians(180.00));
@@ -163,7 +162,6 @@ public class AutoBase extends LinearOpMode {
             // Red alliance
             if (alliance == ALLIANCE.RED){
                 // Red backdrop
-                setupForBackdrop = flipVectorAcrossX(setupForBackdrop);
 
                 Pose2d tempLeftPose = backdropIntermediateLeft;
                 backdropIntermediateLeft = flipAcrossX(backdropIntermediateRight);
@@ -430,9 +428,6 @@ public class AutoBase extends LinearOpMode {
                 .build();
 
 
-        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(backdropSideLeftPurple.end())
-                .lineToLinearHeading(c.backdropLeft)
-                .build();
 
         // TRAJECTORIES FOR CYCLE
 
