@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequenceBuilder;
+import org.firstinspires.ftc.teamcode.tools.Robot;
 
 import java.util.ArrayList;
 
@@ -14,6 +15,7 @@ public class TrajectoryBuilder {
     AutoBase.ConfigItems config;
     private final AutoBase.Coordinates c;
     private final SampleMecanumDrive drive;
+    Robot robot;
 
     public enum PROP_LOCATIONS {
         LEFT,
@@ -22,7 +24,7 @@ public class TrajectoryBuilder {
     }
 
 
-    public TrajectoryBuilder(AutoBase.Coordinates coordinates, SampleMecanumDrive drive, AutoBase.ConfigItems config){
+    public TrajectoryBuilder(AutoBase.Coordinates coordinates, SampleMecanumDrive drive, AutoBase.ConfigItems config, Robot robot){
         this.config = config;
         this.c = coordinates;
         this.drive = drive;
@@ -37,10 +39,10 @@ public class TrajectoryBuilder {
     public ArrayList<TrajectorySequence> computeTrajectory(PROP_LOCATIONS propLoc) {
         ArrayList<TrajectorySequence> finalTrajectory = new ArrayList<>();
 
-        Pose2d backdropYellowCoordinate;
+        Pose2d backdropYellowCoordinate = null;
 
-        Pose2d stackSetup;
-        Pose2d stackLoc;
+        Pose2d stackSetup = null;
+        Pose2d stackLoc = null;
 
 
         if(propLoc == PROP_LOCATIONS.LEFT){
@@ -74,99 +76,114 @@ public class TrajectoryBuilder {
 
         TrajectorySequence intake1;
         TrajectorySequenceBuilder intake1Builder = drive.trajectorySequenceBuilder(null); // placeholder
-        intake1Builder
-                .lineTo(stackSetup.vec())
 
+        TrajectorySequence goToBackdrop1;
+        TrajectorySequenceBuilder goToBackdrop1Builder = drive.trajectorySequenceBuilder(null); // placeholder
+
+        TrajectorySequence park;
+        TrajectorySequenceBuilder parkBuilder = drive.trajectorySequenceBuilder(null); // placeholder
 
 
 
         // Purple drop
 
-
-                        .lineToLinearHeading(c.backdropSideRightPurpleCoordinateD);
-
-
-        // backdrop side purple dropOff
-        if(config.side == AutoBase.SIDE.NEAR){
+        // audience side purple dropOff
+        if(config.side == AutoBase.SIDE.AUDIENCE){
             if(propLoc == PROP_LOCATIONS.LEFT){
                 purpleDropBuilder
                         .lineTo(c.audienceSideLeftPurpleToRightStackCoordinateA)
                         .lineToLinearHeading(c.audienceSideLeftPurpleToRightStackCoordinateB)
-                        .lineToLinearHeading(c.rightStackSetup);
+                        .lineToLinearHeading(stackSetup);
             }
 
             if(propLoc == PROP_LOCATIONS.CENTER){
                 purpleDropBuilder
                         .lineToLinearHeading(c.audienceSideMiddlePurpleToRightStackCoordinateA)
                         .lineTo(c.audienceSideMiddlePurpleToRightStackCoordinateB)
-                        .lineToLinearHeading(c.rightStackSetup);
+                        .lineToLinearHeading(stackSetup);
             }
 
             if(propLoc == PROP_LOCATIONS.RIGHT){
                 purpleDropBuilder
                         .lineToLinearHeading(c.audienceSideRightPurpleToRightStackCoordinateA)
                         .splineTo(c.audienceSideRightPurpleToRightStackCoordinateBVector, c.audienceSideRightPurpleToRightStackCoordinateBAngle)
-                        .splineTo(c.rightStackSetup.vec(), c.rightStackSetup.getHeading());
+                        .splineTo(stackSetup.vec(), stackSetup.getHeading());
             }
         }
 
-        // audience side purple dropOff
+        // backdrop side purple dropOff
         else {
             if(propLoc == PROP_LOCATIONS.LEFT){
                 purpleDropBuilder
                         .lineToLinearHeading(c.backdropSideLeftPurpleCoordinateA)
-                        .lineToLinearHeading(c.backdropSideLeftPurpleCoordinateB);
+                        .lineToLinearHeading(c.backdropSideLeftPurpleCoordinateB)
+                        .lineToLinearHeading(c.backdropSideLeftPurpleCoordinateC);
             }
 
             if(propLoc == PROP_LOCATIONS.CENTER){
                 purpleDropBuilder
                         .lineTo(c.backdropSideCenterPurpleCoordinateA)
-                        .lineToLinearHeading(c.backdropSideCenterPurpleCoordinateB);
+                        .lineToLinearHeading(c.backdropSideCenterPurpleCoordinateB)
+                        .lineToLinearHeading(c.backdropSideCenterPurpleCoordinateC);
             }
 
             if(propLoc == PROP_LOCATIONS.RIGHT){
                 purpleDropBuilder
                         .lineTo(c.backdropSideRightPurpleCoordinateA)
                         .lineToLinearHeading(c.backdropSideRightPurpleCoordinateB)
-                        .lineTo(c.backdropSideRightPurpleCoordinateC);
+                        .lineTo(c.backdropSideRightPurpleCoordinateC)
+                        .lineToLinearHeading(c.backdropSideRightPurpleCoordinateD);
+
             }
         }
         purpleDrop = purpleDropBuilder.build();
-        finalTrajectory.add(purpleDrop);
+        finalTrajectory.add(purpleDrop); // index 0
 
 
         // backdrop side code
-        if(config.side == AutoBase.SIDE.NEAR){
+        if(config.side == AutoBase.SIDE.BACKDROP){
             TrajectorySequence backdropSideYellowDrop = drive.trajectorySequenceBuilder(finalTrajectory.get(finalTrajectory.size() - 1).end())
                     .lineToLinearHeading(backdropYellowCoordinate)
                     .build();
-            finalTrajectory.add(backdropSideYellowDrop);
+            finalTrajectory.add(backdropSideYellowDrop); // index 1 backdrop
         }
 
         // audience side code
         else{
             intake1Builder.setStartPose(finalTrajectory.get(finalTrajectory.size() - 1).end());
             intake1 = intake1Builder.build();
-            finalTrajectory.add(intake1);
+            finalTrajectory.add(intake1); // index 1 audience
+
+
+            if(config.stack_location == AutoBase.STACK_LOCATION.RIGHT){
+                goToBackdrop1Builder.setStartPose(finalTrajectory.get(finalTrajectory.size() - 1).end());
+                goToBackdrop1Builder
+                        .lineToLinearHeading(c.intermediateCyclePose, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                                SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                        .addSpatialMarker(new Vector2d(12, 11), ()-> robot.autoOutTakeYellow.runAsync())
+                        .lineTo(c.backdropRight.vec());
+            }
+            goToBackdrop1 = goToBackdrop1Builder.build();
+            finalTrajectory.add(goToBackdrop1); // index 2 audience
         }
 
+        parkBuilder.setStartPose(finalTrajectory.get(finalTrajectory.size() - 1).end());
 
-
-        TrajectorySequence parkRight = drive.trajectorySequenceBuilder(goToBackdrop.end())
-                .lineTo(c.parkInCorner)
-                .back(10)
-                .build();
-
-        TrajectorySequence parkLeft = drive.trajectorySequenceBuilder(goToBackdrop.end())
-                .forward(2)
-                .build();
-
-        if (config.side == AutoBase.SIDE.NEAR) {
-            finalTrajectory.add(parkRight);
-        }else{
-            finalTrajectory.add(parkLeft);
+        if(config.park_location == AutoBase.PARK_LOCATION.CORNER){
+            parkBuilder
+                    .lineTo(c.parkInCornerSetup)
+                    .lineTo(c.parkInCorner);
         }
-*/
+        else if(config.park_location == AutoBase.PARK_LOCATION.BETWEEN_BACKDROPS){
+            parkBuilder
+                    .lineTo(c.parkBetweenBackdropsSetup)
+                    .lineTo(c.parkBetweenBackdrops);
+        }
+        park = parkBuilder.build();
+        finalTrajectory.add(park);
+
+
+
         return finalTrajectory;
     }
 

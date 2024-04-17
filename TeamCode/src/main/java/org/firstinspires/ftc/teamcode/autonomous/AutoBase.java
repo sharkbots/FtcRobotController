@@ -9,10 +9,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
+import org.firstinspires.ftc.teamcode.Claw;
 import org.firstinspires.ftc.teamcode.ConfigMenu;
 import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.aprilTags.AprilTagPoseDetection;
-import org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
@@ -33,6 +33,8 @@ public class AutoBase extends LinearOpMode {
     private boolean alreadyCompiled = false;
     Buttons buttons;
     ConfigMenu menu;
+    ArrayList<TrajectorySequence> finalTrajectory;
+    TrajectoryBuilder trajectoryBuilder;
 
     ConfigItems config;
 
@@ -47,17 +49,17 @@ public class AutoBase extends LinearOpMode {
         OUTER,
     }
     public enum PARK_LOCATION {
-        LEFT,
+        CORNER,
         CENTER,
-        RIGHT,
+        BETWEEN_BACKDROPS,
     }
     public enum ALLIANCE {
         BLUE,
         RED,
     }
     public enum SIDE {
-        NEAR,
-        FAR,
+        BACKDROP,
+        AUDIENCE,
     }
     Robot robot;
 
@@ -66,10 +68,10 @@ public class AutoBase extends LinearOpMode {
 
     public static class ConfigItems {
         ALLIANCE alliance = ALLIANCE.BLUE;
-        SIDE side = SIDE.NEAR;
+        SIDE side = SIDE.BACKDROP;
         STACK_LOCATION stack_location = STACK_LOCATION.RIGHT;
         TRUSS_LOCATION truss_location = TRUSS_LOCATION.DOOR;
-        PARK_LOCATION park_location = PARK_LOCATION.LEFT;
+        PARK_LOCATION park_location = PARK_LOCATION.CORNER;
         int numCycles = 0;
         int waitForStack1 = 0;
         int waitForStack2 = 0;
@@ -104,8 +106,13 @@ public class AutoBase extends LinearOpMode {
 
         // Blue alliance parking
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
-        Vector2d parkBetweenBackdrops = new Vector2d(50, 11.5);
-        Vector2d parkInCorner = new Vector2d(47, 62);
+
+        Vector2d parkBetweenBackdropsSetup = new Vector2d(50, 11.5);
+        Vector2d parkBetweenBackdrops = new Vector2d(60, 11.5);
+
+        Vector2d parkInCornerSetup = new Vector2d(47, 62);
+        Vector2d parkInCorner = new Vector2d(57, 62);
+
 
         //blue far side
         Vector2d prepareFarDropOutside = new Vector2d(-56, 60);
@@ -166,7 +173,7 @@ public class AutoBase extends LinearOpMode {
             AutoDataStorage.redSide = false;
 
             // Blue alliance far side
-            if(alliance == ALLIANCE.BLUE && side == SIDE.FAR){
+            if(alliance == ALLIANCE.BLUE && side == SIDE.AUDIENCE){
                 startPose = flipToFarSide(startPose);
                 Pose2d tempLeftTeamProp = leftTeamProp;
                 leftTeamProp = flipToFarSide(rightTeamProp);
@@ -191,8 +198,8 @@ public class AutoBase extends LinearOpMode {
                 backdropRight = flipAcrossX(tempLeftPose);
 
                 parkIntermediate = flipAcrossX(parkIntermediate);
-                parkInCorner = flipVectorAcrossX(parkInCorner);
-                parkBetweenBackdrops = flipVectorAcrossX(parkBetweenBackdrops);
+                parkInCornerSetup = flipVectorAcrossX(parkInCornerSetup);
+                parkBetweenBackdropsSetup = flipVectorAcrossX(parkBetweenBackdropsSetup);
 
                 prepareFarDropCenter = flipVectorAcrossX(prepareFarDropCenter);
                 prepareFarDropOutside = flipVectorAcrossX(prepareFarDropOutside);
@@ -213,7 +220,7 @@ public class AutoBase extends LinearOpMode {
                 AutoDataStorage.redSide = true;
 
                 // Near side (Backdrop side)
-                if (side==SIDE.NEAR){
+                if (side==SIDE.BACKDROP){
                     startPose = flipAcrossX(startPose);
                     Pose2d tempLeftTeamProp = leftTeamProp;
                     leftTeamProp = flipAcrossX(rightTeamProp);//blue left spike mark is symmetrical to red right spike mark
@@ -233,7 +240,7 @@ public class AutoBase extends LinearOpMode {
                 }
 
                 // Far side (Audience side)
-                if (side==SIDE.FAR){
+                if (side==SIDE.AUDIENCE){
                     startPose = flipAcrossCenter(startPose);
                     leftTeamProp = flipAcrossCenter(leftTeamProp);
                     centerTeamProp = flipAcrossCenter(centerTeamProp);
@@ -280,22 +287,6 @@ public class AutoBase extends LinearOpMode {
 
     public void Setup(){};
 
-    private enum STACK_POSITIONS{LEFT, CENTER, RIGHT}
-    private void intakeFromStack(AutoBase.STACK_POSITIONS position){
-        Pose2d setup = new Pose2d(), stack = new Pose2d();
-        if (position == AutoBase.STACK_POSITIONS.LEFT){
-            stack = c.leftStack;
-            setup = c.leftStackSetup;
-        }
-        if (position == AutoBase.STACK_POSITIONS.CENTER){
-            stack = c.centerStack;
-            setup = c.centerStackSetup;
-        }
-        if (position == AutoBase.STACK_POSITIONS.RIGHT){
-            stack = c.rightStack;
-            setup = c.rightStackSetup;
-        }
-    }
     @Override
     public void runOpMode() throws InterruptedException {
         Setup();
@@ -311,6 +302,12 @@ public class AutoBase extends LinearOpMode {
 
 
         Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
+
+        Robot.claw.setPitchPosition(Claw.pitchPositions.INTAKE);
+        Robot.claw.setGripPosition(Claw.gripPositions.CLOSE_ONE_PIXEL);
+        Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
+
+
 
 
         drive = new SampleMecanumDrive(hardwareMap);
@@ -377,9 +374,7 @@ public class AutoBase extends LinearOpMode {
 
                 //Compile all the trajectories using the input menu items
                 c = new Coordinates(config.alliance, config.side);
-                TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(c, drive, config);
-                ArrayList<TrajectorySequence> finalTrajectory;
-
+                trajectoryBuilder = new TrajectoryBuilder(c, drive, config, robot);
             }
             else if (!menu.isLocked()){
                 alreadyCompiled = false;
@@ -390,7 +385,6 @@ public class AutoBase extends LinearOpMode {
                 if(currentPropLoc!=TeamPropDetection.propLocation.NULL) {
                     propLoc = currentPropLoc;
                     telemetry.addData("Prop", propLoc);
-                    // telemetry.update();
                 }
             }
         }
@@ -405,79 +399,35 @@ public class AutoBase extends LinearOpMode {
 
 
 
-//
-//        if (propLoc == TeamPropDetection.propLocation.LEFT) {
-//            finalTrajectory = trajectoryBuilder.trajectorySequenceLeft;
-//        }
-//        else if (propLoc == TeamPropDetection.propLocation.CENTER) {
-//            finalTrajectory = trajectoryBuilder.trajectorySequenceCenter;
-//        }
-//        else {
+
+        if (propLoc == TeamPropDetection.propLocation.RIGHT) {
+            finalTrajectory = trajectoryBuilder.trajectorySequenceRight;
+        }
+        else if (propLoc == TeamPropDetection.propLocation.CENTER) {
+            finalTrajectory = trajectoryBuilder.trajectorySequenceCenter;
+        }
+        else {
+            finalTrajectory = trajectoryBuilder.trajectorySequenceLeft;
+        }
 
 
 
         myLocalizer.setPoseEstimate(c.startPose);
         drive.setPoseEstimate(c.startPose); // !!!!!
 
-        // AUDIENCE SIDE PURPLE
-        // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
-
-
-
-
         waitForStart();
 
+        drive.followTrajectorySequence(finalTrajectory.get(0));
 
-
-        TrajectorySequence stackSetupTest = drive.trajectorySequenceBuilder(c.startPose)
-                .lineToLinearHeading(c.rightStackSetup)
-                .build();
-        // TRAJECTORIES FOR CYCLE
-
-        // intake
-        TrajectorySequence intake = drive.trajectorySequenceBuilder(audienceLeftPurpleToRightStack.end())
-                .lineTo(c.rightStack.vec())
-                .build();
-
-// go to backdrop
-        TrajectorySequence goToBackdrop1 = drive.trajectorySequenceBuilder(c.rightStack)
-                .lineTo(new Vector2d(35.00, 12.00))
-                .addSpatialMarker(new Vector2d(12, 11), ()->{
-                robot.autoOutTakeYellow.runAsync();
-                })
-                .lineTo(c.backdropRight.vec())
-                .addSpatialMarker(c.rightStack.vec(), ()->{
-                    robot.openClaw.runAsync();
-                })
-                .build();
-
-        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(intake.end())
-                .lineToLinearHeading(c.intermediateCyclePose, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .addSpatialMarker(new Vector2d(12, 11), ()->{
-                    robot.autoOutTakeYellow.runAsync();
-                })
-                .lineTo(c.backdropRight.vec())
-                .build();
-
-
-
-        robot.closeClaw.run();
-        robot.wait(250, TimeUnit.MILLISECONDS);
-        robot.autoOutTakeYellowHigh.run();
-
-
-//        drive.followTrajectorySequence(audienceLeftPurpleToRightStack);
-//        intake(intake);
-//
-        dropOffPixels(goToBackdrop, apriltags);
-
-
-//        drive.followTrajectorySequence(backdropSideLeftPurple);
-//
-//        setPoseUsingATags(apriltags);
-//
-//        drive.followTrajectorySequence(goToBackdrop);
+        if(config.side == SIDE.AUDIENCE){
+            intakeFromStack(finalTrajectory.get(1));
+            dropOffPixels(finalTrajectory.get(2), apriltags);
+        }
+        else{
+            setPoseUsingATags(apriltags);
+            dropOffPixels(finalTrajectory.get(1), apriltags);
+        }
+        drive.followTrajectorySequence(finalTrajectory.get((finalTrajectory.size())-1));
 
 
         while(!isStopRequested()){
@@ -638,8 +588,8 @@ public class AutoBase extends LinearOpMode {
     }
 
     private void dropOffPixels(TrajectorySequence goToBackdrop, AprilTagPoseDetection apriltags) {
+        robot.outTakeSetClawYawVertical.runAsync();
         drive.followTrajectorySequence(goToBackdrop);
-        robot.outTakeSetClawYawRightHorizontal.run();
 
         robot.wait(500, TimeUnit.MILLISECONDS);
 
@@ -647,12 +597,12 @@ public class AutoBase extends LinearOpMode {
 
         robot.wait(250, TimeUnit.MILLISECONDS);
 
-        drive.setPoseEstimate(apriltags.getRobotPosFromTags());
+        setPoseUsingATags(apriltags);
 
         robot.resetOutTake.runAsync();
     }
 
-    private void intake(TrajectorySequence intake) {
+    private void intakeFromStack(TrajectorySequence intake) {
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
 
 
