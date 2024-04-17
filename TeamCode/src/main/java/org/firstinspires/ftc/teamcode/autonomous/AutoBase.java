@@ -379,27 +379,27 @@ public class AutoBase extends LinearOpMode {
         myLocalizer.setPoseEstimate(c.startPose);
         drive.setPoseEstimate(c.startPose); // !!!!!
 
-        waitForStart();
-
         // AUDIENCE SIDE PURPLE
         // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
 
-        TrajectorySequence audienceSideLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
-                .lineTo(new Vector2d(-36.00, 42.00))
-                .lineToLinearHeading(new Pose2d(-32.73, 31.07, Math.toRadians(180.00)))
-                .lineToLinearHeading(c.rightStackSetup)
+        TrajectorySequence audienceRightPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+                .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
+                .splineTo(new Vector2d(-35.82, 13.35), Math.toRadians(270.00))
+                .splineTo(c.rightStackSetup.vec(), Math.toRadians(180.00))
                 .build();
 
-        TrajectorySequence audienceSideMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
+
+
+        TrajectorySequence audienceMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
                 .lineToLinearHeading(new Pose2d(-40.50, 24.70, Math.toRadians(180.00)))
                 .lineTo(new Vector2d(-44.50, 24.70))
                 .lineToLinearHeading(c.rightStackSetup)
                 .build();
 
-        TrajectorySequence audienceSideRightPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
-                .lineToLinearHeading(new Pose2d(-41.01, 21.65, Math.toRadians(0.00)))
-                .splineTo(new Vector2d(-34.77, 14.05), Math.toRadians(270.00))
-                .splineTo(c.rightStackSetup.vec(), Math.toRadians(180.00))
+        TrajectorySequence audienceLeftPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
+                .lineTo(new Vector2d(-36.00, 42.00))
+                .lineToLinearHeading(new Pose2d(-32.73, 31.07, Math.toRadians(180.00)))
+                .lineToLinearHeading(c.rightStackSetup)
                 .build();
 
 
@@ -428,16 +428,22 @@ public class AutoBase extends LinearOpMode {
                 .build();
 
 
+        waitForStart();
 
+
+
+        TrajectorySequence stackSetupTest = drive.trajectorySequenceBuilder(c.startPose)
+                .lineToLinearHeading(c.rightStackSetup)
+                .build();
         // TRAJECTORIES FOR CYCLE
 
         // intake
-        TrajectorySequence intake = drive.trajectorySequenceBuilder(c.rightStackSetup)
+        TrajectorySequence intake = drive.trajectorySequenceBuilder(audienceLeftPurpleToRightStack.end())
                 .lineTo(c.rightStack.vec())
                 .build();
 
 // go to backdrop
-        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(c.rightStack)
+        TrajectorySequence goToBackdrop1 = drive.trajectorySequenceBuilder(c.rightStack)
                 .lineTo(new Vector2d(35.00, 12.00))
                 .addSpatialMarker(new Vector2d(12, 11), ()->{
                 robot.autoOutTakeYellow.runAsync();
@@ -448,45 +454,46 @@ public class AutoBase extends LinearOpMode {
                 })
                 .build();
 
-
-        // comes back to stack
-        TrajectorySequence goToStack = drive.trajectorySequenceBuilder(c.backdropRight)
-                .lineToLinearHeading(c.intermediateCyclePose)
-                .addSpatialMarker(c.intermediateCyclePose.vec(), ()->{
-                    robot.resetOutTake.runAsync();
-        })
-                .lineTo(c.rightStackSetup.vec())
-                .lineTo(c.rightStack.vec())
+        TrajectorySequence goToBackdrop = drive.trajectorySequenceBuilder(intake.end())
+                .lineToLinearHeading(c.intermediateCyclePose, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .addSpatialMarker(new Vector2d(12, 11), ()->{
+                    robot.autoOutTakeYellow.runAsync();
+                })
+                .lineTo(c.backdropRight.vec())
                 .build();
 
 
-        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+
+        robot.closeClaw.run();
+        robot.wait(250, TimeUnit.MILLISECONDS);
+        robot.autoOutTakeYellowHigh.run();
 
 
-        robot.startIntakingPixels.runAsync();
-        drive.followTrajectorySequence(intake);
+//        drive.followTrajectorySequence(audienceLeftPurpleToRightStack);
+//        intake(intake);
+//
+//        drive.followTrajectorySequence(goToBackdrop);
+//        robot.outTakeSetClawYawRightHorizontal.run();
+//
+//        robot.wait(500, TimeUnit.MILLISECONDS);
+//
+//        robot.openClaw.run();
+//
+//        robot.wait(250, TimeUnit.MILLISECONDS);
+//
+//        drive.setPoseEstimate(apriltags.getRobotPosFromTags());
+//
+//        robot.resetOutTake.runAsync();
 
-        robot.tryIntakeTwoPixels.run();
 
 
-        while(!robot.intake.pixels.hasTwoPixels()) {
-            robot.intake.pixels.update();
-        }
 
-        drive.followTrajectorySequence(backdropSideLeftPurple);
-        int retries = 3;
-        Pose2d correctedPose;
-        do {
-            robot.wait(200, TimeUnit.MILLISECONDS); // Makes sure the robot is still
-            correctedPose = apriltags.getRobotPosFromTags();
-            retries -= 1;
-        } while(retries>0 && correctedPose.getX()==0);
-
-        if(correctedPose.getX()!=0) {
-            drive.setPoseEstimate(correctedPose);
-        }
-
-        drive.followTrajectorySequence(goToBackdrop);
+//        drive.followTrajectorySequence(backdropSideLeftPurple);
+//
+//        setPoseUsingATags(apriltags);
+//
+//        drive.followTrajectorySequence(goToBackdrop);
 
 
         while(!isStopRequested()){
@@ -644,6 +651,37 @@ public class AutoBase extends LinearOpMode {
 
         follower.run(goToStackSetupThroughCenterTrussFromCenterBackdrop, true);*/
 
+    }
+
+    private void intake(TrajectorySequence intake) {
+        robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
+
+
+        robot.startIntakingPixels.runAsync();
+        drive.followTrajectorySequence(intake);
+
+        robot.tryIntakeTwoPixels.run();
+
+
+        while(!robot.intake.pixels.hasTwoPixels()) {
+            robot.intake.pixels.update();
+        }
+
+        robot.holdPixels.run();
+    }
+
+    private void setPoseUsingATags(AprilTagPoseDetection apriltags) {
+        int retries = 3;
+        Pose2d correctedPose;
+        do {
+            robot.wait(200, TimeUnit.MILLISECONDS); // Makes sure the robot is still
+            correctedPose = apriltags.getRobotPosFromTags();
+            retries -= 1;
+        } while(retries>0 && correctedPose.getX()==0);
+
+        if(correctedPose.getX()!=0) {
+            drive.setPoseEstimate(correctedPose);
+        }
     }
 
 }

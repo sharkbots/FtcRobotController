@@ -29,7 +29,7 @@ public class JudgingSession extends LinearOpMode {
 
         Robot.claw.setPitchPosition(Claw.pitchPositions.INTAKE);
         Robot.claw.setYawPosition(Claw.yawPositions.INTAKE);
-        Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+        Robot.claw.setGripPosition(Claw.gripPositions.CLOSE);
         Robot.planeLauncher.storePlane();
         Robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.UP);
         /*Robot.clawPitch.setPosition(Robot.clawPitchIntake); // clawPitchIntake
@@ -77,6 +77,8 @@ public class JudgingSession extends LinearOpMode {
             robot.update();
             Robot.lift.update();
             Robot.claw.update();
+            Robot.planeLauncher.update();
+            Robot.skyHook.update();
 
         }
     }
