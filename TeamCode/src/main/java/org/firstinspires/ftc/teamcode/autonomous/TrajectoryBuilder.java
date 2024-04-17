@@ -151,6 +151,7 @@ public class TrajectoryBuilder {
         // audience side code
         else{
             intake1Builder.setStartPose(finalTrajectory.get(finalTrajectory.size() - 1).end());
+            intake1Builder.lineToLinearHeading(stackLoc);
             intake1 = intake1Builder.build();
             finalTrajectory.add(intake1); // index 1 audience
 

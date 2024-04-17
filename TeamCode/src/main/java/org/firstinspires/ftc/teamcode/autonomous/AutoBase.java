@@ -107,11 +107,11 @@ public class AutoBase extends LinearOpMode {
         // Blue alliance parking
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
 
-        Vector2d parkBetweenBackdropsSetup = new Vector2d(50, 11.5);
+        Vector2d parkBetweenBackdropsSetup = new Vector2d(45, 11.5);
         Vector2d parkBetweenBackdrops = new Vector2d(60, 11.5);
 
-        Vector2d parkInCornerSetup = new Vector2d(47, 62);
-        Vector2d parkInCorner = new Vector2d(57, 62);
+        Vector2d parkInCornerSetup = new Vector2d(45, 62);
+        Vector2d parkInCorner = new Vector2d(60, 62);
 
 
         //blue far side
@@ -126,7 +126,7 @@ public class AutoBase extends LinearOpMode {
         Vector2d purpleDropToStackPreSetup = new Vector2d(-39.0, 45.0);
         Pose2d purpleDropToStackSetup = new Pose2d(-51, 51, Math.toRadians(180));
 
-        Pose2d centerStack = new Pose2d(-56, 24, Math.toRadians(180));
+        Pose2d centerStack = new Pose2d(-58.5, 24, Math.toRadians(180));
         Pose2d centerStackSetup = new Pose2d(centerStack.getX()+10, centerStack.getY(), centerStack.getHeading());
 
         Pose2d leftStack = new Pose2d(-57, 36, centerStack.getHeading());
@@ -158,7 +158,7 @@ public class AutoBase extends LinearOpMode {
         Pose2d backdropSideCenterPurpleCoordinateC = new Pose2d(16.00, 38.50, Math.toRadians(180.00));
 
         Vector2d backdropSideRightPurpleCoordinateA = new Vector2d(12.00, 42.00);
-        Pose2d backdropSideRightPurpleCoordinateB = new Pose2d(8.23, 33.81, Math.toRadians(0.00));
+        Pose2d backdropSideRightPurpleCoordinateB = new Pose2d(10.23, 33.81, Math.toRadians(0.00));
         Vector2d backdropSideRightPurpleCoordinateC = new Vector2d(15.23, 33.81);
         Pose2d backdropSideRightPurpleCoordinateD = new Pose2d(15.73, 33.81, Math.toRadians(180.0));
 
@@ -425,6 +425,7 @@ public class AutoBase extends LinearOpMode {
         }
         else{
             setPoseUsingATags(apriltags);
+            robot.outTakeSetClawYawVertical.runAsync();
             dropOffPixels(finalTrajectory.get(1), apriltags);
         }
         drive.followTrajectorySequence(finalTrajectory.get((finalTrajectory.size())-1));
@@ -588,7 +589,7 @@ public class AutoBase extends LinearOpMode {
     }
 
     private void dropOffPixels(TrajectorySequence goToBackdrop, AprilTagPoseDetection apriltags) {
-        robot.outTakeSetClawYawVertical.runAsync();
+        //robot.outTakeSetClawYawVertical.runAsync();
         drive.followTrajectorySequence(goToBackdrop);
 
         robot.wait(500, TimeUnit.MILLISECONDS);
