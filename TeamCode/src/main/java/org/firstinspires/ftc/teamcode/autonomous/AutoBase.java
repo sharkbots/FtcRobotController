@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -11,14 +10,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.ConfigMenu;
-import org.firstinspires.ftc.teamcode.ConfigMenuTest;
 import org.firstinspires.ftc.teamcode.Intake;
 import org.firstinspires.ftc.teamcode.aprilTags.AprilTagPoseDetection;
-import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.StandardTrackingWheelLocalizer;
@@ -26,7 +19,6 @@ import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.teamProp.TeamPropDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
 import org.firstinspires.ftc.teamcode.tools.Buttons;
-import org.firstinspires.ftc.teamcode.tools.PIXEL_COLOR;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.Global;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -50,9 +42,9 @@ public class AutoBase extends LinearOpMode {
         RIGHT,
     }
     public enum TRUSS_LOCATION {
-        LEFT,
+        DOOR,
         CENTER,
-        RIGHT,
+        OUTER,
     }
     public enum PARK_LOCATION {
         LEFT,
@@ -76,7 +68,7 @@ public class AutoBase extends LinearOpMode {
         ALLIANCE alliance = ALLIANCE.BLUE;
         SIDE side = SIDE.NEAR;
         STACK_LOCATION stack_location = STACK_LOCATION.RIGHT;
-        TRUSS_LOCATION truss_location = TRUSS_LOCATION.LEFT;
+        TRUSS_LOCATION truss_location = TRUSS_LOCATION.DOOR;
         PARK_LOCATION park_location = PARK_LOCATION.LEFT;
         int numCycles = 0;
         int waitForStack1 = 0;
@@ -148,8 +140,6 @@ public class AutoBase extends LinearOpMode {
         Pose2d audienceSideRightPurpleToRightStackCoordinateA = new Pose2d(-41.01, 21.65, Math.toRadians(0.00));
         Vector2d audienceSideRightPurpleToRightStackCoordinateBVector = new Vector2d(-34.77, 14.05);
         double audienceSideRightPurpleToRightStackCoordinateBAngle = Math.toRadians(270.00);
-        Vector2d audienceSideRightPurpleToRightStackCoordinateCVector = new Vector2d (rightStackSetup.getX(), rightStackSetup.getY());
-        double audienceSideRightPurpleToRightStackCoordinateCAngle = Math.toRadians(180.00);
 
         // BACKDROP SIDE PURPLE
         Pose2d backdropSideLeftPurpleCoordinateA = new Pose2d(16.00, 29.00, Math.toRadians(180.00));
@@ -258,8 +248,6 @@ public class AutoBase extends LinearOpMode {
                     audienceSideRightPurpleToRightStackCoordinateA = flipAcrossX(audienceSideRightPurpleToRightStackCoordinateA);
                     audienceSideRightPurpleToRightStackCoordinateBVector = flipVectorAcrossX(audienceSideRightPurpleToRightStackCoordinateBVector);
                     audienceSideRightPurpleToRightStackCoordinateBAngle = flipAngleAcrossX(audienceSideRightPurpleToRightStackCoordinateBAngle);
-                    audienceSideRightPurpleToRightStackCoordinateCVector = flipVectorAcrossX(audienceSideRightPurpleToRightStackCoordinateCVector);
-                    audienceSideRightPurpleToRightStackCoordinateCAngle = flipAngleAcrossX(audienceSideRightPurpleToRightStackCoordinateCAngle);
                 }
             }
         }
@@ -434,48 +422,7 @@ public class AutoBase extends LinearOpMode {
         // AUDIENCE SIDE PURPLE
         // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
 
-        TrajectorySequence audienceSideLeftPurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
-                .lineTo(c.audienceSideLeftPurpleToRightStackCoordinateA)
-                .lineToLinearHeading(c.audienceSideLeftPurpleToRightStackCoordinateB)
-                .lineToLinearHeading(c.rightStackSetup)
-                .build();
 
-        TrajectorySequence audienceSideMiddlePurpleToRightStack = drive.trajectorySequenceBuilder(c.startPose)
-                .lineToLinearHeading(c.audienceSideMiddlePurpleToRightStackCoordinateA)
-                .lineTo(c.audienceSideMiddlePurpleToRightStackCoordinateB)
-                .lineToLinearHeading(c.rightStackSetup)
-                .build();
-
-        TrajectorySequence audienceSideRightPurpleToRightStack = drive.trajectorySequenceBuilder(new Pose2d(-36.00, 62.00, Math.toRadians(90.00)))
-                .lineToLinearHeading(c.audienceSideRightPurpleToRightStackCoordinateA)
-                .splineTo(c.audienceSideRightPurpleToRightStackCoordinateBVector, c.audienceSideRightPurpleToRightStackCoordinateBAngle)
-                .splineTo(c.audienceSideRightPurpleToRightStackCoordinateCVector, c.audienceSideRightPurpleToRightStackCoordinateCAngle)
-                .build();
-
-
-
-
-        // BACKDROP SIDE PURPLE
-        // START POSE: new Pose2d(12.00, 62.00, Math.toRadians(90.00))
-
-        TrajectorySequence backdropSideLeftPurple = drive.trajectorySequenceBuilder(c.startPose)
-                .lineToLinearHeading(c.backdropSideLeftPurpleCoordinateA)
-                .lineToLinearHeading(c.backdropSideLeftPurpleCoordinateB)
-                .lineToLinearHeading(c.backdropSideLeftPurpleCoordinateC)
-                .build();
-
-        TrajectorySequence backdropSideCenterPurple = drive.trajectorySequenceBuilder(c.startPose)
-                .lineTo(c.backdropSideCenterPurpleCoordinateA)
-                .lineToLinearHeading(c.backdropSideCenterPurpleCoordinateB)
-                .lineToLinearHeading(c.backdropSideCenterPurpleCoordinateC)
-                .build();
-
-        TrajectorySequence backdropSideRightPurple = drive.trajectorySequenceBuilder(c.startPose)
-                .lineTo(c.backdropSideRightPurpleCoordinateA)
-                .lineToLinearHeading(c.backdropSideRightPurpleCoordinateB)
-                .lineTo(c.backdropSideRightPurpleCoordinateC)
-                .lineToLinearHeading(c.backdropSideRightPurpleCoordinateD)
-                .build();
 
 
         waitForStart();
@@ -523,20 +470,7 @@ public class AutoBase extends LinearOpMode {
 //        drive.followTrajectorySequence(audienceLeftPurpleToRightStack);
 //        intake(intake);
 //
-//        drive.followTrajectorySequence(goToBackdrop);
-//        robot.outTakeSetClawYawRightHorizontal.run();
-//
-//        robot.wait(500, TimeUnit.MILLISECONDS);
-//
-//        robot.openClaw.run();
-//
-//        robot.wait(250, TimeUnit.MILLISECONDS);
-//
-//        drive.setPoseEstimate(apriltags.getRobotPosFromTags());
-//
-//        robot.resetOutTake.runAsync();
-
-
+        dropOffPixels(goToBackdrop, apriltags);
 
 
 //        drive.followTrajectorySequence(backdropSideLeftPurple);
@@ -701,6 +635,21 @@ public class AutoBase extends LinearOpMode {
 
         follower.run(goToStackSetupThroughCenterTrussFromCenterBackdrop, true);*/
 
+    }
+
+    private void dropOffPixels(TrajectorySequence goToBackdrop, AprilTagPoseDetection apriltags) {
+        drive.followTrajectorySequence(goToBackdrop);
+        robot.outTakeSetClawYawRightHorizontal.run();
+
+        robot.wait(500, TimeUnit.MILLISECONDS);
+
+        robot.openClaw.run();
+
+        robot.wait(250, TimeUnit.MILLISECONDS);
+
+        drive.setPoseEstimate(apriltags.getRobotPosFromTags());
+
+        robot.resetOutTake.runAsync();
     }
 
     private void intake(TrajectorySequence intake) {

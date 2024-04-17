@@ -121,6 +121,10 @@ public class TrajectorySequenceBuilder {
         );
     }
 
+    public void setStartPose(Pose2d startPose){
+        this.lastPose = startPose;
+    }
+
     public TrajectorySequenceBuilder lineTo(Vector2d endPosition) {
         return addPath(() -> currentTrajectoryBuilder.lineTo(endPosition, currentVelConstraint, currentAccelConstraint));
     }
