@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.tools;
 
+import static org.firstinspires.ftc.teamcode.tools.PIXEL_COLOR.MAX_DISTANCE_FROM_MAT_MM;
+
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LED;
@@ -47,7 +49,7 @@ public class PixelsDetection {
         colorSensor1 = hardwareMap.get(RevColorSensorV3.class, "colorsensor1");
         colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorsensor2");
 
-        twoPixelsDetectionDelay = new Deadline(200, TimeUnit.MILLISECONDS);
+        twoPixelsDetectionDelay = new Deadline(20, TimeUnit.MILLISECONDS);
         blinkingDelay = new Deadline(50, TimeUnit.MILLISECONDS);
 
         for(LED ledRed: ledsRed) {
@@ -84,7 +86,8 @@ public class PixelsDetection {
     private PIXEL_COLOR detectColorFrom(RevColorSensorV3 colorSensor, String debugPrefix) {
         ColorSensorInfo colorSensorInfo = new ColorSensorInfo(colorSensor);
 
-        PIXEL_COLOR detectedColor = PIXEL_COLOR.detect(colorSensorInfo);
+        PIXEL_COLOR detectedColor = PIXEL_COLOR.detect(colorSensorInfo,
+                                                       debugPrefix=="1- "? PIXEL_COLOR.MAX_DISTANCE_FROM_MAT_MM: PIXEL_COLOR.MAX_DISTANCE_PIXEL2_FROM_MAT_MM);
 
         Global.telemetry.addLine()
                 .addData(debugPrefix+"PIXEL",  detectedColor.name());

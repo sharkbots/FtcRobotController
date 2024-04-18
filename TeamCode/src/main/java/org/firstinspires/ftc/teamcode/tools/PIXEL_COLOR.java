@@ -14,7 +14,8 @@ public enum PIXEL_COLOR {
     private final double maxHue;
     public final RevBlinkinLedDriver.BlinkinPattern pattern;
 
-    static private final double MAX_DISTANCE_FROM_MAT_MM = 10.5;
+    protected static final double MAX_DISTANCE_FROM_MAT_MM = 11.9;
+    protected static final double MAX_DISTANCE_PIXEL2_FROM_MAT_MM = 14.0;
 
     PIXEL_COLOR(double minHue, double maxHue, RevBlinkinLedDriver.BlinkinPattern pattern) {
         this.minHue = minHue;
@@ -22,8 +23,8 @@ public enum PIXEL_COLOR {
         this.pattern = pattern;
     }
 
-    public static PIXEL_COLOR detect(ColorSensorInfo sensorInfo) {
-        if(sensorInfo.distanceMM() <= MAX_DISTANCE_FROM_MAT_MM) { // distance too far means we are seeing the mat
+    public static PIXEL_COLOR detect(ColorSensorInfo sensorInfo, double maxdistance) {
+        if(sensorInfo.distanceMM() <= maxdistance) { // distance too far means we are seeing the mat
 
 
             for (PIXEL_COLOR color : PIXEL_COLOR.values()) {

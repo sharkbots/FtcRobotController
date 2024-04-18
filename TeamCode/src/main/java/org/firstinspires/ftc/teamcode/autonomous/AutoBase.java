@@ -102,15 +102,15 @@ public class AutoBase extends LinearOpMode {
 
         //Blue backdrop
         Pose2d backdropStrafeForCenter = new Pose2d(51, 45, Math.toRadians(180.00));
-        Pose2d backdropLeft = new Pose2d(51, 41.41, Math.toRadians(180.00));
-        Pose2d backdropCenter = new Pose2d(51, 35.41, Math.toRadians(180.00));
-        Pose2d backdropRight = new Pose2d(51, 29.41, Math.toRadians(180.00));
+        Pose2d backdropLeft = new Pose2d(50.5, 41.41, Math.toRadians(180.00));
+        Pose2d backdropCenter = new Pose2d(50.5, 35.41, Math.toRadians(180.00));
+        Pose2d backdropRight = new Pose2d(50.5, 29.41, Math.toRadians(180.00));
 
         // Blue alliance parking
         Pose2d parkIntermediate = new Pose2d(42, 11.5, Math.toRadians(180.00));
 
         Vector2d parkBetweenBackdropsSetup = new Vector2d(45, 11.5);
-        Vector2d parkBetweenBackdrops = new Vector2d(60, 9.5);
+        Vector2d parkBetweenBackdrops = new Vector2d(60, 7);
 
         Vector2d parkInCornerSetup = new Vector2d(45, 62);
         Vector2d parkInCorner = new Vector2d(60, 62);
