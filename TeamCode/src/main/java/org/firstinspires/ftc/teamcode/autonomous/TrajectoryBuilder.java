@@ -161,11 +161,12 @@ public class TrajectoryBuilder {
                 goToBackdrop1Builder
                         .lineToLinearHeading(c.prepareToGoToStageDoor)
                         .lineToLinearHeading(c.prepareToGoToStageDoor2)
-                        .splineTo(c.intermediateCyclePose.vec(), c.intermediateCyclePose.getHeading(), SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
-                                SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-//                        .addSpatialMarker((c.spatialMarkerGoToBackdrop), ()-> robot.autoOutTakeYellow.runAsync())
-                        .addTemporalMarker(3, ()-> robot.autoOutTakeYellow.runAsync())
-                        .lineToLinearHeading(c.prepareToGoToBackdrop);
+                        .lineToLinearHeading(c.intermediateCyclePose)
+                        .addTemporalMarker(2, ()-> robot.outTakeSetClawYawVertical.runAsync())
+                        .lineToLinearHeading(c.prepareToGoToBackdropCycle);
+                        //.splineTo(c.intermediateCyclePose.vec(), c.intermediateCyclePose.getHeading(), SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                                //SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL));
+                        //.addSpatialMarker((c.spatialMarkerGoToBackdrop), ()-> robot.autoOutTakeYellow.runAsync())
             }
             goToBackdrop1 = goToBackdrop1Builder.build();
             finalTrajectory.add(goToBackdrop1); // index 2 audience
