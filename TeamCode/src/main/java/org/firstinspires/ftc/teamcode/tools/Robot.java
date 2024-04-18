@@ -225,6 +225,9 @@ public class Robot {
         intakingPixels.addTransitionTo(holdingPixels, twoPixelsInPossession,
                 holdPixels);
 
+        intakingPixels.addTransitionTo(holdingPixels, buttons.handlerB::Pressed,
+                holdPixels);
+
         holdingPixels.addTransitionTo(intakingPixels, buttons.handlerA::Pressed,
                 holdingPixelsToIntakingPixels);
 
