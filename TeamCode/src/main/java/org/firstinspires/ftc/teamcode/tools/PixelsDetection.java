@@ -49,7 +49,7 @@ public class PixelsDetection {
         colorSensor1 = hardwareMap.get(RevColorSensorV3.class, "colorsensor1");
         colorSensor2 = hardwareMap.get(RevColorSensorV3.class, "colorsensor2");
 
-        twoPixelsDetectionDelay = new Deadline(130, TimeUnit.MILLISECONDS);
+        twoPixelsDetectionDelay = new Deadline(20, TimeUnit.MILLISECONDS);
         blinkingDelay = new Deadline(50, TimeUnit.MILLISECONDS);
 
         for(LED ledRed: ledsRed) {
