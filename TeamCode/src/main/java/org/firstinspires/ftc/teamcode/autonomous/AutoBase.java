@@ -91,9 +91,10 @@ public class AutoBase extends LinearOpMode {
         Pose2d rightTeamProp = new Pose2d(9, 32, Math.toRadians(0.00));
 
         // vectors to set up for backdrop
-        Vector2d prepareToGoToStageDoor = new Vector2d(-38.78, 10.00);
-        Vector2d prepareToGoToStageDoor2 = new Vector2d(-12, 8.00);
-        Pose2d intermediateCyclePose = new Pose2d(35, 12, 180.0);
+        Pose2d prepareToGoToStageDoor = new Pose2d(-38.78, 8.00, Math.toRadians(180));
+        Pose2d prepareToGoToStageDoor2 = new Pose2d(-12, 8.00, Math.toRadians(180.0));
+        Pose2d intermediateCyclePose = new Pose2d(37.0, 8.00, Math.toRadians(180.0));
+        Pose2d prepareToGoToBackdropCycle = new Pose2d(37.0, 35.0, Math.toRadians(180.0));
         Vector2d spatialMarkerGoToBackdrop = new Vector2d(12, 11);
 
         // near side
@@ -219,9 +220,10 @@ public class AutoBase extends LinearOpMode {
                 rightStack = flipAcrossX(rightStack);
                 rightStackSetup = flipAcrossX(rightStackSetup);
 
-                prepareToGoToStageDoor = flipVectorAcrossX(prepareToGoToStageDoor);
-                prepareToGoToStageDoor2 = flipVectorAcrossX(prepareToGoToStageDoor2);
+                prepareToGoToStageDoor = flipAcrossX(prepareToGoToStageDoor);
+                prepareToGoToStageDoor2 = flipAcrossX(prepareToGoToStageDoor2);
                 intermediateCyclePose = flipAcrossX(intermediateCyclePose);
+                prepareToGoToBackdropCycle = flipAcrossX(prepareToGoToBackdropCycle);
                 spatialMarkerGoToBackdrop = flipVectorAcrossX(spatialMarkerGoToBackdrop);
 
 
@@ -429,14 +431,14 @@ public class AutoBase extends LinearOpMode {
         if(config.side == SIDE.AUDIENCE){
             intakeFromStack(finalTrajectory.get(1));
             drive.followTrajectorySequence(finalTrajectory.get(2));
-            //dropOffPixelsFromBackdropPurple(finalTrajectory.get(3), apriltags);
+            dropOffPixelsFromCycle(finalTrajectory.get(3), apriltags);
         }
         else{
             setPoseUsingATags(apriltags);
             robot.outTakeSetClawYawVertical.runAsync();
             dropOffPixelsFromBackdropPurple(finalTrajectory.get(1), apriltags);
         }
-        //drive.followTrajectorySequence(finalTrajectory.get((finalTrajectory.size())-1));
+        drive.followTrajectorySequence(finalTrajectory.get((finalTrajectory.size())-1));
 
         AutoDataStorage.currentPose = drive.getPoseEstimate();
         AutoDataStorage.comingFromAutonomous = true;
@@ -610,6 +612,21 @@ public class AutoBase extends LinearOpMode {
         robot.wait(250, TimeUnit.MILLISECONDS);
 
         setPoseUsingATags(apriltags);
+
+        robot.resetOutTake.runAsync();
+    }
+
+    private void dropOffPixelsFromCycle(TrajectorySequence goToBackdrop, AprilTagPoseDetection apriltags) {
+        //robot.outTakeSetClawYawVertical.runAsync();
+        setPoseUsingATags(apriltags);
+
+        drive.followTrajectorySequence(goToBackdrop);
+
+        robot.wait(500, TimeUnit.MILLISECONDS);
+
+        robot.openClaw.run();
+
+        robot.wait(250, TimeUnit.MILLISECONDS);
 
         robot.resetOutTake.runAsync();
     }
