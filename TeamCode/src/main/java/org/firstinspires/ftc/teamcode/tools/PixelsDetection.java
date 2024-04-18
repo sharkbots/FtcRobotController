@@ -93,14 +93,14 @@ public class PixelsDetection {
                 .addData(debugPrefix+"PIXEL",  detectedColor.name());
 
 
-        Global.telemetry.addLine()
-                .addData(debugPrefix+"R",  colorSensorInfo.red())
-                .addData(debugPrefix+"G", colorSensorInfo.green())
-                .addData(debugPrefix+"B",  colorSensorInfo.blue());
-        Global.telemetry.addLine()
-                .addData(debugPrefix+"Hue", "%.3f", colorSensorInfo.hue())
-                .addData(debugPrefix+"Sat", "%.3f", colorSensorInfo.saturation())
-                .addData(debugPrefix+"Val", "%.3f", colorSensorInfo.value());
+//        Global.telemetry.addLine()
+//                .addData(debugPrefix+"R",  colorSensorInfo.red())
+//                .addData(debugPrefix+"G", colorSensorInfo.green())
+//                .addData(debugPrefix+"B",  colorSensorInfo.blue());
+//        Global.telemetry.addLine()
+//                .addData(debugPrefix+"Hue", "%.3f", colorSensorInfo.hue())
+//                .addData(debugPrefix+"Sat", "%.3f", colorSensorInfo.saturation())
+//                .addData(debugPrefix+"Val", "%.3f", colorSensorInfo.value());
 
         Global.telemetry.addData(debugPrefix+"Distance (mm)", "%.3f", colorSensorInfo.distanceMM());
         Global.telemetry.addLine();
@@ -119,7 +119,7 @@ public class PixelsDetection {
         return  twoPixelsDetectionDelay.hasExpired() && hasTwoPixelsRaw();
     }
 
-    private boolean hasTwoPixelsRaw() {
+    public boolean hasTwoPixelsRaw() {
         return (pixel1 != PIXEL_COLOR.UNDEFINED) && (pixel2 != PIXEL_COLOR.UNDEFINED);
     }
 

@@ -209,7 +209,7 @@ public class Robot {
 
     private void createTeleopStateTransitions() {
         // button triggers
-        BooleanSupplier twoPixelsInPossession = intake.pixels::hasTwoPixels;
+        BooleanSupplier twoPixelsInPossession = intake.pixels::hasTwoPixelsRaw;
 
         BooleanSupplier alwaysTrue = ()-> true;
 
@@ -223,6 +223,9 @@ public class Robot {
         intakingPixels.addTransitionTo(idle, buttons.handlerLeftTrigger::Pressed, empty);
 
         intakingPixels.addTransitionTo(holdingPixels, twoPixelsInPossession,
+                holdPixels);
+
+        intakingPixels.addTransitionTo(holdingPixels, buttons.handlerB::Pressed,
                 holdPixels);
 
         holdingPixels.addTransitionTo(intakingPixels, buttons.handlerA::Pressed,
