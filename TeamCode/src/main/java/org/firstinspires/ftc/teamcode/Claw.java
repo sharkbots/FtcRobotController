@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.tools.Buttons;
+import org.firstinspires.ftc.teamcode.tools.PIXEL_COLOR;
+import org.firstinspires.ftc.teamcode.tools.PixelsDetection;
 import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.ServoActionManager;
 
@@ -145,8 +147,13 @@ public class Claw {
 
         if(buttons.handlerRightBumper.Pressed()){
             Robot.claw.setGripPosition(Claw.gripPositions.OPEN);
+            Robot.intake.pixels.setLEDMode(PixelsDetection.LEDMode.BLINKING);
+            Robot.intake.pixels.pixel1 = PIXEL_COLOR.UNDEFINED;
+            Robot.intake.pixels.pixel2 = PIXEL_COLOR.UNDEFINED;
+
             //Robot.clawGrip.setPosition(Robot.clawOpen);
         }
+
         if(buttons.handlerLeftBumper.Pressed()){
             Robot.claw.setGripPosition(Claw.gripPositions.CLOSE);
             //Robot.clawGrip.setPosition(Robot.clawClose);

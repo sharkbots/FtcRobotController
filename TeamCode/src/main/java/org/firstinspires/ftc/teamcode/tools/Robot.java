@@ -222,10 +222,10 @@ public class Robot {
 
         intakingPixels.addTransitionTo(idle, buttons.handlerLeftTrigger::Pressed, empty);
 
-        intakingPixels.addTransitionTo(holdingPixels, twoPixelsInPossession,
-                holdPixels);
+//        intakingPixels.addTransitionTo(holdingPixels, twoPixelsInPossession,
+//                holdPixels);
 
-        intakingPixels.addTransitionTo(holdingPixels, buttons.handlerB::Pressed,
+        intakingPixels.addTransitionTo(holdingPixels, buttons.handlerA::Pressed,
                 holdPixels);
 
         holdingPixels.addTransitionTo(intakingPixels, buttons.handlerA::Pressed,
