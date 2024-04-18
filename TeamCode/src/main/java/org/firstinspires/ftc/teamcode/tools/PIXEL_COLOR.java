@@ -14,7 +14,7 @@ public enum PIXEL_COLOR {
     private final double maxHue;
     public final RevBlinkinLedDriver.BlinkinPattern pattern;
 
-    static private final double MAX_DISTANCE_FROM_MAT_MM = 10.5;
+    static private final double MAX_DISTANCE_FROM_MAT_MM = 11.9;
 
     PIXEL_COLOR(double minHue, double maxHue, RevBlinkinLedDriver.BlinkinPattern pattern) {
         this.minHue = minHue;
