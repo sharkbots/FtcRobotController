@@ -4,10 +4,10 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
 public enum PIXEL_COLOR {
 
-    YELLOW(25.0, 125.0, RevBlinkinLedDriver.BlinkinPattern.ORANGE),
+    YELLOW(0.0, 125.0, RevBlinkinLedDriver.BlinkinPattern.ORANGE),
     GREEN(125.0, 160.0, RevBlinkinLedDriver.BlinkinPattern.DARK_GREEN),
     WHITE(160.0, 180.0, RevBlinkinLedDriver.BlinkinPattern.WHITE),
-    PURPLE(180.0, 255.0, RevBlinkinLedDriver.BlinkinPattern.VIOLET),
+    PURPLE(180.0, 256.0, RevBlinkinLedDriver.BlinkinPattern.VIOLET),
     UNDEFINED(-1.0, -1.0, RevBlinkinLedDriver.BlinkinPattern.BLACK);
 
     private final double minHue;

@@ -209,7 +209,7 @@ public class Robot {
 
     private void createTeleopStateTransitions() {
         // button triggers
-        BooleanSupplier twoPixelsInPossession = intake.pixels::hasTwoPixels;
+        BooleanSupplier twoPixelsInPossession = intake.pixels::hasTwoPixelsRaw;
 
         BooleanSupplier alwaysTrue = ()-> true;
 
