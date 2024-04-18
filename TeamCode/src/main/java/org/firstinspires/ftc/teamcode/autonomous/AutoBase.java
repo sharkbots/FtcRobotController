@@ -209,13 +209,25 @@ public class AutoBase extends LinearOpMode {
                 backdropStrafeForCenter = flipAcrossX(backdropStrafeForCenter);
                 backdropRight = flipAcrossX(backdropRight);
 
+                double redaudienceBackdropDrift = 3.0;
+
+                if(side == SIDE.AUDIENCE) {
+                    backdropLeft = new Pose2d(backdropLeft.getX(), backdropLeft.getY()+redaudienceBackdropDrift, backdropLeft.getHeading());
+                    backdropCenter = new Pose2d(backdropCenter.getX(), backdropCenter.getY()+redaudienceBackdropDrift, backdropCenter.getHeading());
+                    backdropRight = new Pose2d(backdropRight.getX(), backdropRight.getY()+redaudienceBackdropDrift, backdropRight.getHeading());
+
+                }
                 parkIntermediate = flipAcrossX(parkIntermediate);
                 parkInCorner = flipVectorAcrossX(parkInCorner);
                 parkInCornerSetup = flipVectorAcrossX(parkInCornerSetup);
                 parkBetweenBackdropsSetup = flipVectorAcrossX(parkBetweenBackdropsSetup);
                 parkBetweenBackdrops = flipVectorAcrossX(parkBetweenBackdrops);
+                if(side == SIDE.AUDIENCE) {
+                    parkBetweenBackdrops = new Vector2d(parkBetweenBackdrops.getX(), parkBetweenBackdrops.getY() + redaudienceBackdropDrift);
+                }
 
-                prepareFarDropCenter = flipVectorAcrossX(prepareFarDropCenter);
+
+                    prepareFarDropCenter = flipVectorAcrossX(prepareFarDropCenter);
                 prepareFarDropOutside = flipVectorAcrossX(prepareFarDropOutside);
                 backdropIntermediateFarOutside = flipVectorAcrossX(backdropIntermediateFarOutside);
                 backdropIntermediateFarStageDoor = flipVectorAcrossX(backdropIntermediateFarStageDoor);
