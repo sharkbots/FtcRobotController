@@ -58,7 +58,6 @@ public class JudgingSession extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Setup();
-        //Global.telemetry.speak("SHARKBOTS SHARKBOTS SHARKBOTS");
         waitForStart();
         while(opModeIsActive()){
 

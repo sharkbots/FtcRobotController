@@ -12,21 +12,31 @@ import org.firstinspires.ftc.teamcode.roadRunner.util.Encoder;
 @TeleOp(name="EncoderTest", group = "Tools")
 public class EncoderTest extends LinearOpMode {
 
-    private DcMotor leftEncoder, rightEncoder, backEncoder;
-    private Buttons buttons;
-
-    public EncoderTest(Gamepad gamepad1, Gamepad gamepad2) {
+    Buttons buttons;
+    DcMotor leftEncoder, rightEncoder, backEncoder;
+    double RightEncoder, LeftEncoder, BackEncoder;
+    public void Setup() {
         buttons = new Buttons(gamepad1, gamepad2);
-    }
-
-    public void runOpMode() {
         leftEncoder = hardwareMap.dcMotor.get("backLeftMotor");
         rightEncoder = hardwareMap.dcMotor.get("intakeMotor");
         backEncoder = hardwareMap.dcMotor.get("frontLeftMotor");
 
-        double REncode = 0;
-        double LEncode = 0;
-        double BEncode = 0;
+        leftEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        RightEncoder = 0;
+        LeftEncoder = 0;
+        BackEncoder = 0;
+
+    }
+    @Override
+    public void runOpMode() throws InterruptedException {
+        Setup();
+        waitForStart();
 
         while (opModeIsActive()) {
             if (buttons.handlerX.Pressed()) {
@@ -38,13 +48,13 @@ public class EncoderTest extends LinearOpMode {
                 backEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
 
-            REncode = rightEncoder.getCurrentPosition();
-            LEncode = leftEncoder.getCurrentPosition();
-            BEncode = backEncoder.getCurrentPosition();
+            RightEncoder = rightEncoder.getCurrentPosition();
+            LeftEncoder = leftEncoder.getCurrentPosition();
+            BackEncoder = backEncoder.getCurrentPosition();
 
-            telemetry.addData("Right encoder:", REncode);
-            telemetry.addData("Left Encoder:", LEncode);
-            telemetry.addData("Back Encoder:", BEncode);
+            telemetry.addData("Right encoder:", rightEncoder.getCurrentPosition());
+            telemetry.addData("Left Encoder:", leftEncoder.getCurrentPosition());
+            telemetry.addData("Back Encoder:", backEncoder.getCurrentPosition());
             telemetry.update();
         }
     }

@@ -106,7 +106,7 @@ public class TrajectoryBuilder {
             if(propLoc == PROP_LOCATIONS.RIGHT){
                 purpleDropBuilder
                         .lineToLinearHeading(c.audienceSideRightPurpleToRightStackCoordinateA)
-                        .splineTo(c.audienceSideRightPurpleToRightStackCoordinateBVector, c.audienceSideRightPurpleToRightStackCoordinateBAngle)
+                        .splineTo(c.audienceSideRightPurpleToRightStackCoordinateB.vec(), c.audienceSideRightPurpleToRightStackCoordinateB.getHeading())
                         .splineTo(stackSetup.vec(), stackSetup.getHeading());
             }
         }
@@ -159,7 +159,8 @@ public class TrajectoryBuilder {
             if(config.stack_location == AutoBase.STACK_LOCATION.RIGHT){
                 goToBackdrop1Builder.setStartPose(finalTrajectory.get(finalTrajectory.size() - 1).end());
                 goToBackdrop1Builder
-                        .lineToLinearHeading(c.intermediateCyclePose, SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                        .lineTo(c.prepareToGoToStageDoor)
+                        .splineTo(c.intermediateCyclePose.vec(), c.intermediateCyclePose.getHeading(), SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
                                 SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                         .addSpatialMarker((c.spatialMarkerGoToBackdrop), ()-> robot.autoOutTakeYellow.runAsync())
                         .lineTo(c.backdropRight.vec());
@@ -167,6 +168,8 @@ public class TrajectoryBuilder {
             goToBackdrop1 = goToBackdrop1Builder.build();
             finalTrajectory.add(goToBackdrop1); // index 2 audience
         }
+
+
 
         parkBuilder.setStartPose(finalTrajectory.get(finalTrajectory.size() - 1).end());
 

@@ -91,7 +91,8 @@ public class AutoBase extends LinearOpMode {
         Pose2d rightTeamProp = new Pose2d(9, 32, Math.toRadians(0.00));
 
         // vectors to set up for backdrop
-        Pose2d intermediateCyclePose = new Pose2d(35, 12, Math.toRadians(180));
+        Vector2d prepareToGoToStageDoor = new Vector2d(-38.78, 10.00);
+        Pose2d intermediateCyclePose = new Pose2d(35, 12, 180.0);
         Vector2d spatialMarkerGoToBackdrop = new Vector2d(12, 11);
 
         // near side
@@ -146,8 +147,7 @@ public class AutoBase extends LinearOpMode {
         Vector2d audienceSideMiddlePurpleToRightStackCoordinateB = new Vector2d(-44.50, 24.70);
 
         Pose2d audienceSideRightPurpleToRightStackCoordinateA = new Pose2d(-41.01, 21.65, Math.toRadians(0.00));
-        Vector2d audienceSideRightPurpleToRightStackCoordinateBVector = new Vector2d(-34.77, 14.05);
-        double audienceSideRightPurpleToRightStackCoordinateBAngle = Math.toRadians(270.00);
+        Pose2d audienceSideRightPurpleToRightStackCoordinateB = new Pose2d(-34.77, 14.05, 270.0);
 
         // BACKDROP SIDE PURPLE
         Pose2d backdropSideLeftPurpleCoordinateA = new Pose2d(16.00, 29.00, Math.toRadians(180.00));
@@ -218,6 +218,7 @@ public class AutoBase extends LinearOpMode {
                 rightStack = flipAcrossX(rightStack);
                 rightStackSetup = flipAcrossX(rightStackSetup);
 
+                prepareToGoToStageDoor = flipVectorAcrossX(prepareToGoToStageDoor);
                 intermediateCyclePose = flipAcrossX(intermediateCyclePose);
                 spatialMarkerGoToBackdrop = flipVectorAcrossX(spatialMarkerGoToBackdrop);
 
@@ -260,8 +261,7 @@ public class AutoBase extends LinearOpMode {
                     audienceSideMiddlePurpleToRightStackCoordinateA = flipAcrossX(audienceSideMiddlePurpleToRightStackCoordinateA);
                     audienceSideMiddlePurpleToRightStackCoordinateB = flipVectorAcrossX(audienceSideMiddlePurpleToRightStackCoordinateB);
                     audienceSideRightPurpleToRightStackCoordinateA = flipAcrossX(audienceSideRightPurpleToRightStackCoordinateA);
-                    audienceSideRightPurpleToRightStackCoordinateBVector = flipVectorAcrossX(audienceSideRightPurpleToRightStackCoordinateBVector);
-                    audienceSideRightPurpleToRightStackCoordinateBAngle = flipAngleAcrossX(audienceSideRightPurpleToRightStackCoordinateBAngle);
+                    audienceSideRightPurpleToRightStackCoordinateB = flipAcrossX(audienceSideRightPurpleToRightStackCoordinateB);
                 }
             }
         }
@@ -274,10 +274,6 @@ public class AutoBase extends LinearOpMode {
 
         public Vector2d flipVectorAcrossX(Vector2d vector2d){
             return new Vector2d(vector2d.getX(), -vector2d.getY());
-        }
-
-        public double flipAngleAcrossX(double angle){
-            return -angle%Math.toRadians(360);
         }
 
         // Near side to far side
@@ -319,7 +315,6 @@ public class AutoBase extends LinearOpMode {
 
         drive = new SampleMecanumDrive(hardwareMap);
         // hardware map for odometry encoders
-        myLocalizer = new StandardTrackingWheelLocalizer(hardwareMap, null, null);
 
         // start location (coordinate)
 
@@ -423,8 +418,6 @@ public class AutoBase extends LinearOpMode {
             }
         }
 
-
-        myLocalizer.setPoseEstimate(c.startPose);
         drive.setPoseEstimate(c.startPose); // !!!!!
 
         waitForStart();
