@@ -92,6 +92,7 @@ public class AutoBase extends LinearOpMode {
 
         // vectors to set up for backdrop
         Vector2d prepareToGoToStageDoor = new Vector2d(-38.78, 10.00);
+        Vector2d prepareToGoToStageDoor2 = new Vector2d(-12, 8.00);
         Pose2d intermediateCyclePose = new Pose2d(35, 12, 180.0);
         Vector2d spatialMarkerGoToBackdrop = new Vector2d(12, 11);
 
@@ -219,6 +220,7 @@ public class AutoBase extends LinearOpMode {
                 rightStackSetup = flipAcrossX(rightStackSetup);
 
                 prepareToGoToStageDoor = flipVectorAcrossX(prepareToGoToStageDoor);
+                prepareToGoToStageDoor2 = flipVectorAcrossX(prepareToGoToStageDoor2);
                 intermediateCyclePose = flipAcrossX(intermediateCyclePose);
                 spatialMarkerGoToBackdrop = flipVectorAcrossX(spatialMarkerGoToBackdrop);
 
@@ -426,14 +428,15 @@ public class AutoBase extends LinearOpMode {
 
         if(config.side == SIDE.AUDIENCE){
             intakeFromStack(finalTrajectory.get(1));
-            dropOffPixels(finalTrajectory.get(2), apriltags);
+            drive.followTrajectorySequence(finalTrajectory.get(2));
+            //dropOffPixelsFromBackdropPurple(finalTrajectory.get(3), apriltags);
         }
         else{
             setPoseUsingATags(apriltags);
             robot.outTakeSetClawYawVertical.runAsync();
-            dropOffPixels(finalTrajectory.get(1), apriltags);
+            dropOffPixelsFromBackdropPurple(finalTrajectory.get(1), apriltags);
         }
-        drive.followTrajectorySequence(finalTrajectory.get((finalTrajectory.size())-1));
+        //drive.followTrajectorySequence(finalTrajectory.get((finalTrajectory.size())-1));
 
         AutoDataStorage.currentPose = drive.getPoseEstimate();
         AutoDataStorage.comingFromAutonomous = true;
@@ -596,7 +599,7 @@ public class AutoBase extends LinearOpMode {
 
     }
 
-    private void dropOffPixels(TrajectorySequence goToBackdrop, AprilTagPoseDetection apriltags) {
+    private void dropOffPixelsFromBackdropPurple(TrajectorySequence goToBackdrop, AprilTagPoseDetection apriltags) {
         //robot.outTakeSetClawYawVertical.runAsync();
         drive.followTrajectorySequence(goToBackdrop);
 
@@ -611,11 +614,11 @@ public class AutoBase extends LinearOpMode {
         robot.resetOutTake.runAsync();
     }
 
-    private void intakeFromStack(TrajectorySequence intake) {
+    private void intakeFromStack(TrajectorySequence intake) throws InterruptedException {
         robot.intake.setIntakeFlipperPosition(Intake.FlipperPosition.PIXEL5);
 
 
-        robot.startIntakingPixels.runAsync();
+        robot.startIntakingPixels.run();
         drive.followTrajectorySequence(intake);
 
         robot.tryIntakeTwoPixels.run();

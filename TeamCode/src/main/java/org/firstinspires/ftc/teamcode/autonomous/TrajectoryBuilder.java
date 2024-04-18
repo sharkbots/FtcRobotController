@@ -28,6 +28,7 @@ public class TrajectoryBuilder {
         this.config = config;
         this.c = coordinates;
         this.drive = drive;
+        this.robot = robot;
 
         trajectorySequenceLeft = computeTrajectory(PROP_LOCATIONS.LEFT);
 
@@ -160,13 +161,20 @@ public class TrajectoryBuilder {
                 goToBackdrop1Builder.setStartPose(finalTrajectory.get(finalTrajectory.size() - 1).end());
                 goToBackdrop1Builder
                         .lineTo(c.prepareToGoToStageDoor)
+                        .lineTo(c.prepareToGoToStageDoor2)
                         .splineTo(c.intermediateCyclePose.vec(), c.intermediateCyclePose.getHeading(), SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
-                                SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                        .addSpatialMarker((c.spatialMarkerGoToBackdrop), ()-> robot.autoOutTakeYellow.runAsync())
-                        .lineTo(c.backdropRight.vec());
+                                SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL));
+//                        .addSpatialMarker((c.spatialMarkerGoToBackdrop), ()-> robot.autoOutTakeYellow.runAsync())
+                        //.addTemporalMarker(3, ()-> robot.autoOutTakeYellow.runAsync())
+                        //.lineToLinearHeading(new Pose2d(35.0, 37.0, 180.0));
             }
             goToBackdrop1 = goToBackdrop1Builder.build();
             finalTrajectory.add(goToBackdrop1); // index 2 audience
+
+            TrajectorySequence audienceSideYellowDrop = drive.trajectorySequenceBuilder(finalTrajectory.get(finalTrajectory.size() - 1).end())
+                    .lineToLinearHeading(backdropYellowCoordinate)
+                    .build();
+            finalTrajectory.add(audienceSideYellowDrop); // index 3 audience
         }
 
 
