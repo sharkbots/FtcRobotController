@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.autonomous;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
+import org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequenceBuilder;
@@ -160,12 +161,11 @@ public class TrajectoryBuilder {
                 goToBackdrop1Builder
                         .lineToLinearHeading(c.prepareToGoToStageDoor)
                         .lineToLinearHeading(c.prepareToGoToStageDoor2)
-                        .lineToLinearHeading(c.intermediateCyclePose)
-                        .addTemporalMarker(2, ()-> robot.autoOutTakeYellow.runAsync())
-                        .lineToLinearHeading(c.prepareToGoToBackdropCycle);
-                        //.splineTo(c.intermediateCyclePose.vec(), c.intermediateCyclePose.getHeading(), SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
-                                //SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL));
-                        //.addSpatialMarker((c.spatialMarkerGoToBackdrop), ()-> robot.autoOutTakeYellow.runAsync())
+                        .splineTo(c.intermediateCyclePose.vec(), c.intermediateCyclePose.getHeading(), SampleMecanumDrive.getVelocityConstraint(30, 30, DriveConstants.TRACK_WIDTH),
+                                SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+//                        .addSpatialMarker((c.spatialMarkerGoToBackdrop), ()-> robot.autoOutTakeYellow.runAsync())
+                        .addTemporalMarker(3, ()-> robot.autoOutTakeYellow.runAsync())
+                        .lineToLinearHeading(c.prepareToGoToBackdrop);
             }
             goToBackdrop1 = goToBackdrop1Builder.build();
             finalTrajectory.add(goToBackdrop1); // index 2 audience

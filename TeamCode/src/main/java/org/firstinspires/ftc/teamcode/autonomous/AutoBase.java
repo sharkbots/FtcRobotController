@@ -91,10 +91,10 @@ public class AutoBase extends LinearOpMode {
         Pose2d rightTeamProp = new Pose2d(9, 32, Math.toRadians(0.00));
 
         // vectors to set up for backdrop
-        Pose2d prepareToGoToStageDoor = new Pose2d(-38.78, 8.00, Math.toRadians(180));
-        Pose2d prepareToGoToStageDoor2 = new Pose2d(-12, 8.00, Math.toRadians(180.0));
-        Pose2d intermediateCyclePose = new Pose2d(37.0, 8.00, Math.toRadians(180.0));
-        Pose2d prepareToGoToBackdropCycle = new Pose2d(37.0, 35.0, Math.toRadians(180.0));
+        Pose2d prepareToGoToStageDoor = new Pose2d(-38.78, 10.00, Math.toRadians(180));
+        Pose2d prepareToGoToStageDoor2 = new Pose2d(-12, 8.00, Math.toRadians(180));
+        Pose2d intermediateCyclePose = new Pose2d(35, 12, Math.toRadians(180.0));
+        Pose2d prepareToGoToBackdrop = new Pose2d(35.0, 37.0, Math.toRadians(180.0));
         Vector2d spatialMarkerGoToBackdrop = new Vector2d(12, 11);
 
         // near side
@@ -223,7 +223,7 @@ public class AutoBase extends LinearOpMode {
                 prepareToGoToStageDoor = flipAcrossX(prepareToGoToStageDoor);
                 prepareToGoToStageDoor2 = flipAcrossX(prepareToGoToStageDoor2);
                 intermediateCyclePose = flipAcrossX(intermediateCyclePose);
-                prepareToGoToBackdropCycle = flipAcrossX(prepareToGoToBackdropCycle);
+                prepareToGoToBackdrop = flipAcrossX(prepareToGoToBackdrop);
                 spatialMarkerGoToBackdrop = flipVectorAcrossX(spatialMarkerGoToBackdrop);
 
 
