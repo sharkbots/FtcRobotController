@@ -166,8 +166,8 @@ public class AutoBase extends LinearOpMode {
 
         Vector2d backdropSideRightPurpleCoordinateA = new Vector2d(12.00, 42.00);
         Pose2d backdropSideRightPurpleCoordinateB = new Pose2d(10.23, 33.81, Math.toRadians(0.00));
-        Vector2d backdropSideRightPurpleCoordinateC = new Vector2d(15.23, 33.81);
-        Pose2d backdropSideRightPurpleCoordinateD = new Pose2d(15.73, 33.81, Math.toRadians(180.0));
+        Vector2d backdropSideRightPurpleCoordinateC = new Vector2d(18.23, 33.81);
+        Pose2d backdropSideRightPurpleCoordinateD = new Pose2d(18.73, 33.81, Math.toRadians(180.0));
 
         Pose2d purpleToStackLeftControlPoint = new Pose2d(-36, 36);
 
@@ -452,12 +452,13 @@ public class AutoBase extends LinearOpMode {
 
         if(config.side == SIDE.AUDIENCE){
             intakeFromStack(finalTrajectory.get(1));
+            robot.wait(config.waitBackdrop1, TimeUnit.SECONDS);
             drive.followTrajectorySequence(finalTrajectory.get(2));
             dropOffPixelsFromCycle(finalTrajectory.get(3), apriltags);
         }
         else{
             setPoseUsingATags(apriltags);
-            robot.outTakeSetClawYawVertical.runAsync();
+            robot.autoOutTakeSetClawYawVertical.runAsync();
             dropOffPixelsFromBackdropPurple(finalTrajectory.get(1), apriltags);
         }
         drive.followTrajectorySequence(finalTrajectory.get((finalTrajectory.size())-1));
@@ -661,10 +662,11 @@ public class AutoBase extends LinearOpMode {
         robot.wait(500, TimeUnit.MILLISECONDS);
         drive.followTrajectorySequence(intake);
 
-        robot.tryIntakeTwoPixels.run();
+        //robot.tryIntakeTwoPixels.run();
+        Deadline intakeTimeout = new Deadline(3, TimeUnit.SECONDS);
+        intakeTimeout.reset();
 
-
-        while(!robot.intake.pixels.hasTwoPixels()) {
+        while(!robot.intake.pixels.hasTwoPixels() || !intakeTimeout.hasExpired()) {
             robot.intake.pixels.update();
         }
 

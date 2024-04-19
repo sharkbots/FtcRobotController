@@ -25,7 +25,7 @@ public class Lift {
         MAX(3600),
         AUTO_MIN_YELLOW(MIN.value - 100),
         AUTO_MIN_YELLOW_LOW(150),
-        AUTO_MIN_YELLOW_HIGH(MIN.value + 800);
+        AUTO_MIN_YELLOW_HIGH(MIN.value + 200);
 
         private final int value;
 

@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.tools;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.Claw;
@@ -92,6 +91,19 @@ public class Robot {
                 .add(intakeActionBuilder.startIntakeMotorWithNoEncoder(1));
 
         holdPixels = new Actions()
+                .add(intakeActionBuilder.setFlipperServoPosition(Intake.FlipperPosition.UP))
+                .add(DeadlineAction.waitFor(150, TimeUnit.MILLISECONDS))
+                .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE))
+                .add(DeadlineAction.waitFor(500, TimeUnit.MILLISECONDS))
+                .add(intakeActionBuilder.setLEDMode(PixelsDetection.LEDMode.SOLID))
+                .add(intakeActionBuilder.startIntakeMotorWithNoEncoder(-1))
+                .add(clawActionBuilder.setPitchPosition(Claw.pitchPositions.INTAKE))
+                .add(DeadlineAction.waitFor(150, TimeUnit.MILLISECONDS))
+                .add(liftActionBuilder.setLiftMotorPositionWithPower(Lift.Position.HOLDING_TELEOP, 1))
+                .add(DeadlineAction.waitFor(100, TimeUnit.MILLISECONDS))
+                .add(intakeActionBuilder.stopIntakeMotor());
+
+        holdOnePixel = new Actions()
                 .add(intakeActionBuilder.setFlipperServoPosition(Intake.FlipperPosition.UP))
                 .add(DeadlineAction.waitFor(150, TimeUnit.MILLISECONDS))
                 .add(clawActionBuilder.setGripPosition(Claw.gripPositions.CLOSE))
@@ -201,8 +213,8 @@ public class Robot {
                 .add(outTake)
                 .add(clawActionBuilder.setYawPosition(Claw.yawPositions.RIGHT_SLANT_UP));
 
-        outTakeSetClawYawVertical = new Actions()
-                .add(outTake)
+        autoOutTakeSetClawYawVertical = new Actions()
+                .add(autoOutTakeYellowHigh)
                 .add(clawActionBuilder.setYawPosition(Claw.yawPositions.RESET));
     }
 
@@ -274,12 +286,12 @@ public class Robot {
     public Actions empty;
 
     //TeleOp Actions
-    public Actions startIntakingPixels, holdPixels, holdingPixelsToIntakingPixels,
+    public Actions startIntakingPixels, holdPixels, holdOnePixel, holdingPixelsToIntakingPixels,
             holdingPixelsToIdle, idleToHoldingPixels, outTake, outTake22, resetOutTake;
 
     //Autonomous Actions
     public Actions tryIntakeOnePixel, tryIntakeTwoPixels, intakeOn, autoHoldOnePixel, autoOutTakeYellow, autoOutTakeYellowHigh, autoOutTakeYellowLow, autonomousOpenClawYellow,
-            openClaw, closeClaw, outTakeSetClawYawLeftHorizontal, outTakeSetClawYawRightHorizontal, outTakeSetClawYawRightSlantedUp, outTakeSetClawYawVertical;
+            openClaw, closeClaw, outTakeSetClawYawLeftHorizontal, outTakeSetClawYawRightHorizontal, outTakeSetClawYawRightSlantedUp, autoOutTakeSetClawYawVertical;
 
 
     public static OverrideMotor intakeMotor;
