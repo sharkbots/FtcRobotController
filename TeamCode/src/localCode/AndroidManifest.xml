@@ -8,9 +8,12 @@
 
     <application
         android:name=".MyApplication"
-        tools:replace="android:name">
+        tools:replace="android:name, android:theme"
+        android:theme="@style/AppTheme"
+        >
         <activity
             android:name=".MainActivity"
+            android:theme="@style/AppTheme"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
