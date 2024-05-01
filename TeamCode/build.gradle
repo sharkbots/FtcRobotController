@@ -26,6 +26,21 @@ android {
          'tflite'
     }
 
+    flavorDimensions "version"
+    productFlavors {
+        localCode {
+            dimension "version"
+            applicationIdSuffix ".localcode"
+            versionNameSuffix "-local"
+        }
+        teamCode {
+            dimension "version"
+            //applicationIdSuffix ".teamcode"
+            //versionNameSuffix "-team"
+        }
+    }
+
+
     defaultConfig {
         minSdkVersion 24
         //noinspection ExpiredTargetSdkVersion
