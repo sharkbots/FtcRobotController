@@ -7,9 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.aprilTags.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.tools.AutoDataStorage;
 import org.firstinspires.ftc.teamcode.tools.Global;
-import org.firstinspires.ftc.teamcode.tools.JudgingRobot;
-import org.firstinspires.ftc.teamcode.tools.Robot;
-import org.firstinspires.ftc.teamcode.tools.SetDriveMotors;
 
 @TeleOp(name = "Judging Session", group = "Testing")
 public class JudgingSession extends LinearOpMode {

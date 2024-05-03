@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.tools.Buttons;
 import org.firstinspires.ftc.teamcode.tools.PIXEL_COLOR;
 import org.firstinspires.ftc.teamcode.tools.PixelsDetection;
-import org.firstinspires.ftc.teamcode.tools.Robot;
 import org.firstinspires.ftc.teamcode.tools.ServoActionManager;
 
 public class Claw {

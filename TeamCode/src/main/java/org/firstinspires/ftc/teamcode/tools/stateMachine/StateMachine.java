@@ -8,7 +8,7 @@ public class StateMachine {
 
     // Inner State class representing an individual state within the StateMachine
     public static class State {
-        private final ArrayList<Transition> transitions = new ArrayList<>(); // List of transitions from this state
+        final ArrayList<Transition> transitions = new ArrayList<>(); // List of transitions from this state
         private Transition currentTransition = null; // The transition that is currently being processed
         public String name; // Name identifier for the state
 
@@ -92,7 +92,7 @@ public class StateMachine {
         }
     }
 
-    private final ArrayList<State> states = new ArrayList<>(); // List of all states in the state machine
+    final ArrayList<State> states = new ArrayList<>(); // List of all states in the state machine
     public State currentState = null; // The state machine's current state
 
     // Method to add a new state to the state machine

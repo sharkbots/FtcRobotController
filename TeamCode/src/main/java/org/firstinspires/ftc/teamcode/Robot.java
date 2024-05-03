@@ -1,21 +1,20 @@
-package org.firstinspires.ftc.teamcode.tools;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
-import org.firstinspires.ftc.teamcode.Claw;
-import org.firstinspires.ftc.teamcode.Hanger;
-import org.firstinspires.ftc.teamcode.Intake;
-import org.firstinspires.ftc.teamcode.Lift;
-import org.firstinspires.ftc.teamcode.PlaneLauncher;
+import org.firstinspires.ftc.teamcode.tools.Buttons;
+import org.firstinspires.ftc.teamcode.tools.LEDRibbons;
+import org.firstinspires.ftc.teamcode.tools.OverrideMotor;
+import org.firstinspires.ftc.teamcode.tools.PixelsDetection;
 import org.firstinspires.ftc.teamcode.tools.stateMachine.Actions;
 import org.firstinspires.ftc.teamcode.tools.stateMachine.ClawActionBuilder;
+import org.firstinspires.ftc.teamcode.tools.stateMachine.DeadlineAction;
 import org.firstinspires.ftc.teamcode.tools.stateMachine.IntakeActionBuilder;
 import org.firstinspires.ftc.teamcode.tools.stateMachine.LiftActionBuilder;
 import org.firstinspires.ftc.teamcode.tools.stateMachine.StateMachine;
-import org.firstinspires.ftc.teamcode.tools.stateMachine.DeadlineAction;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
